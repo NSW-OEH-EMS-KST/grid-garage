@@ -9,6 +9,7 @@ from tools.geodata.display import DisplayGeodataTool
 from tools.geodata.search import SearchGeodataTool
 from tools.geodata.select import SelectGeodataTool
 from tools.geodata.describe import DescribeGeodataTool
+from tools.geodata.list_workspace_tables import ListWorkspaceTablesGeodataTool
 # feature tools
 from tools.feature.rasterise_by_table import RasteriseByTableTool
 from tools.feature.clip import ClipFeatureTool
@@ -51,7 +52,8 @@ class Toolbox(object):
                          DeleteGeodataTool,
                          ExtractParentDatasourceGeodataTool,
                          GenerateNamesGeodataTool,
-                         RenameDatasetsGeodataTool}
+                         RenameDatasetsGeodataTool,
+                         ListWorkspaceTablesGeodataTool}
 
         feature_tools = {RasteriseByTableTool,
                          ClipFeatureTool}

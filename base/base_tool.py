@@ -77,7 +77,6 @@ class BaseTool(object):
 
     def getParameterInfo(self):
         """Define parameter definitions"""
-        self.send_info("base getParameterInfo")
         return []
 
     def isLicensed(self):
@@ -134,13 +133,13 @@ class BaseTool(object):
     def get_parameter_names(self):
         return [p.name for p in self.arc_parameters]
 
-    def run_function_with_parameters_values(self, func):
-        func(self.get_parameter_dict())
-        return
+    # def run_function_with_parameters_values(self, func):
+    #     func(self.get_parameter_dict())
+    #     return
 
-    def run_function_with_parameters_objects(self, func):
-        func({p.name: p for p in self.arc_parameters})
-        return
+    # def run_function_with_parameters_objects(self, func):
+    #     func({p.name: p for p in self.arc_parameters})
+    #     return
 
     def iterate_function_on_tableview(self, func, parameter_name, key_names):
 
@@ -170,7 +169,7 @@ class BaseTool(object):
                 r = utils.make_tuple(r)
                 self.current_row = r
                 data = {k: v for k, v in zip(key_names, r)}
-                g = data.get("geodata", None)
+                g = data.get(key_names[0], None)  # convention: first key is geodata
                 self.current_geodata = g
                 func(data)
 
@@ -181,16 +180,12 @@ class BaseTool(object):
         multi_val = getattr(param, "multivalue", False)
 
         if param.datatype == "Table View":
-            raise ValueError("Table View not implemented, use 'iterate_function_on_tableview'")
+            raise ValueError("Function deprecation, use 'iterate_function_on_tableview'")
 
-        if multi_val:
-            rows = param.valueAsText.split(";")
-        else:
-            rows = [param.valueAsText]
+        rows = param.valueAsText.split(";") if multi_val else [param.valueAsText]
 
         if not rows:
-            self.send_info("No rows to process")
-            return
+            raise ValueError("No values to process.")
 
         # iterate
         total_items, count = len(rows), 0

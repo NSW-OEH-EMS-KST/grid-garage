@@ -16,7 +16,13 @@ class ClipRasterTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterating]
-        self.polygons = self.polygon_srs = self.rectangle = self.clipping_geometry = self.nodata = self.raster_format = self.maintain_extent = None
+        self.polygons = None
+        self.polygon_srs = None
+        self.rectangle = None
+        self.clipping_geometry = None
+        self.nodata = None
+        self.raster_format = None
+        self.maintain_extent = None
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("rectangle", "Rectangle", "GPExtent", "Required", False, "Input", None, "extent", None, None)
@@ -31,16 +37,9 @@ class ClipRasterTool(BaseTool):
 
     def initialise(self):
         p = self.get_parameter_dict()
-
         self.rectangle = p["rectangle"]
         self.polygons = p["polygon_ds"]
-
-        d = self.geodata.describe(self.polygons)
-        self.polygon_srs = d.get("dataset_spatialReference", "Unknown")
-
-        if "unknown" in self.points_srs.lower():
-            raise ValueError("Point dataset '{0}'has unknown spatial reference system ({1})".format(self.polygons, self.polygon_srs))
-
+        self.polygon_srs = self.geodata.get_srs(self.polygons, raise_unknown_error=True)
         self.clipping_geometry = "ClippingGeometry" if p["clipping_geometry"] else "NONE"
         self.nodata = p["no_data_val"]
         self.raster_format = "" if p["raster_format"].lower() == "esri grid" else '.' + p["raster_format"]
@@ -52,23 +51,10 @@ class ClipRasterTool(BaseTool):
         return
 
     def process(self, data):
-        self.send_info(data)
         ras = data["raster"]
-
-        if not self.geodata.exists(ras):
-            raise ValueError("'{0}' does not exist".format(ras))
-
-        if not self.geodata.is_rasterdataset(ras):
-            raise ValueError("'{0}' is not a raster dataset".format(ras))
-
-        d = self.geodata.describe(ras)
-        ras_srs = d.get("dataset_spatialReference", "Unknown")
-
-        if "unknown" in ras_srs.lower():
-            raise ValueError("Raster dataset '{0}' has an unknown spatial reference system".format(ras))
-
-        if self.clipping_geometry and ras_srs != self.polygon_srs:
-            raise ValueError("Spatial reference systems don't match ({0} != {1})\nCan't clip using geometry.".format(ras_srs, self.points_srs))
+        self.geodata.validate_geodata(ras, raster=True)
+        ras_srs = self.geodata.get_srs(ras, raise_unknown_error=True)
+        self.geodata.compare_srs(ras_srs, self.polygon_srs, raise_no_match_error=True, other_condition=(self.clipping_geometry != "NONE"))
 
         ras_out = self.geodata.make_raster_name(ras, self.results.output_workspace, self.raster_format)
         self.send_info("Clipping {0} -->> {1} ...".format(ras, ras_out))

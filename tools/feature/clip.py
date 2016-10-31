@@ -1,70 +1,58 @@
+
 from base.base_tool import BaseTool
 from base.class_decorators import geodata, results
 from base.method_decorators import input_output_table, input_tableview, parameter
 from arcpy import Clip_analysis
+from base.utils import split_up_filename, join_up_filename
 
 tool_settings = {"label": "Clip",
                  "description": "Clips...",
                  "can_run_background": "True",
                  "category": "Feature"}
 
-
+# "http://desktop.arcgis.com/en/arcmap/latest/tools/analysis-toolbox/clip.htm"
 @geodata
 @results
 class ClipFeatureTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)
+        self.clip_features = None
+        self.clip_srs = None
+        self.xy_tolerance = None
+        self.meta = None
         self.execution_list = [self.initialise, self.iterating]
-        self.polygons = None
-        # self.point_rows = None
-        self.polygons_srs = None
-        # self.result_dict = {}
 
     @input_tableview("feature_table", "Table of Features", False, ["feature:geodata:"])
-    @parameter("featureclass", "Select Polygon Feature Dataset", "DEFeatureClass", "Required", False, "Input", ["Polygon"], None, None, None)
+    @parameter("clip_features", "Clip Features", "DEFeatureClass", "Required", False, "Input", ["Polygon"], None, None, None)
+    @parameter("xy_tolerance", "XY Tolerance", "GPLinearUnit", "Optional", False, "Input", None, None, None, None)
     @input_output_table
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
 
     def initialise(self):
         pars = self.get_parameter_dict()
-        # self.send_info(pars)
-
-        self.polygons = pars.get("featureclass", [])
-
-        d = self.geodata.describe(self.points)
-        self.polygons_srs = d.get("dataset_spatialReference", "Unknown")
-        source = d.get("general_catalogPath", None)
-
-        if "unknown" in self.points_srs.lower():
-            self.send_warning("Polygon dataset '{0}'has unknown spatial reference system ({1})".format(source, self.polygons_srs))
-            exit(1)
+        self.clip_features = pars["clip_features"]
+        self.clip_srs = self.geodata.get_srs(geodata, raise_unknown_error=True)
+        self.xy_tolerance = pars["xy_tolerance"] if pars["xy_tolerance"] else "#"
 
     def iterating(self):
         self.iterate_function_on_tableview(self.process, "feature_table", ["geodata"])
         return
 
     def process(self, data):
-        self.send_info(data)
+        # self.send_info(data)
         fc = data["feature"]
-        if not self.geodata.exists(fc):
-            raise ValueError("'{0}' does not exist".format(fc))
-        if not self.geodata.is_featureclass(fc):
-            raise ValueError("'{0}' is not a feature class".format(fc))
+        self.geodata.validate_geodata(fc, vector=True)
+        fc_srs = self.geodata.get_srs(fc, raise_unknown_error=True)
+        self.geodata.compare_srs(fc_srs, self.clip_srs, raise_no_match_error=True)
 
-        d = self.geodata.describe(fc)
-        # r_base = d.get("general_baseName", "None")
-        fc_srs = d.get("dataset_spatialReference", "Unknown")
+        # parse input name, construct output name
+        fc_ws, fc_base, fc_name, fc_ext = split_up_filename(fc)
+        fc_out = join_up_filename(self.output_workspace, fc_name, ('shp', '')[self.output_workspace_type == "LocalDatabase"])
 
-        if "unknown" in fc_srs.lower():
-            raise ValueError("Feature class '{0}' has an unknown spatial reference system".format(fc))
-
-        if fc_srs != self.points_srs:  # hack!! needs doing properly
-            raise ValueError("Spatial reference systems do not match ({0} != {1})".format(fc_srs, self.points_srs))
-
-        fc_out = ""  # TODO
         self.send_info("Clipping {0} -->> {1} ...".format(fc, fc_out))
-        # Clip_analysis()  # TODO
+        Clip_analysis(fc, self.clip_features, fc_out, self.xy_tolerance)
 
+        self.results.add({"geodata": fc_out, "source_geodata": fc})
         return
 

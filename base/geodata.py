@@ -11,6 +11,31 @@ raster_formats = ["tif", "img", "Esri Grid"]
 resample_methods = ["NEAREST", "BILINEAR", "CUBIC", "MAJORITY"]
 
 
+class DoesNotExistError(ValueError):
+    def __init__(self, geodata):
+        super(DoesNotExistError, self).__init__("{0} does not exist".format(geodata))
+
+
+class NotRasterError(ValueError):
+    def __init__(self, geodata):
+        super(NotRasterError, self).__init__("{0} is not a raster dataset".format(geodata))
+
+
+class NotVectorError(ValueError):
+    def __init__(self, geodata):
+        super(NotVectorError, self).__init__("{0} is not a vector dataset".format(geodata))
+
+
+class UnknownSrsError(ValueError):
+    def __init__(self, geodata):
+        super(UnknownSrsError, self).__init__("Dataset '{0}' has an unknown spatial reference system".format(geodata))
+
+
+class UnmatchedSrsError(ValueError):
+    def __init__(self, srs1, srs2):
+        super(UnmatchedSrsError, self).__init__("Spatial references do not match '{0}' != '{1}".format(srs1, srs2))
+
+
 # these few functions are not made methods so that back-end modules can import them easily for use
 
 def table_conversion(in_rows, out_path, out_name):
@@ -58,14 +83,15 @@ def table_conversion(in_rows, out_path, out_name):
 
 
 def describe_arc(geodata):
+
+    if not geodata_exists(geodata):
+        raise DoesNotExistError(geodata)
+
     return arcpy.Describe(geodata)
 
 
 def is_local_gdb(workspace):
-    def workspace_type(ws):
-        return arcpy.Describe(ws).workspaceType
-    # refactored - no longer returns workspace
-    return workspace_type(workspace) == "LocalDatabase"
+    return describe_arc(workspace).workspaceType == "LocalDatabase"
 
 
 def get_search_cursor_rows(in_table, field_names, where_clause=None):
@@ -82,7 +108,10 @@ def get_search_cursor_rows(in_table, field_names, where_clause=None):
 
 
 def geodata_exists(geodata):
-    return arcpy.Exists(geodata)
+    if geodata:
+        return arcpy.Exists(geodata)
+    else:
+        return False
 
 
 # the main class that is attributed to the tool as 'geodata'
@@ -292,4 +321,31 @@ class GeodataUtils(object):
             raise ValueError("Datum transformation was not found for {0} (1) -> {2}".format(in_ds, cs_in.name, cs_out.name))
 
         return shortest
+
+    def get_srs(self, geodata, raise_unknown_error=False):
+        d = self.describe(geodata)
+        srs = d.get("dataset_spatialReference", "Unknown")
+
+        if "unknown" in srs.lower() and raise_unknown_error:
+            raise UnknownSrsError
+
+        return srs
+
+    def validate_geodata(self, geodata, exists=True, raster=False, vector=False):
+        if not geodata_exists(geodata):
+            raise DoesNotExistError(geodata)
+        if raster and not self.is_rasterdataset(geodata):
+            raise NotRasterError
+        if vector and not self.is_featureclass(geodata):
+            raise NotVectorError
+
+    def compare_srs(self, srs1, srs2, raise_no_match_error=False, other_condition=True):
+        if not other_condition:
+            return False
+        if srs1 == srs2:
+            return True
+        if raise_no_match_error:
+                raise UnmatchedSrsError(srs1, srs2)
+
+
 

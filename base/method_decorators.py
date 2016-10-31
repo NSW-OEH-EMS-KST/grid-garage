@@ -9,9 +9,12 @@ def parameter(name, display_name, data_type, parameter_type, multi_value, direct
 
     par = arcpy.Parameter(name=name, displayName=display_name, datatype=data_type, parameterType=parameter_type, multiValue=multi_value, direction=direction)
 
-    if value_list and data_type == "GPString":
-        par.filter.type = "ValueList"
-        par.filter.list = value_list
+    if value_list:  # and data_type == "GPString":
+        # print par.filter.type  # = "ValueList"
+        try:
+            par.filter.list = value_list
+        except:
+            pass
 
     if default_environment:
         par.defaultEnvironmentName = default_environment
@@ -50,7 +53,7 @@ def validate_parameter(name, display_name, data_type, parameter_type, multi_valu
     if parameter_type not in pt_list:
         raise ValueError("parameter_type must be in {0}\nGot {1}".format(pt_list, parameter_type))
     if parameter_type == "Derived" and direction != "Output":
-        raise ValueError("Derived parameter types must have direction set to 'Output'\nGot {0}".format(direction))
+        raise ValueError("Derived parameter types must have direction set to 'Output', not '{0}'".format(direction))
 
     if value_list and not isinstance(value_list, list):
         raise ValueError("value_list must be a list {0}".format(value_list))
@@ -310,7 +313,7 @@ def arc_parameter_datatype_list():
 
     x = arc_parameter_types_string.split("\n")[1:-1]  # remove leading + trailing blanks
     x = [v.split(",", 2) for v in x]  # split the csv into a list
-    return [k for n, k, d in x][1:] # list singly, remove the first (header)
+    return [k for n, k, d in x][1:]  # list singly, remove the first (header)
 
 
 def arc_environment_list():
