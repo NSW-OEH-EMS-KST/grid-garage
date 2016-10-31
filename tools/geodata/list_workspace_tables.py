@@ -35,7 +35,7 @@ class ListWorkspaceTablesGeodataTool(BaseTool):
         for f in found:
             f_ws, f_base, f_name, f_ext = split_up_filename(f)
             d = {"geodata": f, "table_name": f_base}
-            match = re.search(r'\d{8}_\d{8}', f_base)
+            match = re.search(r'\d{8}_\d{6}', f_base)
             d["date_time_ex_name"] = match.group(0) if match else None
             dic_list.append(d)
 
