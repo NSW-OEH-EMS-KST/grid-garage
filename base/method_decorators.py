@@ -1,6 +1,7 @@
 import arcpy
 import functools
-from base.geodata import raster_formats  # easy import for tools
+# import into here to allow easy import for tools
+from base.geodata import raster_formats, resample_methods, aggregation_methods, data_nodata, expand_trunc
 
 
 def parameter(name, display_name, data_type, parameter_type, multi_value, direction, value_list, default_environment, dependancy_list, default_value):
@@ -10,11 +11,17 @@ def parameter(name, display_name, data_type, parameter_type, multi_value, direct
     par = arcpy.Parameter(name=name, displayName=display_name, datatype=data_type, parameterType=parameter_type, multiValue=multi_value, direction=direction)
 
     if value_list:  # and data_type == "GPString":
-        # print par.filter.type  # = "ValueList"
-        try:
-            par.filter.list = value_list
-        except:
-            pass
+        if value_list[0] == "Range" and len(value_list) == 3:  # a range, probably need to extend this usage a bit in hindsight
+            try:
+                par.filter.type = "Range"
+                par.filter.list = value_list[1:3]
+            except:
+                pass
+        else:
+            try:
+                par.filter.list = value_list
+            except:
+                pass
 
     if default_environment:
         par.defaultEnvironmentName = default_environment

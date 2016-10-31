@@ -4,7 +4,7 @@ from base.method_decorators import input_tableview, input_output_table, paramete
 from arcpy import Clip_management
 
 tool_settings = {"label": "Clip",
-                 "description": "Clips raster datasets\n",
+                 "description": "Clips raster datasets",
                  "can_run_background": "True",
                  "category": "Raster"}
 

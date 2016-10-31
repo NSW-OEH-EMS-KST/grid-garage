@@ -7,8 +7,11 @@ from base.utils import split_up_filename
 arc_data_types = "Any,Container,Geo,FeatureDataset,FeatureClass,PlanarGraph,GeometricNetwork,Topology,Text,Table,RelationshipClass,RasterDataset,RasterBand,TIN,CadDrawing,RasterCatalog,Toolbox,Tool,NetworkDataset,Terrain,RepresentationClass,CadastralFabric,SchematicDataset,Locator"
 datatype_list = arc_data_types.split(",")
 
-raster_formats = ["tif", "img", "Esri Grid"]
+raster_formats = ["Esri Grid", "tif", "img"]
 resample_methods = ["NEAREST", "BILINEAR", "CUBIC", "MAJORITY"]
+aggregation_methods = ["SUM", "MEAN", "MAXIMUM", "MINIMUM", "MEDIAN"]
+data_nodata = ["DATA", "NODATA"]
+expand_trunc = ["EXPAND", "TRUNCATE"]
 
 
 class DoesNotExistError(ValueError):
