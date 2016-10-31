@@ -1,7 +1,7 @@
 import arcpy
 import functools
-# import into here to allow easy import for tools
-from base.geodata import raster_formats, resample_methods, aggregation_methods, data_nodata, expand_trunc
+# import here to allow easier import for tools
+from base.geodata import raster_formats, resample_methods, aggregation_methods, data_nodata, expand_trunc, stats_type
 
 
 def parameter(name, display_name, data_type, parameter_type, multi_value, direction, value_list, default_environment, dependancy_list, default_value):

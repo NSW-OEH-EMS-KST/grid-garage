@@ -12,6 +12,7 @@ resample_methods = ["NEAREST", "BILINEAR", "CUBIC", "MAJORITY"]
 aggregation_methods = ["SUM", "MEAN", "MAXIMUM", "MINIMUM", "MEDIAN"]
 data_nodata = ["DATA", "NODATA"]
 expand_trunc = ["EXPAND", "TRUNCATE"]
+stats_type = ["MEAN", "MAJORITY", "MAXIMUM", "MEDIAN", "MINIMUM", "RANGE", "STD", "SUM", "VARIETY"]
 
 
 class DoesNotExistError(ValueError):
@@ -151,6 +152,31 @@ class GeodataUtils(object):
             table_name = "{0}_{1}{2}".format(ras_name, count, ext)
         else:
             table_name = "{0}{1}".format(ras_name, ext)
+
+        if arcpy.Exists(table_name):
+            table_name = arcpy.CreateUniqueName(table_name, out_wspace)
+
+        return os.path.join(out_wspace, table_name)
+
+    @staticmethod
+    def make_table_name(like_name, out_wspace, ext='', count=None):
+        """ Tries to correctly name a raster per type and workspace.
+            Needs further testing.
+        """
+        _, __, tbl_name, tbl_ext = split_up_filename(like_name)
+
+        ext = ext.replace(".", "").replace("ESRI Grid", "")  # esrify a few things
+
+        if ext:
+            if is_local_gdb(out_wspace):
+                ext = ''
+            else:
+                ext = ("." + ext)
+
+        if count:
+            table_name = "{0}_{1}{2}".format(tbl_name, count, ext)
+        else:
+            table_name = "{0}{1}".format(tbl_name, ext)
 
         if arcpy.Exists(table_name):
             table_name = arcpy.CreateUniqueName(table_name, out_wspace)
