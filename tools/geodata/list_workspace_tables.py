@@ -1,0 +1,44 @@
+from base.base_tool import BaseTool
+from base.class_decorators import geodata, results
+from base.method_decorators import input_output_table, parameter
+from base.utils import split_up_filename
+import re
+
+tool_settings = {"label": "List Workspace Tables",
+                 "description": "List tables within a workspace",
+                 "can_run_background": False,
+                 "category": "Geodata"}
+
+
+@geodata
+@results
+class ListWorkspaceTablesGeodataTool(BaseTool):
+    def __init__(self):
+        BaseTool.__init__(self, tool_settings)
+        self.execution_list = [self.inspect]
+
+    @parameter("workspace", "Workspace to Inspect", "DEWorkspace", "Required", False, "Input", None, None, None, None)
+    @input_output_table
+    def getParameterInfo(self):
+        return BaseTool.getParameterInfo(self)
+
+    def inspect(self):
+        ws = self.get_parameter_by_name("workspace").valueAsText
+        self.send_info("Searching for tables in {0}".format(ws))
+        found = self.geodata.walk(ws, data_types="Table")
+        self.send_info(found)
+        if not found:
+            self.send_info("No tables were found")
+            return
+
+        dic_list = []
+        for f in found:
+            f_ws, f_base, f_name, f_ext = split_up_filename(f)
+            d = {"geodata": f, "table_name": f_base}
+            match = re.search(r'\d{8}_\d{8}', f_base)
+            d["date_time_ex_name"] = match.group(0) if match else None
+            dic_list.append(d)
+
+        self.send_info(dic_list)
+        self.send_info(self.results.add(dic_list))
+        return
