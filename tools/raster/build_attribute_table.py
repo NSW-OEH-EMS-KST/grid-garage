@@ -35,6 +35,7 @@ class BuildAttributeTableRasterTool(BaseTool):
         ras = data["raster"]
         self.geodata.validate_geodata(ras, raster=True)
 
+        self.send_info("Building attribute table for {0}...".format(ras))
         #  BuildRasterAttributeTable_management(in_raster, {overwrite})
         BuildRasterAttributeTable_management(ras, self.overwrite)
 
