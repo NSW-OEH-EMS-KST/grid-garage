@@ -33,10 +33,10 @@ class ZonalCountsRasterTool(BaseTool):
         self.zone_vals = p["zone_vals"]
 
     def iterate(self):
-        self.iterate_function_on_tableview(self.process, "raster_table", ["raster"])
+        self.iterate_function_on_tableview(self.count, "raster_table", ["raster"])
         return
 
-    def process(self, data):
+    def count(self, data):
         self.send_info(data)
         # self.add_result("TODO")
         return
