@@ -16,7 +16,8 @@ from tools.feature.clip import ClipFeatureTool
 # raster tools
 from tools.raster.aggregate import AggregateRasterTool
 from tools.raster.block_statistics import BlockStatisticsRasterTool
-from tools.raster.build_rat_calculate_statistics import BuildRatCalculateStatisticsTool
+from tools.raster.build_attribute_table import BuildAttributeTableRasterTool
+from tools.raster.calculate_statistics import CalculateStatisticsRasterTool
 from tools.raster.clip import ClipRasterTool
 from tools.raster.copy import CopyRasterTool
 from tools.raster.lookup_by_table import LookupByTableRasterTool
@@ -60,7 +61,8 @@ class Toolbox(object):
 
         raster_tools = {AggregateRasterTool,
                         BlockStatisticsRasterTool,
-                        BuildRatCalculateStatisticsTool,
+                        BuildAttributeTableRasterTool,
+                        CalculateStatisticsRasterTool,
                         ClipRasterTool,
                         CopyRasterTool,
                         LookupByTableRasterTool,
