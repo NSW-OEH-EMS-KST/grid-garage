@@ -35,5 +35,9 @@ class LookupByTableRasterTool(BaseTool):
             self.send_info("Looking up field {0} in {1} -->> {2}".format(f, ras, ras_out))
             out = Lookup(ras, f)
             out.save(ras_out)
+            self.results.add({"geodata": ras_out, "source_geodata": ras})
+
         return
+
+"http://desktop.arcgis.com/en/arcmap/latest/tools/spatial-analyst-toolbox/lookup.htm"
 

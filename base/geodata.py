@@ -17,15 +17,6 @@ pixel_type = ["1_BIT", "2_BIT", "4_BIT", "8_BIT_UNSIGNED", "8_BIT_SIGNED", "16_B
 raster_formats2 = ["TIFF", "IMAGINE Image", "BMP", "GIF", "PNG", "JPEG", "JPEG2000", "DTED", "Esri Grid","Esri BIL", "Esri BSQ", "Esri BIP", "ENVI,CRF", "MRF"]
 
 
-
-
-
-
-
-
-
-
-
 class DoesNotExistError(ValueError):
     def __init__(self, geodata):
         super(DoesNotExistError, self).__init__("{0} does not exist".format(geodata))
