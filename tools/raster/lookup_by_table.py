@@ -6,7 +6,7 @@ from arcpy.sa import Lookup
 tool_settings = {"label": "Lookup by Table",
                  "description": "Lookup by table..",
                  "can_run_background": "True",
-                 "category": "Raster TODO"}
+                 "category": "Raster"}
 
 
 @results
@@ -16,7 +16,7 @@ class LookupByTableRasterTool(BaseTool):
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
-    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:", "lookup fields:fields:"])
+    @input_tableview("raster_table", "Table for Rasters", False, ["lookup fields:fields:", "raster:geodata:"])
     @input_output_table
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)

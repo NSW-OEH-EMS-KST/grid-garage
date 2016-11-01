@@ -86,7 +86,7 @@ def validate_parameter(name, display_name, data_type, parameter_type, multi_valu
 
 def input_tableview(name, display_name, multi_value, required_fields):
     if not isinstance(required_fields, (list, tuple)):
-        raise ValueError("Required fields must be in a list ['x:y:z',...]")  # def-time
+        raise ValueError("Required fields must be in a list ['x:y:z', ...]")  # def-time
 
     # create parameter
     par = arcpy.Parameter(name=name,
@@ -115,6 +115,7 @@ def input_tableview(name, display_name, multi_value, required_fields):
             p.value = f_name
         p.parameterDependencies = [name]  # should be constant
         pars.append(p)
+        # pars.insert(i, p)
         i += 1
 
     def decorator(f):
