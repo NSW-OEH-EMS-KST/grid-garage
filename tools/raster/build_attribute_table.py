@@ -1,5 +1,5 @@
 from base.base_tool import BaseTool
-from base.class_decorators import results
+from base.class_decorators import results, geodata
 from base.method_decorators import input_tableview, input_output_table, parameter
 from arcpy import BuildRasterAttributeTable_management
 
@@ -10,6 +10,7 @@ tool_settings = {"label": "Build Attribute Table",
 
 
 @results
+@geodata
 class BuildAttributeTableRasterTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)

@@ -1,5 +1,5 @@
 from base.base_tool import BaseTool
-from base.class_decorators import results
+from base.class_decorators import results, geodata
 from base.method_decorators import input_tableview, input_output_table, parameter, stats_type, data_nodata
 from arcpy.sa import BlockStatistics
 
@@ -10,6 +10,7 @@ tool_settings = {"label": "Block Statistics",
 
 
 @results
+@geodata
 class BlockStatisticsRasterTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)

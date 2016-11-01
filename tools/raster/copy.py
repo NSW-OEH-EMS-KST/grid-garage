@@ -1,5 +1,5 @@
 from base.base_tool import BaseTool
-from base.class_decorators import results
+from base.class_decorators import results, geodata
 from base.method_decorators import input_tableview, input_output_table, parameter, raster_formats, pixel_type, raster_formats2
 from arcpy import CopyRaster_management
 
@@ -10,6 +10,7 @@ tool_settings = {"label": "Copy",
 
 
 @results
+@geodata
 class CopyRasterTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)
@@ -24,7 +25,6 @@ class CopyRasterTool(BaseTool):
         self.RGB_to_Colormap = None
         self.format = None
         self.transform = None
-        # self. = None
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("config_keyword", "Config Keyword", "GPString", "Optional", False, "Input", None, None, None, None)
