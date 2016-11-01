@@ -1,5 +1,5 @@
 from base.base_tool import BaseTool
-from base.class_decorators import results
+from base.class_decorators import results, geodata
 from base.method_decorators import input_tableview, input_output_table, parameter
 
 tool_settings = {"label": "Set NoData Value",
@@ -9,10 +9,11 @@ tool_settings = {"label": "Set NoData Value",
 
 
 @results
+@geodata
 class SetNodataValueRasterTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)
-        self.execution_list = [self.iterate]
+        self.execution_list = [self.initialise, self.iterate]
         self.ndv = None
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:none"])
