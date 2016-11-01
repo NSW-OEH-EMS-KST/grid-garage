@@ -27,10 +27,10 @@ class SetValueToNullRasterTool(BaseTool):
         self.val_to_null = p["val_to_null"]
 
     def iterate(self):
-        self.iterate_function_on_tableview(self.process, "raster_table", ["raster"])
+        self.iterate_function_on_tableview(self.set_null, "raster_table", ["raster"])
         return
 
-    def process(self, data):
+    def set_null(self, data):
         self.send_info(data)
         # TODO
         return

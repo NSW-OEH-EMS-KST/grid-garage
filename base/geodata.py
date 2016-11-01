@@ -15,7 +15,7 @@ expand_trunc = ["EXPAND", "TRUNCATE"]
 stats_type = ["MEAN", "MAJORITY", "MAXIMUM", "MEDIAN", "MINIMUM", "RANGE", "STD", "SUM", "VARIETY"]
 pixel_type = ["1_BIT", "2_BIT", "4_BIT", "8_BIT_UNSIGNED", "8_BIT_SIGNED", "16_BIT_UNSIGNED", "16_BIT_SIGNED", "32_BIT_UNSIGNED", "32_BIT_SIGNED", "32_BIT_FLOAT", "64_BIT"]
 raster_formats2 = ["TIFF", "IMAGINE Image", "BMP", "GIF", "PNG", "JPEG", "JPEG2000", "DTED", "Esri Grid","Esri BIL", "Esri BSQ", "Esri BIP", "ENVI,CRF", "MRF"]
-
+transform_methods = ["STANDARDISE", "STRETCH", "NORMALISE", "LOG", "SQUAREROOT", "INVERT"]
 
 class DoesNotExistError(ValueError):
     def __init__(self, geodata):
