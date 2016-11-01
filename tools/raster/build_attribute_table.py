@@ -3,10 +3,10 @@ from base.class_decorators import results
 from base.method_decorators import input_tableview, input_output_table, parameter
 from arcpy import BuildRasterAttributeTable_management
 
-tool_settings = {"label": "Build Attribute Tables & Calculate Statistics",
-                 "description": "Builds Attribute Tables for rasters and calculates band statistics",
+tool_settings = {"label": "Build Attribute Table",
+                 "description": "Builds attribute tables for rasters",
                  "can_run_background": "True",
-                 "category": "Raster TODO"}
+                 "category": "Raster"}
 
 
 @results
@@ -17,7 +17,7 @@ class BuildAttributeTableRasterTool(BaseTool):
         self.overwrite = None
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
-    @parameter("overwrite", "Overwrite existing table", "GPBoolean", "Required", False, "Input", None, None, None)
+    @parameter("overwrite", "Overwrite existing table", "GPBoolean", "Required", False, "Input", None, None, None, None)
     @input_output_table
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
@@ -34,8 +34,10 @@ class BuildAttributeTableRasterTool(BaseTool):
         self.send_info(data)
         ras = data["raster"]
         self.geodata.validate_geodata(ras, raster=True)
+
         #  BuildRasterAttributeTable_management(in_raster, {overwrite})
         BuildRasterAttributeTable_management(ras, self.overwrite)
+
         self.results.add({"geodata": ras, "attribute_table": "built"})
         return
 
