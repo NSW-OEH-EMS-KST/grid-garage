@@ -49,7 +49,7 @@ class ReclassByTableRasterTool(BaseTool):
         self.geodata.validate_geodata(ras, raster=True)
 
         ras_out = self.geodata.make_raster_name(ras, self.results.output_workspace, self.raster_format)
-        self.send_info("Reclassifying {0} -->> {1} ...".format(ras, ras_out))
+        self.send_info("Reclassifying {0} -->> {1}...".format(ras, ras_out))
         ReclassByTable_3d(ras, self.in_remap_table, self.from_value_field, self.to_value_field, self.output_value_field, ras_out, self.missing_values)
 
         self.results.add({"geodata": ras_out, "source_geodata": ras})

@@ -16,7 +16,7 @@ class LookupByTableRasterTool(BaseTool):
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
-    @input_tableview("raster_table", "Table for Rasters", False, ["lookup fields:fields:", "raster:geodata:"])
+    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @input_output_table
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
