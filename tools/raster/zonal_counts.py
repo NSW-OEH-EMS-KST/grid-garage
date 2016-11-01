@@ -5,7 +5,7 @@ from base.method_decorators import input_tableview, input_output_table, paramete
 tool_settings = {"label": "Zonal Counts",
                  "description": "Zonal counts...",
                  "can_run_background": "True",
-                 "category": "Raster TODO"}
+                 "category": "Raster"}
 
 
 @results
