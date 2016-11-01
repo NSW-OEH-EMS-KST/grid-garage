@@ -6,7 +6,7 @@ from arcpy import Resample_management
 tool_settings = {"label": "Resample",
                  "description": "Resample rasters...",
                  "can_run_background": "True",
-                 "category": "Raster TODO"}
+                 "category": "Raster"}
 
 
 @results
