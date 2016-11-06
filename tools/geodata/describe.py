@@ -16,7 +16,7 @@ class DescribeGeodataTool(BaseTool):
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterating]
 
-    @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:none"])
+    @input_tableview("geodata_table", "Table for Geodata", False, ["geodata:geodata:none"])
     @input_output_table
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
