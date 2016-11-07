@@ -65,10 +65,11 @@ class ResultsUtils(object):
 
         # here we will just store the keys from the first result,
         # re-using these will force an error for any inconsistency
-        if not hasattr(self, "result_fieldnames"):  # flags the first result call, so we will add it now
+        # write the header on first call
+        if not os.path.isfile(self.result_csv):
             setattr(self, "result_fieldnames", result[0].keys() if is_tuple else result.keys())
             with open(self.result_csv, "wb") as csv_file:
-                writer = csv.DictWriter(csv_file, fieldnames=self.result_fieldnames)
+                writer = csv.DictWriter(csv_file, delimiter=',', lineterminator='\n', fieldnames=self.result_fieldnames)
                 writer.writeheader()
 
         # write the data
@@ -92,10 +93,10 @@ class ResultsUtils(object):
         err = str(e).strip()
 
         # write the header on first call
-        if not hasattr(self, "failure_fieldnames"):  # flags the first fail call, so we will add it now
+        if not os.path.isfile(self.fail_csv):
             setattr(self, "failure_fieldnames", ["geodata", "failure", "row_data"])
             with open(self.fail_csv, "wb") as csv_file:
-                writer = csv.DictWriter(csv_file, fieldnames=self.failure_fieldnames)
+                writer = csv.DictWriter(csv_file, delimiter=',', lineterminator='\n', fieldnames=self.failure_fieldnames)
                 writer.writeheader()
 
         # write the failure record
