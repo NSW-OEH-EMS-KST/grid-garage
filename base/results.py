@@ -32,7 +32,7 @@ class ResultsUtils(object):
         self.output_workspace_parent = os.path.split(self.output_workspace)[0]
 
         if self.output_workspace_type == "RemoteDatabase":
-            raise ValueError("Remote database workspaces ar not yet supported")
+            raise ValueError("Remote database workspaces are not yet supported")
 
         # if output is to a fgdb, put the csv into it's parent folder
         csv_ws = self.output_workspace_parent if self.output_workspace_type == "LocalDatabase" else self.output_workspace
@@ -67,12 +67,12 @@ class ResultsUtils(object):
         # re-using these will force an error for any inconsistency
         if not hasattr(self, "result_fieldnames"):  # flags the first result call, so we will add it now
             setattr(self, "result_fieldnames", result[0].keys() if is_tuple else result.keys())
-            with open(self.result_csv, "w") as csv_file:
+            with open(self.result_csv, "wb") as csv_file:
                 writer = csv.DictWriter(csv_file, fieldnames=self.result_fieldnames)
                 writer.writeheader()
 
         # write the data
-        with open(self.result_csv, "a") as csv_file:
+        with open(self.result_csv, "ab") as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames=self.result_fieldnames)
             if is_tuple:
                 writer.writerows(result)
@@ -94,12 +94,12 @@ class ResultsUtils(object):
         # write the header on first call
         if not hasattr(self, "failure_fieldnames"):  # flags the first fail call, so we will add it now
             setattr(self, "failure_fieldnames", ["geodata", "failure", "row_data"])
-            with open(self.fail_csv, "a") as csv_file:
+            with open(self.fail_csv, "wb") as csv_file:
                 writer = csv.DictWriter(csv_file, fieldnames=self.failure_fieldnames)
                 writer.writeheader()
 
         # write the failure record
-        with open(self.fail_csv, "a") as csv_file:
+        with open(self.fail_csv, "ab") as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames=self.failure_fieldnames)
             writer.writerow({"geodata": geodata, "failure": err, "row_data": str(row)})
             self.fail_count += 1
