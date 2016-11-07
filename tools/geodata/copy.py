@@ -5,7 +5,7 @@ from base.method_decorators import input_output_table, input_tableview
 tool_settings = {"label": "Copy",
                  "description": "Copies...",
                  "can_run_background": "True",
-                 "category": "Geodata"}
+                 "category": "Feature"}
 
 
 @geodata
