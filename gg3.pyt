@@ -49,7 +49,6 @@ class Toolbox(object):
                          SelectGeodataTool,
                          DisplayGeodataTool,
                          CompareExtentsGeodataTool,
-                         CopyGeodataTool,
                          DeleteGeodataTool,
                          ExtractParentDatasourceGeodataTool,
                          GenerateNamesGeodataTool,
@@ -57,6 +56,7 @@ class Toolbox(object):
                          ListWorkspaceTablesGeodataTool}
 
         feature_tools = {RasteriseByTableTool,
+                         CopyGeodataTool,
                          ClipFeatureTool}
 
         raster_tools = {AggregateRasterTool,
