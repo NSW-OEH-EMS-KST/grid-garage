@@ -10,7 +10,7 @@ tool_settings = {"label": "Copy",
 
 @geodata
 @results
-class CopyGeodataTool(BaseTool):
+class CopyFeatureTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterating]

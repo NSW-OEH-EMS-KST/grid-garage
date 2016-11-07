@@ -1,6 +1,5 @@
 # geodata tools
 from tools.geodata.compare_extents import CompareExtentsGeodataTool
-from tools.geodata.copy import CopyGeodataTool
 from tools.geodata.delete import DeleteGeodataTool
 from tools.geodata.extract_parent_datasources import ExtractParentDatasourceGeodataTool
 from tools.geodata.generate_names import GenerateNamesGeodataTool
@@ -12,6 +11,7 @@ from tools.geodata.describe import DescribeGeodataTool
 from tools.geodata.list_workspace_tables import ListWorkspaceTablesGeodataTool
 # feature tools
 from tools.feature.rasterise_by_table import RasteriseByTableTool
+from tools.feature.copy import CopyFeatureTool
 from tools.feature.clip import ClipFeatureTool
 # raster tools
 from tools.raster.aggregate import AggregateRasterTool
@@ -56,7 +56,7 @@ class Toolbox(object):
                          ListWorkspaceTablesGeodataTool}
 
         feature_tools = {RasteriseByTableTool,
-                         CopyGeodataTool,
+                         CopyFeatureTool,
                          ClipFeatureTool}
 
         raster_tools = {AggregateRasterTool,
