@@ -364,7 +364,11 @@ class GeodataUtils(object):
 
         return srs
 
-    def validate_geodata(self, geodata, exists=True, raster=False, vector=False):
+    def validate_geodata(self, geodata, raster=False, vector=False):
+        if not geodata:
+            raise ValueError("None object was passed in for geodata")
+        if not isinstance(geodata, basestring):
+            raise ValueError("A non-string was passed in for geodata")
         if not geodata_exists(geodata):
             raise DoesNotExistError(geodata)
         if raster and not self.is_raster(geodata):

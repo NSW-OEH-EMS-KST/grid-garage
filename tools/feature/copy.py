@@ -15,24 +15,30 @@ class CopyFeatureTool(BaseTool):
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterating]
 
-    @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
+    @input_tableview("features_table", "Table for Features", False, ["feature:geodata:"])
     @input_output_table
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
 
     def iterating(self):
-        self.iterate_function_on_tableview(self.process, "geodata_table", ["geodata"])
+        self.iterate_function_on_tableview(self.process, "features_table", ["feature"])
         return
 
     def process(self, data):
-        fc = data["geodata"]
+        self.send_info(data)
+        fc = data["feature"]
+        self.send_info(fc)
+        self.send_info("1")
         self.geodata.validate_geodata(fc, vector=True)
+        self.send_info("2")
 
         ws = self.results.output_workspace
         nfc = self.geodata.make_featureclass_name(fc, ws)
+        self.send_info("3")
 
         self.send_info('copying {0} --> {1}'.format(fc, nfc))
         self.geodata.copy_feature(fc, nfc)
+        self.send_info("4")
 
         self.results.add({'geodata': nfc, 'copied_from': fc})
         return

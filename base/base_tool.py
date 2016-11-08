@@ -6,11 +6,10 @@ Created on Thu Sep  1 10:48:26 2016
 """
 import utils
 import os
-import traceback
 import contextlib
 import ast
 from base.class_decorators import arcmap
-from base.geodata import get_search_cursor_rows, geodata_exists
+from base.geodata import get_search_cursor_rows
 
 
 @arcmap
@@ -50,15 +49,9 @@ class BaseTool(object):
         try:
             yield
         except Exception as e:
-            # self.send_info("error handling...")
-            # msg = traceback.format_exc()
-            # self.send_warning(msg)
             self.send_warning(str(e))
-            # self.send_warning(arcpy.GetMessages())
-            # TODO
-            # Need to log the extended stuff...
             if hasattr(self, "results"):
-                self.results.fail(self.current_geodata, str(e), self.current_row)
+                self.results.fail(self.current_geodata, e, self.current_row)
 
     @staticmethod
     def evaluate(node_or_string):
