@@ -29,7 +29,7 @@ class CopyFeatureTool(BaseTool):
         self.geodata.validate_geodata(fc, vector=True)
 
         ws = self.results.output_workspace
-        nfc = self.geodata.make_table_name(fc, ws)
+        nfc = self.geodata.make_featureclass_name(fc, ws)
 
         self.send_info('copying {0} --> {1}'.format(fc, nfc))
         self.geodata.copy_feature(fc, nfc)
