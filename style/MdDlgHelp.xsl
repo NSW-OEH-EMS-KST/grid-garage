@@ -22,7 +22,7 @@
 
 <xsl:variable name="Font">arial,verdana</xsl:variable>
 <xsl:variable name="Margin">0em 0em 0em 0em</xsl:variable>
-<xsl:variable name="BackgroundColor">Red</xsl:variable>
+<xsl:variable name="BackgroundColor">White</xsl:variable>
 <xsl:variable name="SmallFont">verdana,arial</xsl:variable>
 <xsl:variable name="SmallSize">7pt</xsl:variable>
 <xsl:variable name="SmallColor">Black</xsl:variable>
