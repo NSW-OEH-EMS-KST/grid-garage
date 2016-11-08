@@ -2,7 +2,7 @@
 from base.base_tool import BaseTool
 from base.class_decorators import geodata, results
 from base.method_decorators import input_output_table, input_tableview, parameter
-from arcpy import Clip_analysis
+from arcpy import Clip_analysis, ValidateTableName
 from base.utils import split_up_filename, join_up_filename
 
 tool_settings = {"label": "Clip",
@@ -47,7 +47,7 @@ class ClipFeatureTool(BaseTool):
 
         # parse input name, construct output name
         fc_ws, fc_base, fc_name, fc_ext = split_up_filename(fc)
-        fc_out = join_up_filename(self.results.output_workspace, fc_name, ('shp', '')[self.results.output_workspace_type == "LocalDatabase"])
+        fc_out = ValidateTableName(fc_name, self.results.output_workspace)
 
         self.send_info("Clipping {0} -->> {1} ...".format(fc, fc_out))
         Clip_analysis(fc, self.clip_features, fc_out, self.xy_tolerance)

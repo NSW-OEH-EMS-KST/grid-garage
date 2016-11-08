@@ -59,7 +59,7 @@ class ResultsUtils(object):
             pass
 
         if self.output_workspace_type == "LocalDatabase":
-            ret.append("Temporary Results initialised:\nTemp Result CSV @ {0}\nTemp Failure CSV @ {1}".format(self.result_csv, self).fail_csv)
+            ret.append("Temporary Results initialised:\nTemp Result CSV @ {0}\nTemp Failure CSV @ {1}".format(self.result_csv, self.fail_csv))
         else:
             ret.append("Results initialised:\nResult CSV @ {0}\nFailure CSV @ {1}".format(self.result_csv, self.fail_csv))
 

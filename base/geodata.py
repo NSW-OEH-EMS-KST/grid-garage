@@ -209,6 +209,8 @@ class GeodataUtils(object):
 
         if arcpy.Exists(table_name):
             table_name = arcpy.CreateUniqueName(table_name, out_wspace)
+        else:
+            table_name = arcpy.ValidateTableName(table_name, out_wspace)
 
         return os.path.join(out_wspace, table_name)
 
