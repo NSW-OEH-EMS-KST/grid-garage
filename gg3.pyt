@@ -1,5 +1,6 @@
 # geodata tools
 from tools.geodata.compare_extents import CompareExtentsGeodataTool
+from tools.geodata.copy import CopyGeodataTool
 from tools.geodata.delete import DeleteGeodataTool
 from tools.geodata.extract_parent_datasources import ExtractParentDatasourceGeodataTool
 from tools.geodata.generate_names import GenerateNamesGeodataTool
@@ -45,6 +46,7 @@ class Toolbox(object):
         self.alias = "GridGarage"
 
         geodata_tools = {SearchGeodataTool,
+                         CopyGeodataTool,
                          DescribeGeodataTool,
                          SelectGeodataTool,
                          DisplayGeodataTool,

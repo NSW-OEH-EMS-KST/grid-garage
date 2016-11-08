@@ -131,7 +131,8 @@ class GeodataUtils(object):
         self.datatype_list = datatype_list
         self.exists = geodata_exists
         self.rename = arcpy.Rename_management
-        self.copy = arcpy.Copy_management
+        self.copy_geodata = arcpy.Copy_management
+        self.copy_feature = arcpy.CopyFeatures_management
         self.delete = arcpy.Delete_management
         self.clip = arcpy.Clip_analysis
         return

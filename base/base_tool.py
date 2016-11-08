@@ -58,7 +58,7 @@ class BaseTool(object):
             # TODO
             # Need to log the extended stuff...
             if hasattr(self, "results"):
-                self.results.fail(self.current_geodata, e, self.current_row)
+                self.results.fail(self.current_geodata, str(e), self.current_row)
 
     @staticmethod
     def evaluate(node_or_string):
