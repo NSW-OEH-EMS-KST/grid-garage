@@ -116,6 +116,7 @@ class ResultsUtils(object):
         if self.output_workspace_type == "LocalDatabase":  # it's an fgdb
             try:
                 self.result_table = table_conversion(self.result_csv, self.output_workspace, self.result_table_name)
+                os.remove(self.result_csv)
             except:
                 self.result_table = os.path.join(self.output_workspace_parent, self.result_table_name + ".csv")
                 copyfile(self.result_csv, self.result_table)
@@ -135,6 +136,7 @@ class ResultsUtils(object):
         if self.output_workspace_type != "FileSystem":  # it's a a fgdb or rmdb
             try:
                 self.fail_table = table_conversion(self.fail_csv, self.output_workspace, self.fail_table_name)
+                os.remove(self.fail_csv)
             except:
                 self.fail_table = os.path.join(self.output_workspace_parent, self.fail_table_name + ".csv")
                 copyfile(self.fail_csv, self.fail_table)
