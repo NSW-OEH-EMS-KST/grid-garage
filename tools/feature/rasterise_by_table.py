@@ -36,7 +36,7 @@ class RasteriseByTableTool(BaseTool):
         if not self.geodata.exists(feat_ds):
             raise ValueError("'{0}' does not exist".format(feat_ds))
 
-        if not self.geodata.is_featureclass(feat_ds):
+        if not self.geodata.is_vector(feat_ds):
             raise ValueError("'{0}' is not a feature class".format(feat_ds))
 
         fields_string = data["fields"]

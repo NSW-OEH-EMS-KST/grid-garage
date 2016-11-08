@@ -13,14 +13,14 @@ tool_settings = {"label": "Copy",
 class CopyFeatureTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)
-        self.execution_list = [self.iterating]
+        self.execution_list = [self.iterate]
 
     @input_tableview("features_table", "Table for Features", False, ["feature:geodata:"])
     @input_output_table
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
 
-    def iterating(self):
+    def iterate(self):
         self.iterate_function_on_tableview(self.process, "features_table", ["feature"])
         return
 
