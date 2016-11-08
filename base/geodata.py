@@ -220,7 +220,7 @@ class GeodataUtils(object):
             return False
 
     @staticmethod
-    def is_rasterdataset(item):
+    def is_raster(item):
         d = arcpy.Describe(item)
         try:
             return d.dataType == "RasterDataset"
@@ -366,7 +366,7 @@ class GeodataUtils(object):
     def validate_geodata(self, geodata, exists=True, raster=False, vector=False):
         if not geodata_exists(geodata):
             raise DoesNotExistError(geodata)
-        if raster and not self.is_rasterdataset(geodata):
+        if raster and not self.is_raster(geodata):
             raise NotRasterError
         if vector and not self.is_featureclass(geodata):
             raise NotVectorError

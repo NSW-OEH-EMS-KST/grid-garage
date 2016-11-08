@@ -27,7 +27,7 @@ class CopyFeatureTool(BaseTool):
     def process(self, data):
         # self.send_info(data)
         gd = data["geodata"]
-        if self.geodata.is_raster_dataset(gd):
+        if self.geodata.is_raster(gd):
             raise ValueError("Use the CopyRasterTool to copy raster data.")
 
         ws = self.results.output_workspace

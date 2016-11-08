@@ -52,7 +52,7 @@ class ValuesAtPointsRasterTool(BaseTool):
         ras = data["raster"]
         if not self.geodata.exists(ras):
             raise ValueError("'{0}' does not exist".format(ras))
-        if not self.geodata.is_rasterdataset(ras):
+        if not self.geodata.is_raster(ras):
             raise ValueError("'{0}' is not a raster dataset".format(ras))
 
         d = self.geodata.describe(ras)
