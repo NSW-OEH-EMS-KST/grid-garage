@@ -90,7 +90,7 @@ class ResultsUtils(object):
         if not self.fail_csv:
             raise ValueError("Fail CSV is not set")
 
-        err = str(e).strip()
+        err = str(e).strip().replace('\n', '|').replace('\r', '')
 
         # write the header on first call
         if not os.path.isfile(self.fail_csv):

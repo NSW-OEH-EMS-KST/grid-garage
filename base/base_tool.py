@@ -49,7 +49,7 @@ class BaseTool(object):
         try:
             yield
         except Exception as e:
-            self.send_warning(str(e))
+            self.send_warning(e)
             if hasattr(self, "results"):
                 self.results.fail(self.current_geodata, e, self.current_row)
 
