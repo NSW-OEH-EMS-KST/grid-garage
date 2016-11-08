@@ -213,7 +213,7 @@ class GeodataUtils(object):
         return os.path.join(out_wspace, table_name)
 
     @staticmethod
-    def is_featureclass(item):
+    def is_vector(item):
         d = arcpy.Describe(item)
         try:
             return d.dataType == "FeatureClass"
@@ -366,15 +366,15 @@ class GeodataUtils(object):
 
     def validate_geodata(self, geodata, raster=False, vector=False):
         if not geodata:
-            raise ValueError("None object was passed in for geodata")
+            raise ValueError("None or empty object was passed as geodata argument")
         if not isinstance(geodata, basestring):
             raise ValueError("A non-string was passed in for geodata")
-        if not geodata_exists(geodata):
-            raise DoesNotExistError(geodata)
-        if raster and not self.is_raster(geodata):
-            raise NotRasterError
-        if vector and not self.is_featureclass(geodata):
-            raise NotVectorError
+        # if not geodata_exists(geodata):
+        #     raise DoesNotExistError(geodata)
+        # if raster and not self.is_raster(geodata):
+        #     raise NotRasterError
+        # if vector and not self.is_vector(geodata):
+        #     raise NotVectorError
 
     def compare_srs(self, srs1, srs2, raise_no_match_error=False, other_condition=True):
         if not other_condition:

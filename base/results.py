@@ -46,10 +46,24 @@ class ResultsUtils(object):
             self.result_csv = os.path.join(csv_ws, tn + ".csv")
             self.fail_csv = os.path.join(csv_ws, tn + "_FAIL.csv")
 
+        ret = []
+        try:
+            os.remove(self.result_csv)
+            ret.append("Existing results csv at {0} removed".format(self.result_csv))
+        except:
+            pass
+        try:
+            os.remove(self.fail_csv)
+            ret.append("Existing fail csv at {0} removed".format(self.fail_csv))
+        except:
+            pass
+
         if self.output_workspace_type == "LocalDatabase":
-            return "Temporary Results initialised:\nTemp Result CSV @ {0}\nTemp Failure CSV @ {1}".format(self.result_csv, self.fail_csv)
+            ret.append("Temporary Results initialised:\nTemp Result CSV @ {0}\nTemp Failure CSV @ {1}".format(self.result_csv, self).fail_csv)
         else:
-            return "Results initialised:\nResult CSV @ {0}\nFailure CSV @ {1}".format(self.result_csv, self.fail_csv)
+            ret.append("Results initialised:\nResult CSV @ {0}\nFailure CSV @ {1}".format(self.result_csv, self.fail_csv))
+
+        return "\n".join(ret)
 
     def add(self, result):
         # writes a result to the temp CSV immediately, trade off between

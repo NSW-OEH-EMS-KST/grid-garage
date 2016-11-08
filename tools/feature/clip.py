@@ -20,7 +20,7 @@ class ClipFeatureTool(BaseTool):
         self.clip_srs = None
         self.xy_tolerance = None
         self.meta = None
-        self.execution_list = [self.initialise, self.iterating]
+        self.execution_list = [self.initialise, self.iterate]
 
     @input_tableview("feature_table", "Table of Features", False, ["feature:geodata:"])
     @parameter("clip_features", "Clip Features", "DEFeatureClass", "Required", False, "Input", ["Polygon"], None, None, None)
@@ -32,15 +32,14 @@ class ClipFeatureTool(BaseTool):
     def initialise(self):
         pars = self.get_parameter_dict()
         self.clip_features = pars["clip_features"]
-        self.clip_srs = self.geodata.get_srs(geodata, raise_unknown_error=True)
+        self.clip_srs = self.geodata.get_srs(self.clip_features, raise_unknown_error=True)
         self.xy_tolerance = pars["xy_tolerance"] if pars["xy_tolerance"] else "#"
 
-    def iterating(self):
-        self.iterate_function_on_tableview(self.process, "feature_table", ["geodata"])
+    def iterate(self):
+        self.iterate_function_on_tableview(self.process, "feature_table", ["feature"])
         return
 
     def process(self, data):
-        # self.send_info(data)
         fc = data["feature"]
         self.geodata.validate_geodata(fc, vector=True)
         fc_srs = self.geodata.get_srs(fc, raise_unknown_error=True)
@@ -48,7 +47,7 @@ class ClipFeatureTool(BaseTool):
 
         # parse input name, construct output name
         fc_ws, fc_base, fc_name, fc_ext = split_up_filename(fc)
-        fc_out = join_up_filename(self.output_workspace, fc_name, ('shp', '')[self.output_workspace_type == "LocalDatabase"])
+        fc_out = join_up_filename(self.results.output_workspace, fc_name, ('shp', '')[self.results.output_workspace_type == "LocalDatabase"])
 
         self.send_info("Clipping {0} -->> {1} ...".format(fc, fc_out))
         Clip_analysis(fc, self.clip_features, fc_out, self.xy_tolerance)
