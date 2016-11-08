@@ -52,4 +52,6 @@ class BlockStatisticsRasterTool(BaseTool):
         self.results.add({"geodata": tbl_out, "source_geodata": ras})
         return
 
+
 "http://desktop.arcgis.com/en/arcmap/latest/tools/spatial-analyst-toolbox/block-statistics.htm"
+
