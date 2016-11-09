@@ -1,6 +1,6 @@
 from base.base_tool import BaseTool
 from base.class_decorators import results, geodata
-from base.method_decorators import input_tableview, input_output_table, parameter, stats_type, data_nodata
+from base.method_decorators import input_tableview, input_output_table, parameter, stats_type, data_nodata, raster_formats
 from arcpy.sa import BlockStatistics
 
 tool_settings = {"label": "Block Statistics",
@@ -24,6 +24,7 @@ class BlockStatisticsRasterTool(BaseTool):
     @parameter("neighbourhood", "Neighbourhood", "GPSANeighborhood", "Required", False, "Input", None, None, None, None)
     @parameter("statistics_type", "Statistics", "GPString", "Optional", False, "Input", stats_type, None, None, stats_type[0])
     @parameter("ignore_nodata", "No Data Treatment", "GPString", "Optional", False, "Input", data_nodata, None, None, data_nodata[0])
+    @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, raster_formats[0])
     @input_output_table
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
@@ -33,6 +34,7 @@ class BlockStatisticsRasterTool(BaseTool):
         self.neighbourhood = p["neighbourhood"]
         self.statistics_type = p["statistics_type"] if p["statistics_type"] else "#"
         self.ignore_nodata = p["ignore_nodata"] if p["ignore_nodata"] else "#"
+        self.raster_format = p["raster_format"]
 
     def iterate(self):
         self.iterate_function_on_tableview(self.block_statistics, "raster_table", ["raster"])
