@@ -3,7 +3,7 @@ from base.base_tool import BaseTool
 from base.class_decorators import geodata, results
 from base.method_decorators import input_output_table, input_tableview, parameter
 from arcpy import Clip_analysis, ValidateTableName
-from base.utils import split_up_filename, join_up_filename
+from base.utils import split_up_filename
 
 tool_settings = {"label": "Clip",
                  "description": "Clips...",
