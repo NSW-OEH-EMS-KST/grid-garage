@@ -45,11 +45,8 @@ class CalculateStatisticsRasterTool(BaseTool):
         return
 
     def calculate(self, data):
-        self.send_info(data)
         ras = data["raster"]
         self.geodata.validate_geodata(ras, raster=True)
-
-        # CalculateStatistics_management(in_raster_dataset, {x_skip_factor}, {y_skip_factor}, {ignore_values}, {skip_existing}, {area_of_interest})
         CalculateStatistics_management(ras, self.x_skip_factor, self.y_skip_factor, self.ignore_values, self.skip_existing, self.area_of_interest)
         return
 
