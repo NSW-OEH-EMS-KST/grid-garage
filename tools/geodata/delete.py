@@ -41,6 +41,6 @@ class DeleteGeodataTool(BaseTool):
         self.send_info('Deleting {0}'.format(gd))
         self.geodata.delete(gd)
 
-        self.results.add({'deleted_geodata': gd, 'at_utc': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]})
+        self.results.add({'deleted_geodata': gd, 'time-deleted': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]})
         return
 
