@@ -28,16 +28,14 @@ class BuildAttributeTableRasterTool(BaseTool):
         self.overwrite = "Overwrite" if p["overwrite"] else "NONE"
 
     def iterate(self):
-        self.iterate_function_on_parameter(self.build_rat, "raster_table", ["raster"])
+        self.iterate_function_on_tableview(self.build_rat, "raster_table", ["raster"])
         return
 
     def build_rat(self, data):
-        self.send_info(data)
         ras = data["raster"]
         self.geodata.validate_geodata(ras, raster=True)
 
         self.send_info("Building attribute table for {0}...".format(ras))
-        #  BuildRasterAttributeTable_management(in_raster, {overwrite})
         BuildRasterAttributeTable_management(ras, self.overwrite)
 
         self.results.add({"geodata": ras, "attribute_table": "built"})
