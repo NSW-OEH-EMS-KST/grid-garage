@@ -25,20 +25,14 @@ class CopyFeatureTool(BaseTool):
         return
 
     def process(self, data):
-        # self.send_info(data)
         fc = data["feature"]
-        # self.send_info(fc)
-        # self.send_info("1")
         self.geodata.validate_geodata(fc, vector=True)
-        # self.send_info("2")
 
         ws = self.results.output_workspace
         nfc = self.geodata.make_featureclass_name(fc, ws)
-        self.send_info("3")
 
         self.send_info('copying {0} --> {1}'.format(fc, nfc))
         self.geodata.copy_feature(fc, nfc)
-        self.send_info("4")
 
         self.results.add({'geodata': nfc, 'copied_from': fc})
         return
