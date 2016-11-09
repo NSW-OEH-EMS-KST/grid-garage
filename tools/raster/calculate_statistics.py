@@ -10,6 +10,7 @@ tool_settings = {"label": "Calculate Statistics",
 
 
 @results
+@geodata
 class CalculateStatisticsRasterTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)
