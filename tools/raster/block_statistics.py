@@ -31,7 +31,7 @@ class BlockStatisticsRasterTool(BaseTool):
     def initialise(self):
         p = self.get_parameter_dict()
         self.neighbourhood = p["neighbourhood"]
-        self.statistics_type = p["statistics_type"] if p["aggregation_type"] else "#"
+        self.statistics_type = p["statistics_type"] if p["statistics_type"] else "#"
         self.ignore_nodata = p["ignore_nodata"] if p["ignore_nodata"] else "#"
 
     def iterate(self):
@@ -45,7 +45,7 @@ class BlockStatisticsRasterTool(BaseTool):
 
         tbl_out = self.geodata.make_table_name(ras, self.results.output_workspace, self.raster_format)
         self.send_info("Calculating block statistics on {0}...".format(ras))
-        #  BlockStatistics(in_raster, {neighborhood}, {statistics_type}, {ignore_nodata})
+
         out = BlockStatistics(ras, self.neighbourhood, self.statistics_type, self.ignore_nodata)
         out.save(tbl_out)
 
