@@ -10,6 +10,7 @@ tool_settings = {"label": "Aggregate",
 
 
 @results
+@geodata
 class AggregateRasterTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)
