@@ -1,5 +1,5 @@
 from base.base_tool import BaseTool
-from base.class_decorators import results
+from base.class_decorators import results, geodata
 from base.method_decorators import input_tableview, input_output_table, parameter, raster_formats, aggregation_methods, data_nodata, expand_trunc
 from arcpy.sa import Aggregate
 
