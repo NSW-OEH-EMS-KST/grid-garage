@@ -28,7 +28,7 @@ class BuildAttributeTableRasterTool(BaseTool):
         self.overwrite = "Overwrite" if p["overwrite"] else "NONE"
 
     def iterate(self):
-        self.iterate_function_on_parameter(self.build_rat, "geodata_table", ["geodata"])
+        self.iterate_function_on_parameter(self.build_rat, "raster_table", ["raster"])
         return
 
     def build_rat(self, data):
