@@ -26,8 +26,8 @@ class ClipRasterTool(BaseTool):
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("rectangle", "Rectangle", "GPExtent", "Required", False, "Input", None, "extent", None, None)
-    @parameter("polygon_ds", "Polygon feature dataset to clip by", "DEFeatureClass", "Required", False, "Input", ["Polygon"], None, None, None)
-    @parameter("clipping_geometry", "Use features for clipping", "GPBoolean", "Required", False, "Input", None, None, None, None)
+    @parameter("polygon_ds", "Polygon feature dataset to clip by", "DEFeatureClass", "Optional", False, "Input", ["Polygon"], None, None, None)
+    @parameter("clipping_geometry", "Use features for clipping", "GPBoolean", "Optional", False, "Input", None, None, None, None)
     @parameter("no_data_val", "Value for 'NoData'", "GPString", "Required", False, "Input", None, "nodata", None, None)
     @parameter("maintain_extent", "Maintain clipping extent", "GPString", "Optional", False, "Input", ["MAINTAIN_EXTENT ", "NO_MAINTAIN_EXTENT"], None, None, None)
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)

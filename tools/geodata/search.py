@@ -27,7 +27,7 @@ class SearchGeodataTool(BaseTool):
         p = self.get_parameter_dict()
         gt = p.get("geodata_types", "")
         gt = gt.split(";")
-        self.send_info(gt)
+        # self.send_info(gt)
         self.geodata_types = gt
 
     def iterating(self):

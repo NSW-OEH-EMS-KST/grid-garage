@@ -175,7 +175,7 @@ class GeodataUtils(object):
             if is_local_gdb(out_wspace):
                 ext = ''
             else:
-                ext = ("." + ext)
+                ext = "." + ext
 
         if count:
             table_name = "{0}_{1}{2}".format(tbl_name, count, ext)
@@ -184,11 +184,13 @@ class GeodataUtils(object):
 
         if arcpy.Exists(table_name):
             table_name = arcpy.CreateUniqueName(table_name, out_wspace)
+        else:
+            table_name = arcpy.ValidateTableName(table_name, out_wspace)
 
         return os.path.join(out_wspace, table_name)
 
     @staticmethod
-    def make_featureclass_name(like_name, out_wspace, ext='', count=None):
+    def make_vector_name(like_name, out_wspace, ext='', count=None):
         """ Tries to correctly name a raster per type and workspace.
             Needs further testing.
         """
@@ -200,7 +202,7 @@ class GeodataUtils(object):
             if is_local_gdb(out_wspace):
                 ext = ''
             else:
-                ext = ("." + ext)
+                ext = "." + ext
 
         if count:
             table_name = "{0}_{1}{2}".format(gd_name, count, ext)
@@ -216,6 +218,9 @@ class GeodataUtils(object):
 
     @staticmethod
     def is_vector(item):
+        if not geodata_exists(item):
+            raise DoesNotExistError(item)
+
         d = arcpy.Describe(item)
         try:
             return d.dataType in ["FeatureClass", "ShapeFile"]
@@ -224,6 +229,9 @@ class GeodataUtils(object):
 
     @staticmethod
     def is_raster(item):
+        if not geodata_exists(item):
+            raise DoesNotExistError(item)
+
         d = arcpy.Describe(item)
         try:
             return d.dataType == "RasterDataset"

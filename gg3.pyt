@@ -4,7 +4,7 @@ from tools.geodata.copy import CopyGeodataTool
 from tools.geodata.delete import DeleteGeodataTool
 from tools.geodata.extract_parent_datasources import ExtractParentDatasourceGeodataTool
 from tools.geodata.generate_names import GenerateNamesGeodataTool
-from tools.geodata.rename_datasets import RenameDatasetsGeodataTool
+from tools.geodata.rename import RenameGeodataTool
 from tools.geodata.display import DisplayGeodataTool
 from tools.geodata.search import SearchGeodataTool
 from tools.geodata.select import SelectGeodataTool
@@ -54,7 +54,7 @@ class Toolbox(object):
                          DeleteGeodataTool,
                          ExtractParentDatasourceGeodataTool,
                          GenerateNamesGeodataTool,
-                         RenameDatasetsGeodataTool,
+                         RenameGeodataTool,
                          ListWorkspaceTablesGeodataTool}
 
         feature_tools = {RasteriseByTableTool,

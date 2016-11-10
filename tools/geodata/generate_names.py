@@ -80,7 +80,7 @@ class GenerateNamesGeodataTool(BaseTool):
         gd = data["geodata"]
 
         # get the current name elements
-        ws, old_base, old_name, old_ext = split_up_filename(gd)
+        old_ws, old_base, old_name, old_ext = split_up_filename(gd)
 
         # start with the current name
         new_name = old_name
@@ -91,12 +91,16 @@ class GenerateNamesGeodataTool(BaseTool):
 
         new_name = self.prefix + new_name if self.prefix else new_name
         new_name = new_name + self.suffix if self.suffix else new_name
-        new_name = new_name + old_ext if old_ext else new_name
 
-        new_full = join_up_filename(ws, new_name)
+        # get the new name elements for validation
+        new_ws, new_base, new_name, new_ext = split_up_filename(new_name)
+        if self.geodata.is_raster(gd):
+            new_full = self.geodata.make_raster_name(new_name, old_ws, old_ext)
+        elif self.geodata.is_vector(gd):
+            new_full = self.geodata.make_vector_name(new_name, old_ws, old_ext)
+        else:
+            new_full = join_up_filename(old_ws, new_name, old_ext)
 
         self.send_info("{0} -->> {1}".format(old_base, new_name))
-
-        # done
-        self.results.add({'geodata': gd, 'candidate_geodata': new_full, 'existing_base_name': old_base, 'candidate_base_name': new_name})
+        self.results.add({'geodata': gd, 'candidate_name': new_full, 'existing_base_name': old_base, 'candidate_base_name': new_base})
         return

@@ -146,6 +146,9 @@ class ResultsUtils(object):
         if not os.path.exists(self.fail_csv):
             return "No failures"
 
+        if not self.fail_count:
+            return "No failures"
+
         err_msg = ""
         if self.output_workspace_type != "FileSystem":  # it's a a fgdb or rmdb
             try:
@@ -155,7 +158,7 @@ class ResultsUtils(object):
                 self.fail_table = os.path.join(self.output_workspace_parent, self.fail_table_name + ".csv")
                 copyfile(self.fail_csv, self.fail_table)
                 os.remove(self.fail_csv)
-                err_msg = "Table to Table Conversion failed. Hoised temporary failure CSV to database parent directory...\n"
+                err_msg = "Table to Table Conversion failed. Hoisted temporary failure CSV to database parent directory...\n"
         else:
             self.fail_table = self.fail_csv
 

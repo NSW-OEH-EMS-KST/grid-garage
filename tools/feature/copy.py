@@ -46,7 +46,7 @@ class CopyFeatureTool(BaseTool):
 
         ws = self.results.output_workspace
         ex = splitext(fc)[1]
-        nfc = self.geodata.make_featureclass_name(fc, ws, ex)
+        nfc = self.geodata.make_vector_name(fc, ws, ex)
 
         self.send_info('copying {0} --> {1}'.format(fc, nfc))
         # CopyFeatures_management(in_features, out_feature_class, {config_keyword}, {spatial_grid_1}, {spatial_grid_2}, {spatial_grid_3})
