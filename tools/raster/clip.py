@@ -52,9 +52,9 @@ class ClipRasterTool(BaseTool):
         return
 
     def process(self, data):
-        self.send_info(data)
+        self.send_info("data " + str(data))
         ras = data["raster"]
-        self.send_info(ras)
+        self.send_info("ras " + str(ras))
         self.geodata.validate_geodata(ras, raster=True)
         ras_srs = self.geodata.get_srs(ras, raise_unknown_error=True)
         self.geodata.compare_srs(ras_srs, self.polygon_srs, raise_no_match_error=True, other_condition=(self.clipping_geometry != "NONE"))
