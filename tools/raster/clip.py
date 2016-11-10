@@ -1,5 +1,5 @@
 from base.base_tool import BaseTool
-from base.class_decorators import results
+from base.class_decorators import results, geodata
 from base.method_decorators import input_tableview, input_output_table, parameter, raster_formats
 from arcpy import Clip_management
 
@@ -12,6 +12,7 @@ tool_settings = {"label": "Clip",
     NO_MAINTAIN_EXTENT - Maintain the cell alignment as the input raster and adjust the output extent accordingly."""
 
 @results
+@geodata
 class ClipRasterTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)

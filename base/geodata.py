@@ -139,82 +139,48 @@ class GeodataUtils(object):
 
     @staticmethod
     def make_raster_name(like_name, out_wspace, ext='', count=None):
-        """ Tries to correctly name a raster per type and workspace.
-            Needs further testing.
-        """
-        _, __, ras_name, ras_ext = split_up_filename(like_name)
-
-        ext = ext.replace(".", "").replace("ESRI Grid", "")  # esrify a few things
-
-        if ext:
-            if is_local_gdb(out_wspace):
-                ext = ''
-            else:
-                ext = ("." + ext)
-
-        if count:
-            table_name = "{0}_{1}{2}".format(ras_name, count, ext)
-        else:
-            table_name = "{0}{1}".format(ras_name, ext)
-
-        if arcpy.Exists(table_name):
-            table_name = arcpy.CreateUniqueName(table_name, out_wspace)
-
-        return os.path.join(out_wspace, table_name)
-
-    @staticmethod
-    def make_table_name(like_name, out_wspace, ext='', count=None):
-        """ Tries to correctly name a raster per type and workspace.
-            Needs further testing.
-        """
-        _, __, tbl_name, tbl_ext = split_up_filename(like_name)
-
-        ext = ext.replace(".", "").replace("ESRI Grid", "")  # esrify a few things
-
-        if ext:
-            if is_local_gdb(out_wspace):
-                ext = ''
-            else:
-                ext = "." + ext
-
-        if count:
-            table_name = "{0}_{1}{2}".format(tbl_name, count, ext)
-        else:
-            table_name = "{0}{1}".format(tbl_name, ext)
-
-        if arcpy.Exists(table_name):
-            table_name = arcpy.CreateUniqueName(table_name, out_wspace)
-        else:
-            table_name = arcpy.ValidateTableName(table_name, out_wspace)
-
-        return os.path.join(out_wspace, table_name)
-
-    @staticmethod
-    def make_vector_name(like_name, out_wspace, ext='', count=None):
-        """ Tries to correctly name a raster per type and workspace.
-            Needs further testing.
-        """
         _, __, gd_name, gd_ext = split_up_filename(like_name)
 
-        ext = ext.replace(".", "")  # .replace("ESRI Grid", "")  # esrify a few things
+        ext = "" if is_local_gdb(out_wspace) or ext == "Esri Grid" else ext
+        ext = "." + ext if ext[0] != "." else ext
 
-        if ext:
-            if is_local_gdb(out_wspace):
-                ext = ''
-            else:
-                ext = "." + ext
-
-        if count:
-            table_name = "{0}_{1}{2}".format(gd_name, count, ext)
-        else:
-            table_name = "{0}{1}".format(gd_name, ext)
-
+        table_name = os.path.join(out_wspace, gd_name + ext)
         if arcpy.Exists(table_name):
-            table_name = arcpy.CreateUniqueName(table_name, out_wspace)
+            table_name = arcpy.CreateUniqueName(gd_name, out_wspace)
         else:
-            table_name = arcpy.ValidateTableName(table_name, out_wspace)
+            table_name = arcpy.ValidateTableName(gd_name, out_wspace)
 
-        return os.path.join(out_wspace, table_name)
+        return os.path.join(out_wspace, table_name + ext)
+
+    @staticmethod
+    def make_table_name(like_name, out_wspace, ext=''):
+        _, __, gd_name, gd_ext = split_up_filename(like_name)
+
+        ext = "" if is_local_gdb(out_wspace) else ext
+        ext = "." + ext if ext[0] != "." else ext
+
+        table_name = os.path.join(out_wspace, gd_name + ext)
+        if arcpy.Exists(table_name):
+            table_name = arcpy.CreateUniqueName(gd_name, out_wspace)
+        else:
+            table_name = arcpy.ValidateTableName(gd_name, out_wspace)
+
+        return os.path.join(out_wspace, table_name + ext)
+
+    @staticmethod
+    def make_vector_name(like_name, out_wspace, ext=''):
+        _, __, gd_name, gd_ext = split_up_filename(like_name)
+
+        ext = "" if is_local_gdb(out_wspace) else ext
+        ext = "." + ext if ext[0] != "." else ext
+
+        table_name = os.path.join(out_wspace, gd_name + ext)
+        if arcpy.Exists(table_name):
+            table_name = arcpy.CreateUniqueName(gd_name, out_wspace)
+        else:
+            table_name = arcpy.ValidateTableName(gd_name, out_wspace)
+
+        return os.path.join(out_wspace, table_name + ext)
 
     @staticmethod
     def is_vector(item):

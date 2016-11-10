@@ -101,6 +101,6 @@ class GenerateNamesGeodataTool(BaseTool):
         else:
             new_full = join_up_filename(old_ws, new_name, old_ext)
 
-        self.send_info("{0} -->> {1}".format(old_base, new_name))
+        self.send_info("{0} -->> {1}".format(gd, new_full))
         self.results.add({'geodata': gd, 'candidate_name': new_full, 'existing_base_name': old_base, 'candidate_base_name': new_base})
         return
