@@ -27,7 +27,7 @@ class ClipRasterTool(BaseTool):
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("rectangle", "Rectangle", "GPExtent", "Required", False, "Input", None, "extent", None, None)
-    @parameter("polygon_ds", "Polygon feature dataset to clip by", "DEFeatureClass", "Optional", False, "Input", ["Polygon"], None, None, None)
+    @parameter("polygon", "Polygon feature dataset to clip by", "DEFeatureClass", "Optional", False, "Input", ["Polygon"], None, None, None)
     @parameter("clipping_geometry", "Use features for clipping", "GPBoolean", "Optional", False, "Input", None, None, None, None)
     @parameter("no_data_val", "Value for 'NoData'", "GPString", "Required", False, "Input", None, "nodata", None, None)
     @parameter("maintain_extent", "Maintain clipping extent", "GPString", "Optional", False, "Input", ["MAINTAIN_EXTENT ", "NO_MAINTAIN_EXTENT"], None, None, None)
@@ -39,7 +39,7 @@ class ClipRasterTool(BaseTool):
     def initialise(self):
         p = self.get_parameter_dict()
         self.rectangle = p["rectangle"]
-        self.polygons = p["polygon_ds"]
+        self.polygons = p["polygon"]
         self.polygon_srs = self.geodata.get_srs(self.polygons, raise_unknown_error=True)
         self.clipping_geometry = "ClippingGeometry" if p["clipping_geometry"] else "NONE"
         self.nodata = p["no_data_val"]
@@ -52,7 +52,9 @@ class ClipRasterTool(BaseTool):
         return
 
     def process(self, data):
+        self.send_info(data)
         ras = data["raster"]
+        self.send_info(ras)
         self.geodata.validate_geodata(ras, raster=True)
         ras_srs = self.geodata.get_srs(ras, raise_unknown_error=True)
         self.geodata.compare_srs(ras_srs, self.polygon_srs, raise_no_match_error=True, other_condition=(self.clipping_geometry != "NONE"))
