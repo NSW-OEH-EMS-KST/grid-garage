@@ -32,8 +32,10 @@ class CopyGeodataTool(BaseTool):
         ngd = self.geodata.make_table_name(gd, ws, ex)
 
         self.send_info('copying {0} --> {1}'.format(gd, ngd))
+        # Copy_management(in_data, out_data, {data_type})
         self.geodata.copy_geodata(gd, ngd)
 
         self.results.add({'geodata': ngd, 'copied_from': gd})
         return
 
+"http://desktop.arcgis.com/en/arcmap/latest/tools/data-management-toolbox/copy.htm"
