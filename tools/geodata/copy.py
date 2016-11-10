@@ -1,6 +1,7 @@
 from base.base_tool import BaseTool
 from base.class_decorators import geodata, results
 from base.method_decorators import input_output_table, input_tableview
+from os.path import splitext
 
 tool_settings = {"label": "Copy",
                  "description": "Make a simple copy of geodata",
@@ -27,7 +28,8 @@ class CopyGeodataTool(BaseTool):
     def process(self, data):
         gd = data["geodata"]
         ws = self.results.output_workspace
-        ngd = self.geodata.make_table_name(gd, ws)
+        ex = splitext(gd)[1]
+        ngd = self.geodata.make_table_name(gd, ws, ex)
 
         self.send_info('copying {0} --> {1}'.format(gd, ngd))
         self.geodata.copy_geodata(gd, ngd)

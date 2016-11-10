@@ -1,6 +1,7 @@
 from base.base_tool import BaseTool
 from base.class_decorators import geodata, results
 from base.method_decorators import input_output_table, input_tableview
+from os.path import splitext
 
 tool_settings = {"label": "Copy",
                  "description": "Copies...",
@@ -29,7 +30,8 @@ class CopyFeatureTool(BaseTool):
         self.geodata.validate_geodata(fc, vector=True)
 
         ws = self.results.output_workspace
-        nfc = self.geodata.make_featureclass_name(fc, ws)
+        ex = splitext(fc)[1]
+        nfc = self.geodata.make_featureclass_name(fc, ws, ex)
 
         self.send_info('copying {0} --> {1}'.format(fc, nfc))
         self.geodata.copy_feature(fc, nfc)
