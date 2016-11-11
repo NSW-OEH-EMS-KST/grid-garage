@@ -2,6 +2,9 @@ from base.geodata import describe_arc, table_conversion
 from shutil import copyfile
 import os
 import csv
+import traceback
+import sys
+import arcpy
 
 
 class ResultsUtils(object):
@@ -98,14 +101,27 @@ class ResultsUtils(object):
 
         return "Result written: {0}".format(result)
 
-    def fail(self, geodata, e, row):
+    def fail(self, geodata, e, row, tool=None):
         # writes a fail to the temp CSV immediately, trade off between
         # runtime performance, RAM usage and failure (recovery of results)
         if not self.fail_csv:
             raise ValueError("Fail CSV is not set")
 
-        err = str(e).strip().replace('\n', '|').replace('\r', '')
+        tb = sys.exc_info()[2]
+        tbinfo = traceback.format_tb(tb)[0]
+        # Concatenate information together concerning the error into a message string
+        msg = "FAIL: " + tbinfo + str(sys.exc_info()[1])
+        # msgs = "ArcPy ERRORS:\n" + arcpy.GetMessages(2) + "\n"
+        # msg = pymsg + msgs
+        # self.warn()
+        if tool:
+            tool.send_warning(msg)
+        # arcpy.AddError(msgs)
 
+        # Print Python error messages for use in Python / Python Window
+        #
+        # print pymsg + "\n"
+        # print msgs
         # write the header on first call
         if not os.path.isfile(self.fail_csv):
             setattr(self, "failure_fieldnames", ["geodata", "failure", "row_data"])
@@ -113,10 +129,11 @@ class ResultsUtils(object):
                 writer = csv.DictWriter(csv_file, delimiter=',', lineterminator='\n', fieldnames=self.failure_fieldnames)
                 writer.writeheader()
 
+        msg = msg.strip().replace('\n', '|').replace('\r', '')
         # write the failure record
         with open(self.fail_csv, "ab") as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames=self.failure_fieldnames)
-            writer.writerow({"geodata": geodata, "failure": err, "row_data": str(row)})
+            writer.writerow({"geodata": geodata, "failure": msg, "row_data": str(row)})
             self.fail_count += 1
 
     def write(self):

@@ -126,14 +126,6 @@ class BaseTool(object):
     def get_parameter_names(self):
         return [p.name for p in self.arc_parameters]
 
-    # def run_function_with_parameters_values(self, func):
-    #     func(self.get_parameter_dict())
-    #     return
-
-    # def run_function_with_parameters_objects(self, func):
-    #     func({p.name: p for p in self.arc_parameters})
-    #     return
-
     def iterate_function_on_tableview(self, func, parameter_name, key_names):
 
         param = self.get_parameter_by_name(parameter_name)
