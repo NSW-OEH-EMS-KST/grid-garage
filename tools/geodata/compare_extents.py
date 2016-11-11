@@ -27,17 +27,11 @@ class CompareExtentsGeodataTool(BaseTool):
         return BaseTool.getParameterInfo(self)
 
     def initialise(self):
-        # p = self.get_parameter_dict(leave_as_object=["aoi_layer"])
         p = self.get_parameter_dict()
-        self.send_info(p)
         self.aoi_dataset = p['aoi_dataset']
-        d = Describe(self.aoi_dataset)
         self.aoi_extent = Describe(self.aoi_dataset).extent  # self.aoi_layer.getExtent(False)
         self.aoi_srs_name = self.aoi_extent.spatialReference.name
         self.aoi_extent_string = "{0} {1}".format(self.aoi_extent, self.aoi_srs_name)
-
-        self.send_info(self.aoi_extent)
-        self.send_info(self.aoi_extent_string)
 
     def iterate(self):
         self.iterate_function_on_tableview(self.process, "geodata_table", ["geodata"])
