@@ -18,18 +18,21 @@ class CompareExtentsGeodataTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
-        self.aoi_lyr = self.aoi_extent = self.aoi_srs_name = self.aoi_extent_string = None
+        self.aoi_dataset = self.aoi_extent = self.aoi_srs_name = self.aoi_extent_string = None
 
     @input_tableview("geodata_table", "Table for Geodata", False, ["geodata:geodata:"])
-    @parameter("aoi_layer", "Select dataset to compare with", ["DERasterDataset", "DEFeatureDataset"], "Required", False, "Input", ["Point"], None, None, None)
+    @parameter("aoi_dataset", "Dataset to compare with", ["DEFeatureClass", "DERasterDataset"], "Required", False, "Input", None, None, None, None)
     @input_output_table
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
 
     def initialise(self):
-        p = self.get_parameter_dict(leave_as_object=["aoi_layer"])
-        self.aoi_lyr = p['aoi_lyr']
-        self.aoi_extent = self.aoi_layer.getExtent(False)
+        # p = self.get_parameter_dict(leave_as_object=["aoi_layer"])
+        p = self.get_parameter_dict()
+        self.send_info(p)
+        self.aoi_dataset = p['aoi_dataset']
+        d = Describe(self.aoi_dataset)
+        self.aoi_extent = Describe(self.aoi_dataset).extent  # self.aoi_layer.getExtent(False)
         self.aoi_srs_name = self.aoi_extent.spatialReference.name
         self.aoi_extent_string = "{0} {1}".format(self.aoi_extent, self.aoi_srs_name)
 
@@ -47,8 +50,8 @@ class CompareExtentsGeodataTool(BaseTool):
 
         d = self.geodata.describe(ds_in)
         ds_srs = d.get("dataset_spatialReference", "Unknown")
-        if "unknown" in ds_srs.lower():
-            raise UnknownSrsError(ds_srs)
+        if not ds_srs or "unknown" in ds_srs.lower():
+            raise UnknownSrsError(ds_in)
 
         if ds_srs != self.aoi_srs_name:  # hack!! needs doing properly
             raise UnmatchedSrsError(ds_srs, self.aoi_srs_name)

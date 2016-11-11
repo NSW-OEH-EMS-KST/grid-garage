@@ -207,7 +207,7 @@ class GeodataUtils(object):
     @staticmethod
     def walk(workspace, data_types=None, types=None, followlinks=True):
         x = []
-        for root, dirs, files in arcpy.da.Walk(workspace, datatype=data_types, type=types, followlinks=followlinks):
+        for root, dirs, files in arcpy.da.Walk('"' + workspace + '"', datatype=data_types, type=types, followlinks=followlinks):
             for f in files:
                 x.append(os.path.join(root, f))
         return x

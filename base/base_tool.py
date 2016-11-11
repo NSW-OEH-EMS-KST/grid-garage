@@ -120,8 +120,7 @@ class BaseTool(object):
         return
 
     def get_parameter_dict(self, leave_as_object=()):
-        pd = {p.name: p if p.name in leave_as_object else p.valueAsText for p in self.arc_parameters}
-        return pd
+        return {p.name: p if p.name in leave_as_object else p.valueAsText for p in self.arc_parameters}
 
     def get_parameter_names(self):
         return [p.name for p in self.arc_parameters]
