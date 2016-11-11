@@ -15,15 +15,19 @@ tool_settings = {"label": "List Workspace Tables",
 class ListWorkspaceTablesGeodataTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)
-        self.execution_list = [self.inspect]
+        self.execution_list = [self.iterate]
 
-    @parameter("workspace", "Workspace to Inspect", "DEWorkspace", "Required", False, "Input", None, None, None, None)
+    @parameter("workspaces", "Workspaces", "DEWorkspace", "Required", True, "Input", None, None, None, None)
     @input_output_table
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
 
-    def inspect(self):
-        ws = self.get_parameter_by_name("workspace").valueAsText
+    def iterate(self):
+        self.iterate_function_on_parameter(self.list, "workspaces", ["workspace"])
+
+    def list(self, data):
+        # ws = self.get_parameter_by_name("workspace").valueAsText
+        ws = data["workspace"]
         self.send_info("Searching for tables in {0}".format(ws))
         found = self.geodata.walk(ws, data_types="Table")
         self.send_info(found)
