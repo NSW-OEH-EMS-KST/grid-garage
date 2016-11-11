@@ -16,7 +16,7 @@ tool_settings = {"label": "Clip",
 class ClipRasterTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)
-        self.execution_list = [self.initialise, self.iterating]
+        self.execution_list = [self.initialise, self.iterate]
         self.polygons = None
         self.polygon_srs = None
         self.rectangle = None
@@ -40,18 +40,18 @@ class ClipRasterTool(BaseTool):
         p = self.get_parameter_dict()
         self.rectangle = p["rectangle"]
         self.polygons = p["polygon"]
-        self.polygon_srs = self.geodata.get_srs(self.polygons, raise_unknown_error=True)
+        self.polygon_srs = self.geodata.get_srs(self.polygons, raise_unknown_error=True) if self.polygons else None
         self.clipping_geometry = "ClippingGeometry" if p["clipping_geometry"] else "NONE"
         self.nodata = p["no_data_val"]
         self.raster_format = "" if p["raster_format"].lower() == "esri grid" else '.' + p["raster_format"]
         self.maintain_extent = p["maintain_extent"]
         return
 
-    def iterating(self):
-        self.iterate_function_on_tableview(self.process, "raster_table", ["raster"])
+    def iterate(self):
+        self.iterate_function_on_tableview(self.clip, "raster_table", ["raster"])
         return
 
-    def process(self, data):
+    def clip(self, data):
         self.send_info("data " + str(data))
         ras = data["raster"]
         self.send_info("ras " + str(ras))
