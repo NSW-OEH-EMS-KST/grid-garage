@@ -40,7 +40,7 @@ class UnknownSrsError(ValueError):
 
 class UnmatchedSrsError(ValueError):
     def __init__(self, srs1, srs2):
-        super(UnmatchedSrsError, self).__init__("Spatial references do not match '{0}' != '{1}".format(srs1, srs2))
+        super(UnmatchedSrsError, self).__init__("Spatial references do not match '{0}' != '{1}'".format(srs1, srs2))
 
 
 # these few functions are not made methods so that back-end modules can import them easily for use
@@ -144,10 +144,10 @@ class GeodataUtils(object):
         ext = "" if is_local_gdb(out_wspace) or ext == "Esri Grid" else ext
         ext = "." + ext if (ext and ext[0] != ".") else ext
 
-        raster_name = os.path.join(out_wspace, r_name + suffix)
-        raster_name = arcpy.ValidateTableName(raster_name, out_wspace)
+        raster_name = arcpy.ValidateTableName(r_name + suffix, out_wspace)
+        raster_name_full = os.path.join(out_wspace, raster_name)
 
-        if arcpy.Exists(raster_name):
+        if arcpy.Exists(raster_name_full):
             raster_name = arcpy.CreateUniqueName(raster_name, out_wspace)
 
         return os.path.join(out_wspace, raster_name + ext)

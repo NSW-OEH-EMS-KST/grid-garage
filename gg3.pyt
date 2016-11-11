@@ -2,7 +2,7 @@
 from tools.geodata.compare_extents import CompareExtentsGeodataTool
 from tools.geodata.copy import CopyGeodataTool
 from tools.geodata.delete import DeleteGeodataTool
-from tools.geodata.extract_parent_datasources import ExtractParentDatasourceGeodataTool
+from tools.geodata.extract_parent import ExtractParentGeodataTool
 from tools.geodata.generate_names import GenerateNamesGeodataTool
 from tools.geodata.rename import RenameGeodataTool
 from tools.geodata.display import DisplayGeodataTool
@@ -52,7 +52,7 @@ class Toolbox(object):
                          DisplayGeodataTool,
                          CompareExtentsGeodataTool,
                          DeleteGeodataTool,
-                         ExtractParentDatasourceGeodataTool,
+                         ExtractParentGeodataTool,
                          GenerateNamesGeodataTool,
                          RenameGeodataTool,
                          ListWorkspaceTablesGeodataTool}

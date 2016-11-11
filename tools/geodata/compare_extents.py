@@ -2,7 +2,9 @@ from base.base_tool import BaseTool
 from base.class_decorators import geodata, results
 from base.method_decorators import input_output_table, input_tableview, parameter
 from collections import OrderedDict
-import arcpy
+from arcpy import Describe
+from base.geodata import DoesNotExistError, UnknownSrsError, UnmatchedSrsError
+
 
 tool_settings = {"label": "Compare Extents",
                  "description": "Compare Extents...",
@@ -15,10 +17,10 @@ tool_settings = {"label": "Compare Extents",
 class CompareExtentsGeodataTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)
-        self.execution_list = [self.iterating]
+        self.execution_list = [self.initialise, self.iterate]
         self.aoi_lyr = self.aoi_extent = self.aoi_srs_name = self.aoi_extent_string = None
 
-    @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
+    @input_tableview("geodata_table", "Table for Geodata", False, ["geodata:geodata:"])
     @parameter("aoi_layer", "Select dataset to compare with", ["DERasterDataset", "DEFeatureDataset"], "Required", False, "Input", ["Point"], None, None, None)
     @input_output_table
     def getParameterInfo(self):
@@ -28,33 +30,31 @@ class CompareExtentsGeodataTool(BaseTool):
         p = self.get_parameter_dict(leave_as_object=["aoi_layer"])
         self.aoi_lyr = p['aoi_lyr']
         self.aoi_extent = self.aoi_layer.getExtent(False)
-        self.aoi_extent_string = "{0} {1}".format(self.aoi_extent, self.aoi_extent.spatialReference.name)
+        self.aoi_srs_name = self.aoi_extent.spatialReference.name
+        self.aoi_extent_string = "{0} {1}".format(self.aoi_extent, self.aoi_srs_name)
 
         self.send_info(self.aoi_extent)
         self.send_info(self.aoi_extent_string)
 
-    def iterating(self):
+    def iterate(self):
         self.iterate_function_on_tableview(self.process, "geodata_table", ["geodata"])
         return
 
     def process(self, data):
-        self.send_info(data)
         ds_in = data["geodata"]
-
         if not self.geodata.exists(ds_in):
-            raise ValueError("'{0}' does not exist".format(ds_in))
+            raise DoesNotExistError(ds_in)
 
         d = self.geodata.describe(ds_in)
         ds_srs = d.get("dataset_spatialReference", "Unknown")
-
         if "unknown" in ds_srs.lower():
-            raise ValueError("Dataset '{0}' has an unknown spatial reference system".format(ds_srs))
+            raise UnknownSrsError(ds_srs)
 
         if ds_srs != self.aoi_srs_name:  # hack!! needs doing properly
-            raise ValueError("Spatial reference systems do not match ({0} != {1}\nUnable to compare extents)".format(ds_srs, self.aoi_srs_name))
+            raise UnmatchedSrsError(ds_srs, self.aoi_srs_name)
 
         try:
-            ds_extent = arcpy.Describe(ds_in).extent
+            ds_extent = Describe(ds_in).extent
         except:
             raise ValueError("Could not obtain extent from {0}".format(ds_in))
 
