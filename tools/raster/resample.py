@@ -19,7 +19,7 @@ class ResampleRasterTool(BaseTool):
         self.cell_size = None
         self.raster_format = None
 
-    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:none"])
+    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("resample_type", "Resampling Method", "GPString", "Required", False, "Input", resample_methods, "resamplingMethod", None, None)
     @parameter("cell_size", "Cell Size", "GPSACellSize", "Required", False, "Input", None, "cellSize", None, None)
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
@@ -32,18 +32,19 @@ class ResampleRasterTool(BaseTool):
         self.resample_type = p["resample_type"]
         self.cell_size = p["cell_size"]
         self.raster_format = p["raster_format"]
+        return
 
     def iterate(self):
-        self.iterate_function_on_tableview(self.resample, "geodata_table", ["geodata"])
+        self.iterate_function_on_tableview(self.resample, "raster_table", ["raster"])
         return
 
     def resample(self, data):
-        self.send_info(data)
         ras = data["raster"]
         self.geodata.validate_geodata(ras, raster=True)
         ras_out = self.geodata.make_raster_name(ras, self.results.output_workspace, self.raster_format)
+
         self.send_info("Resampling {0} -->> {1} ...".format(ras, ras_out))
-        Resample_management(ras, ras_out, self.cell_size, self.resampling_type)
+        Resample_management(ras, ras_out, self.cell_size, self.resample_type)
 
         self.results.add({"geodata": ras_out, "source_geodata": ras})
         return
