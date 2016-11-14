@@ -19,24 +19,22 @@ class ReprojectRasterTool(BaseTool):
         self.out_fmt = self.out_cs = self.cellsz = self.resamp = self.rego = None
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:none"])
-    @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @parameter("output_cs", "Output Coordinate System", "GPCoordinateSystem", "Required", False, "Input", None, "outputCoordinateSystem", None, None)
     @parameter("cell_size", "Cell Size", "GPSACellSize", "Required", False, "Input", None, "cellSize", None, None)
     @parameter("resample_type", "Resampling Method", "GPString", "Required", False, "Input", resample_methods, "resamplingMethod", None, None)
     @parameter("rego_point", "Registration Point", "GPPoint", "Optional", False, "Input", None, None, None, None)
+    @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
 
     def initialise(self):
         pd = self.get_parameter_dict()
-
         self.out_fmt = "" if pd['raster_format'].lower == 'esri grid' else pd["raster_format"]  # fix output extension
         self.out_cs = pd["output_cs"]
         self.cellsz = "#" if not pd["cell_size"] else pd['cell_size']
         self.resamp = "#" if not pd["resample_type"] else pd['resample_type']
         self.rego = "#" if not pd['rego_point'] else pd['rego_point']  # fix empty value for arcgis
-
         return
 
     def iterate(self):
