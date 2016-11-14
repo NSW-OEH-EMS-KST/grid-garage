@@ -52,7 +52,6 @@ class Toolbox(object):
                          DisplayGeodataTool,
                          CompareExtentsGeodataTool,
                          DeleteGeodataTool,
-                         # ExtractParentGeodataTool,
                          GenerateNamesGeodataTool,
                          RenameGeodataTool,
                          ListWorkspaceTablesGeodataTool}

@@ -1,6 +1,6 @@
 from base.base_tool import BaseTool
 from base.class_decorators import results, geodata
-from base.method_decorators import input_tableview, input_output_table, parameter, data_nodata
+from base.method_decorators import input_tableview, input_output_table, parameter, data_nodata, raster_formats
 from arcpy import ReclassByTable_3d
 
 tool_settings = {"label": "Reclass by Table",
@@ -14,19 +14,18 @@ tool_settings = {"label": "Reclass by Table",
 class ReclassByTableRasterTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)
-        self.execution_list = [self.iterate]
+        self.execution_list = [self.initialise, self.iterate]
         self.in_remap_table = None
         self.from_value_field = None
         self.to_value_field = None
         self.output_value_field = None
         self.missing_values = None
+        self.raster_format = None
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
-    @parameter("in_remap_table", "Remap Table", "DETable", "Required", False, "Input", None, None, ["from_value_field", "from_value_field", "output_value_field"], None)
-    @parameter("from_value_field", "From Value Field", "Field", "Required", False, "Input", None, None, None, None)
-    @parameter("to_value_field", "To Value Field", "Field", "Required", False, "Input", None, None, None, None)
-    @parameter("output_value_field", "Output Value Field", "Field", "Required", False, "Input", None, None, None, None)
+    @input_tableview("in_remap_table", "Remap Table", False, ["Output Value::", "To Value::", "From Value::"])
     @parameter("missing_values", "Missing value treatment", "GPString", "Optional", False, "Input", data_nodata, None, None, data_nodata[0])
+    @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, "Esri Grid")
     @input_output_table
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
@@ -34,10 +33,11 @@ class ReclassByTableRasterTool(BaseTool):
     def initialise(self):
         p = self.get_parameter_dict()
         self.in_remap_table = p["in_remap_table"]
-        self.from_value_field = p["from_value_field"]
-        self.to_value_field = p["to_value_field"]
-        self.output_value_field = p["output_value_field"]
+        self.from_value_field = p["in_remap_table_field_2"]
+        self.to_value_field = p["in_remap_table_field_1"]
+        self.output_value_field = p["in_remap_table_field_0"]
         self.missing_values = p["missing_values"] if p["missing_values"] else "#"
+        self.raster_format = "" if p["raster_format"].lower() == "esri grid" else '.' + p["raster_format"]
 
     def iterate(self):
         self.iterate_function_on_tableview(self.reclass, "raster_table", ["raster"])

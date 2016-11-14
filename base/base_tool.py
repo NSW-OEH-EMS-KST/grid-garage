@@ -139,7 +139,7 @@ class BaseTool(object):
 
         # map fields
         num_fields = len(key_names)                                                      # [rf1, rf2, ...]
-        f_names = ["field_{0}".format(i) for i in range(0, num_fields)]                  # [f_0, f_1, ...]
+        f_names = ["{0}_field_{1}".format(parameter_name, i) for i in range(0, num_fields)]                  # [f_0, f_1, ...]
         f_vals = [self.get_parameter_by_name(f_name).valueAsText for f_name in f_names]
 
         rows = get_search_cursor_rows(v, f_vals)

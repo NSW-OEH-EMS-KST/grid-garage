@@ -105,7 +105,7 @@ def input_tableview(name, display_name, multi_value, required_fields):
 
         f_alias, f_name, f_default = rf.split(":")
 
-        p = arcpy.Parameter(name="field_{0}".format(i),
+        p = arcpy.Parameter(name="{0}_field_{1}".format(name, i),
                             displayName="Field for {0}".format(f_alias),
                             datatype="Field",
                             parameterType="Required",
@@ -115,7 +115,6 @@ def input_tableview(name, display_name, multi_value, required_fields):
             p.value = f_name
         p.parameterDependencies = [name]  # should be constant
         pars.append(p)
-        # pars.insert(i, p)
         i += 1
 
     def decorator(f):
