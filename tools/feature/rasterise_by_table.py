@@ -19,9 +19,9 @@ class RasteriseByTableTool(BaseTool):
         self.execution_list = [self.iterating]
         return
 
-    @input_tableview("features_table", "Table of Features and Fields", False, ["feature:geodata:", "fields:fields:"])
-    @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
+    @input_tableview("features_table", "Table of Features and Fields", False, ["feature:geodata:", "fields:table_fields:"])
     @parameter("cell_size", "Cell Size", "GPSACellSize", "Required", False, "Input", None, "cellSize", None, None)
+    @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
