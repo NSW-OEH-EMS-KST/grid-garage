@@ -47,9 +47,6 @@ class CompareExtentsGeodataTool(BaseTool):
         if not ds_srs or "unknown" in ds_srs.lower():
             raise UnknownSrsError(ds_in)
 
-        if ds_srs != self.aoi_srs_name:  # hack!! needs doing properly
-            raise UnmatchedSrsError(ds_srs, self.aoi_srs_name)
-
         try:
             ds_extent = Describe(ds_in).extent
         except:
