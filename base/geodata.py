@@ -309,13 +309,12 @@ class GeodataUtils(object):
 
         cs_in = arcpy.Describe(in_ds).spatialReference
         if "unknown" in cs_in.name.lower():
-            s = "Dataset '{0}' has unknown spatial reference system)".format(in_ds)
-            raise ValueError(s)
+            raise UnknownSrsError(in_ds)
 
         cs_out = parse_proj_string_for_name(cs_out).strip("'")
-        if "unknown" in cs_out:
-            s = "Spatial reference system '{0}' has unknown qualities".format(cs_out)
-            raise ValueError(s)
+        # if "unknown" in cs_out:
+        #     s = "Spatial reference system '{0}' has unknown qualities".format(cs_out)
+        #     raise ValueError(s)
 
         if cs_in.name == cs_out:
             return "#"

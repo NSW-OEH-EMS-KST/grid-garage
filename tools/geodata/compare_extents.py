@@ -3,7 +3,7 @@ from base.class_decorators import geodata, results
 from base.method_decorators import input_output_table, input_tableview, parameter
 from collections import OrderedDict
 from arcpy import Describe
-from base.geodata import DoesNotExistError, UnknownSrsError, UnmatchedSrsError
+from base.geodata import DoesNotExistError, UnknownSrsError
 
 
 tool_settings = {"label": "Compare Extents",
