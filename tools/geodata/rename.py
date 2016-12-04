@@ -15,7 +15,7 @@ class RenameGeodataTool(BaseTool):
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.start_iteration]
 
-    @input_tableview("geodata_table", "Table for Geodata", False, ["geodata:geodata:", "new name:candidate_name:"])
+    @input_tableview("geodata_table", "Table for Geodata", False, ["new name:candidate_name:", "geodata:geodata:"])
     @input_output_table
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
