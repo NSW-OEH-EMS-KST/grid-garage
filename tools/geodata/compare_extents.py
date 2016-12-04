@@ -21,7 +21,7 @@ class CompareExtentsGeodataTool(BaseTool):
         self.aoi_dataset = self.aoi_extent = self.aoi_srs_name = self.aoi_extent_string = None
 
     @input_tableview("geodata_table", "Table for Geodata", False, ["geodata:geodata:"])
-    @parameter("aoi_dataset", "Dataset to compare with", ["DEFeatureClass", "DERasterDataset"], "Required", False, "Input", None, None, None, None)
+    @parameter("aoi_dataset", "Dataset (Area of Interest) to compare with", ["DEFeatureClass", "DERasterDataset"], "Required", False, "Input", None, None, None, None)
     @input_output_table
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
