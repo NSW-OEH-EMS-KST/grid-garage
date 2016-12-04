@@ -7,7 +7,7 @@ from arcpy import FeatureToRaster_conversion
 
 tool_settings = {"label": "Rasterise by Table",
                  "description": "Rasterise features by a 'field of fields'",
-                 "can_run_background": True,
+                 "can_run_background": "True",
                  "category": "Feature"}
 
 

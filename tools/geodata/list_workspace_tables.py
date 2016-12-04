@@ -6,7 +6,7 @@ import re
 
 tool_settings = {"label": "List Workspace Tables",
                  "description": "List tables within a workspace",
-                 "can_run_background": True,
+                 "can_run_background": "True",
                  "category": "Geodata"}
 
 
