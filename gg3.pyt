@@ -31,12 +31,12 @@ from tools.raster.set_value_to_null import SetValueToNullRasterTool
 from tools.raster.transform import TransformRasterTool
 from tools.raster.tweak_values import TweakValuesRasterTool
 from tools.raster.zonal_counts import ZonalCountsRasterTool
-# metadata tools
-from tools.metadata.search import SearchMetadataTool
-from tools.metadata.tips_from_template import TipsFromTemplateMetadataTool
-from tools.metadata.tips_from_tip_files import TipsFromTipFilesMetadataTool
-from tools.metadata.export_tips import ExportTipsMetadataTool
-from tools.metadata.export_xml import ExportXmlMetadataTool
+# # metadata tools
+# from tools.metadata.search import SearchMetadataTool
+# from tools.metadata.tips_from_template import TipsFromTemplateMetadataTool
+# from tools.metadata.tips_from_tip_files import TipsFromTipFilesMetadataTool
+# from tools.metadata.export_tips import ExportTipsMetadataTool
+# from tools.metadata.export_xml import ExportXmlMetadataTool
 
 
 class Toolbox(object):
@@ -77,13 +77,13 @@ class Toolbox(object):
                         TweakValuesRasterTool,
                         ZonalCountsRasterTool}
 
-        metadata_tools = {SearchMetadataTool,
-                          TipsFromTemplateMetadataTool,
-                          TipsFromTipFilesMetadataTool,
-                          ExportTipsMetadataTool,
-                          ExportXmlMetadataTool}
+        # metadata_tools = {SearchMetadataTool,
+        #                   TipsFromTemplateMetadataTool,
+        #                   TipsFromTipFilesMetadataTool,
+        #                   ExportTipsMetadataTool,
+        #                   ExportXmlMetadataTool}
 
-        self.tools = list(geodata_tools | feature_tools | raster_tools | metadata_tools)
+        self.tools = list(geodata_tools | feature_tools | raster_tools)  # | metadata_tools)
 
 
 def main():
