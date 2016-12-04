@@ -4,7 +4,7 @@ from base.method_decorators import input_output_table, parameter
 
 tool_settings = {"label": "Select",
                  "description": "Feed selected geodata into a table",
-                 "can_run_background": False,
+                 "can_run_background": True,
                  "category": "Geodata"}
 
 

@@ -5,7 +5,7 @@ from base.geodata import datatype_list
 
 tool_settings = {"label": "Search",
                  "description": "Search for identifiable geodata",
-                 "can_run_background": False,
+                 "can_run_background": True,
                  "category": "Geodata"}
 
 
