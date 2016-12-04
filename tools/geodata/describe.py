@@ -4,7 +4,7 @@ from base.method_decorators import input_output_table, input_tableview
 
 tool_settings = {"label": "Describe",
                  "description": "Describes geodata",
-                 "can_run_background": False,
+                 "can_run_background": True,
                  "category": "Geodata"}
 
 
