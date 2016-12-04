@@ -19,8 +19,8 @@ class ZonalCountsRasterTool(BaseTool):
         self.zone_vals = None
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:none"])
-    @parameter("zone", "Zone Features", "GPString", "Required", False, "Input", None, None, None, None)
-    @parameter("zone_field", "Zone Field", "GPString", "Required", False, "Input", None, None, None, None)
+    @parameter("zone", "Zone Features", "DEFeatureClass", "Required", False, "Input", None, None, None, None)
+    @parameter("zone_field", "Zone Field", "GPString", "Required", False, "Input", None, None, ["zone"], None)
     @parameter("zone_vals", "Zone Values", "GPString", "Required", False, "Input", None, None, None, None)
     @input_output_table
     def getParameterInfo(self):
