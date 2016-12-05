@@ -34,10 +34,10 @@ class CompareExtentsGeodataTool(BaseTool):
         self.aoi_extent_string = "{0} {1}".format(self.aoi_extent, self.aoi_srs_name)
 
     def iterate(self):
-        self.iterate_function_on_tableview(self.process, "geodata_table", ["geodata"])
+        self.iterate_function_on_tableview(self.compare, "geodata_table", ["geodata"])
         return
 
-    def process(self, data):
+    def compare(self, data):
         ds_in = data["geodata"]
         if not self.geodata.exists(ds_in):
             raise DoesNotExistError(ds_in)
