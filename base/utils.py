@@ -1,6 +1,7 @@
-# import arcpy
 import datetime
 import os
+from collections import OrderedDict
+from re import compile
 
 
 def make_tuple(ob):
@@ -45,3 +46,55 @@ def join_up_filename(workspace, filename, ext=''):
         ext += '.'
 
     return os.path.join(workspace, filename) + ext
+
+
+def get_ordered_dict_from_keys(key_seq, initial_val):
+    return OrderedDict.fromkeys(sorted(key_seq), initial_val)
+
+
+def decorate_func(var_name, var_value):
+    """ Function decorator.
+
+    Parameters:
+        var_name = attribute name
+        var_value = attribute var_value
+    Output:
+        returns a tuple of strings representing dates found
+    """
+
+    def decorated(func):
+        setattr(func, var_name, var_value)
+        return func
+
+    return decorated
+
+
+@decorate_func("pattern", None)
+def find_date(s):
+    """ Attempt to extract valid dates from a string.
+
+    Parameters:
+        s (string) = The string to be parsed for dates
+    Output:
+        returns a tuple of strings representing dates found
+    """
+    date_set = []
+
+    if find_date.pattern is None:
+        find_date.pattern = compile(r'\d{8}')
+
+    for match in find_date.pattern.findall(s):
+        try:
+            val = datetime.strptime(match, '%Y%m%d')
+            val = val.strftime('%Y/%m/%d')
+            date_set.append(val)
+        except ValueError:
+            pass  # ignore, not date
+
+    x = len(date_set)
+    if x > 1:
+        return date_set[0], date_set[1:]
+    elif x == 1:
+        return [date_set[0], None]
+    else:
+        return [None, None]

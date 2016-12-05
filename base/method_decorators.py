@@ -29,6 +29,9 @@ def parameter(name, display_name, data_type, parameter_type, multi_value, direct
     if default_value:
         par.value = default_value
 
+    if dependancy_list:
+        par.parameterDependencies = dependancy_list  # should be constant
+
     def decorated(f):
         @functools.wraps(f)
         def wrapped(*args, **kwargs):

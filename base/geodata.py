@@ -157,7 +157,7 @@ class GeodataUtils(object):
         _, __, gd_name, gd_ext = split_up_filename(like_name)
 
         ext = "" if is_local_gdb(out_wspace) else ext
-        ext = "." + ext if ext[0] != "." else ext
+        ext = "." + ext if (ext and ext[0] != ".") else ext
 
         table_name = os.path.join(out_wspace, gd_name + ext)
         if arcpy.Exists(table_name):
@@ -172,7 +172,7 @@ class GeodataUtils(object):
         _, __, gd_name, gd_ext = split_up_filename(like_name)
 
         ext = "" if is_local_gdb(out_wspace) else ext
-        ext = "." + ext if ext[0] != "." else ext
+        ext = "." + ext if (ext and ext[0] != ".") else ext
 
         table_name = os.path.join(out_wspace, gd_name + ext)
         if arcpy.Exists(table_name):
