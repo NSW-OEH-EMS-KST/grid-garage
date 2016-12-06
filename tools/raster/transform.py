@@ -3,8 +3,8 @@ from base.class_decorators import results, geodata
 from base.method_decorators import input_tableview, input_output_table, parameter, transform_methods, raster_formats
 from base.geodata import DoesNotExistError
 from base.utils import split_up_filename
-from arcpy import Raster
-from arcpy.sa import SquareRoot, Ln
+import arcpy
+import numpy as np
 
 tool_settings = {"label": "Transform",
                  "description": "Transforms rasters...",
@@ -17,23 +17,38 @@ class TransformRasterTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
-        self.transform = None
+        self.method = None
         self.max_stretch = None
         self.min_stretch = None
         self.raster_format = None
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:none"])
-    @parameter("transform", "Method", "GPString", "Required", False, "Input", transform_methods, None, None, transform_methods[0])
-    @parameter("max_stretch", "Stretch to maximum value", "GPDouble", "Required", False, "Input", None, None, None, None)
-    @parameter("min_stretch", "Stretch to minimum value", "GPDouble", "Required", False, "Input", None, None, None, None)
+    @parameter("method", "Method", "GPString", "Required", False, "Input", transform_methods, None, None, transform_methods[0])
+    @parameter("max_stretch", "Stretch to maximum value", "GPDouble", "Optional", False, "Input", None, None, None, None)
+    @parameter("min_stretch", "Stretch to minimum value", "GPDouble", "Optional", False, "Input", None, None, None, None)
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
 
+    def updateParameters(self, parameters):
+        BaseTool.updateParameters(self, parameters)
+        parameters[3].enabled = parameters[4].enabled = parameters[2].value == 'STRETCH'
+        return
+
+    def updateMessages(self, parameters):
+        BaseTool.updateMessages(self, parameters)
+        stretch = parameters[2].value == 'STRETCH'
+        if stretch and not parameters[3].valueAsText:
+            parameters[3].setIDMessage("ERROR", 735, parameters[3].displayName)
+        if stretch and not parameters[4].valueAsText:
+            parameters[4].setIDMessage("ERROR", 735, parameters[4].displayName)
+        return
+
     def initialise(self):
         p = self.get_parameter_dict()
-        self.transform = p["transform"]
+        self.send_info(p)
+        self.method = p["method"]
         self.max_stretch = p["max_stretch"]
         self.min_stretch = p["min_stretch"]
         self.raster_format = p["raster_format"]
@@ -50,48 +65,58 @@ class TransformRasterTool(BaseTool):
 
         _, __, ras_name, ras_ext = split_up_filename(r_in)
         r_out = self.geodata.make_raster_name(r_in, self.results.output_workspace, self.raster_format)
-        self.send_info("Transforming raster {0} -->> {1} using method {2}".format(r_in, r_out, self.transform))
 
-        out_raster =None
+        self.send_info("Transforming raster {0} -->> {1} using method {2}".format(r_in, r_out, self.method))
+        nd_out = None
         vals = None
 
-        if self.transform == "Standardise":
-            stdv = float(self.geodata.describe(r_in)['raster_band_stats_STD'])
-            mean = float(self.geodata.describe(r_in)['raster_band_stats_MEAN'])
-            vals = '{0} std={1} mean={2}'.format(self.transform, stdv, mean)
-            out_raster = (Raster(r_in) - mean) / stdv
+        self.send_info("...reading raster array...")
+        nd_in = arcpy.RasterToNumPyArray(r_in, nodata_to_value=np.nan)
+        self.send_info(nd_in)
 
-        elif self.transform == "Stretch":
-            maxv = float(self.geodata.describe(r_in)['raster_band_stats_MAXIMUM'])
-            minv = float(self.geodata.describe(r_in)['raster_band_stats_MINIMUM'])
-            vals = '{0} old_max={1} old_min={2} new_max={3} new_min={4}'.format(
-                self.transform, maxv, minv, self.max_stretch, self.min_stretch)
-            # tool.info(vals)
-            # tool.info(r_in)
-            out_raster = ((Raster(r_in) - minv) * self.max_stretch /
-                          (maxv - minv) + self.min_stretch)
+        if self.method == "STANDARDISE":
+            self.send_info("...standardising...")
+            stdv = nd_in.std()
+            mean = nd_in.mean()
+            vals = '{0} std={1} mean={2}'.format(self.method, stdv, mean)
+            nd_out = (nd_in - mean) / stdv
 
-        elif self.transform == "Normalise":
-            maxv = float(self.geodata.describe(r_in)['raster_band_stats_MAXIMUM'])
-            minv = float(self.geodata.describe(r_in)['raster_band_stats_MINIMUM'])
-            vals = '{0} old_max={1} old_min={2} new_max={3} new_min={4}'.format(
-                self.transform, maxv, minv, self.max_stretch, self.min_stretch)
-            out_raster = (Raster(r_in) - minv) / (maxv - minv)
+        elif self.method == "STRETCH":
+            self.send_info("...standardising...")
+            maxv = nd_in.max()
+            minv = nd_in.min()
+            vals = '{0} old_max={1} old_min={2} new_max={3} new_min={4}'.format(self.method, maxv, minv, self.max_stretch, self.min_stretch)
+            nd_out = (nd_in - minv) * self.max_stretch / (maxv - minv) + self.min_stretch
 
-        elif self.transform == "Log":
-            vals = '{0}'.format(self.transform)
-            out_raster = Ln(r_in)
+        elif self.method == "NORMALISE":
+            self.send_info("...normalising...")
+            maxv = nd_in.max()
+            minv = nd_in.min()
+            vals = '{0} old_max={1} old_min={2} new_max={3} new_min={4}'.format(self.method, maxv, minv, self.max_stretch, self.min_stretch)
+            nd_out = (nd_in - minv) / (maxv - minv)
 
-        elif self.transform == "Square-Root":
-            vals = '{0}'.format(self.transform)
-            out_raster = SquareRoot(r_in)
+        elif self.method == "LOG":
+            self.send_info("...logarithmicising...")
+            vals = '{0}'.format(self.method)
+            nd_out = nd_in.log()
 
-        elif self.transform == "Invert":
-            maxv = float(self.geodata.describe(r_in)['MAXIMUM'])
-            minv = float(self.geodata.describe(r_in)['MINIMUM'])
-            vals = '{0} max={1} min={2}'.format(self.transform, maxv, minv)
-            out_raster = (Raster(r_in) - (maxv + minv)) * -1
+        elif self.method == "SQUAREROOT":
+            self.send_info("...square-rooting...")
+            vals = '{0}'.format(self.method)
+            nd_out = r_in.sqrt()
+
+        elif self.method == "INVERT":
+            self.send_info("...inverting...")
+            maxv = nd_in.max()
+            minv = nd_in.min()
+            vals = '{0} max={1} min={2}'.format(self.method, maxv, minv)
+            nd_out = (nd_in - (maxv + minv)) * -1
 
         # save and exit
-        out_raster.save(r_out)
-        return {"item": r_out, "metadata": "todo", "transform": vals}
+        arcpy.env.overwriteOutput = True
+        arcpy.env.outputCoordinateSystem = r_in
+        arcpy.env.cellSize = r_in
+        ras_out = arcpy.NumPyArrayToRaster(nd_out, value_to_nodata=np.nan)
+        ras_out.save(r_out)
+        self.results.add({"geodata": r_out, "source_geodata": r_in, "transform": vals})
+        return

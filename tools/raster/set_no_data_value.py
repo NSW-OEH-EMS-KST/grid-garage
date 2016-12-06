@@ -8,7 +8,6 @@ tool_settings = {"label": "Set NoData Value",
                  "can_run_background": "True",
                  "category": "Raster"}
 
-
 @results
 @geodata
 class SetNodataValueRasterTool(BaseTool):
@@ -27,7 +26,7 @@ class SetNodataValueRasterTool(BaseTool):
 
     def initialise(self):
         p = self.get_parameter_dict()
-        self.ndv = p["ndv"]
+        self.ndv = float(p["ndv"])
         self.raster_format = "" if p['raster_format'].lower == 'esri grid' else p["raster_format"]  # fix output extension
 
     def iterate(self):
@@ -42,8 +41,10 @@ class SetNodataValueRasterTool(BaseTool):
 
         self.send_info("Setting NDV {0} into {1} -> {2}".format(self.ndv, ras, r_out))
         null_ras = IsNull(ras)
+        self.send_info("done isnull")
         out_ras = Con(null_ras, self.ndv, ras, "#")
+        self.send_info("done con")
         out_ras.save(r_out)
 
-        self.results.add({"geodata": r_out, "source": ras})
+        self.results.add({"geodata": r_out, "source_geodata": ras})
         return

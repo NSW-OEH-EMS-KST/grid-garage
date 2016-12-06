@@ -63,7 +63,7 @@ class ZonalCountsRasterTool(BaseTool):
 
         for zone_id in self.zone_ids:
             self.send_info('Processing {0} against zone {1}'.format(r_in, zone_id))
-            lyr_zone = self.zone_layers[zone_id]  #'zone_{0}'.format(zone_id)
+            lyr_zone = self.zone_layers[zone_id]
 
             # clip the source raster to current zone
             self.send_info("...clipping to feature...")

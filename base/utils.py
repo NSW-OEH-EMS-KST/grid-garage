@@ -98,3 +98,23 @@ def find_date(s):
         return [date_set[0], None]
     else:
         return [None, None]
+
+
+# def parse_proj_string_for_gcs(proj_string):
+#     # s = PROJCS['GDA_1994_Australia_Albers', GEOGCS[
+#     #     'GCS_GDA_1994', DATUM['D_GDA_1994', SPHEROID['GRS_1980', 6378137.0, 298.257222101]], PRIMEM['Greenwich', 0.0],
+#     #     UNIT['Degree', 0.0174532925199433]], PROJECTION['Albers'], PARAMETER['False_Easting', 0.0], PARAMETER[
+#     #            'False_Northing', 0.0], PARAMETER['Central_Meridian', 132.0], PARAMETER['Standard_Parallel_1', -18.0],
+#     #        PARAMETER['Standard_Parallel_2', -36.0], PARAMETER['Latitude_Of_Origin', 0.0], UNIT['Meter', 1.0]]
+#     x, y, z = proj_string.split("[", 2)
+#     return y.split(",")[0].strip("'")
+
+def parse_proj_string_for_name(proj_string):
+    # s = PROJCS['GDA_1994_Australia_Albers', GEOGCS[
+    #     'GCS_GDA_1994', DATUM['D_GDA_1994', SPHEROID['GRS_1980', 6378137.0, 298.257222101]], PRIMEM['Greenwich', 0.0],
+    #     UNIT['Degree', 0.0174532925199433]], PROJECTION['Albers'], PARAMETER['False_Easting', 0.0], PARAMETER[
+    #            'False_Northing', 0.0], PARAMETER['Central_Meridian', 132.0], PARAMETER['Standard_Parallel_1', -18.0],
+    #        PARAMETER['Standard_Parallel_2', -36.0], PARAMETER['Latitude_Of_Origin', 0.0], UNIT['Meter', 1.0]]
+    x, y, z = proj_string.split("[", 2)
+    return y.split(",")[0].strip("'")
+

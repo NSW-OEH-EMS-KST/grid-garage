@@ -46,9 +46,7 @@ class UnmatchedSrsError(ValueError):
 # these few functions are not made methods so that back-end modules can import them easily for use
 
 def table_conversion(in_rows, out_path, out_name):
-    """ Copy a file-based table to a local database.
-        returns full path to new table if successful
-    """
+    """ Copy a file-based table to a local database, returns full path to new table if successful"""
     fms = arcpy.FieldMappings()
     fms.addTable(in_rows)
 
@@ -295,57 +293,65 @@ class GeodataUtils(object):
         #             bp.update(z)
         #         update({"Band_{0}".format(i): bp})
 
-    @staticmethod
-    def get_transformation(in_ds, cs_out):
+    # @staticmethod
+    def get_transformation(self, in_ds, out_cs, overrides=None):
 
-        def parse_proj_string_for_name(proj_string):
-            # s = PROJCS['GDA_1994_Australia_Albers', GEOGCS[
-            #     'GCS_GDA_1994', DATUM['D_GDA_1994', SPHEROID['GRS_1980', 6378137.0, 298.257222101]], PRIMEM['Greenwich', 0.0],
-            #     UNIT['Degree', 0.0174532925199433]], PROJECTION['Albers'], PARAMETER['False_Easting', 0.0], PARAMETER[
-            #            'False_Northing', 0.0], PARAMETER['Central_Meridian', 132.0], PARAMETER['Standard_Parallel_1', -18.0],
-            #        PARAMETER['Standard_Parallel_2', -36.0], PARAMETER['Latitude_Of_Origin', 0.0], UNIT['Meter', 1.0]]
-            x, y = proj_string.split("[", 1)
-            return y.split(",")[0].strip("'")
+        cs_in = self.get_srs(in_ds, raise_unknown_error=True, as_object=True)
 
-        cs_in = arcpy.Describe(in_ds).spatialReference
-        if "unknown" in cs_in.name.lower():
-            raise UnknownSrsError(in_ds)
-
-        cs_out = parse_proj_string_for_name(cs_out).strip("'")
-        # if "unknown" in cs_out:
-        #     s = "Spatial reference system '{0}' has unknown qualities".format(cs_out)
-        #     raise ValueError(s)
-
-        if cs_in.name == cs_out:
+        if cs_in.GCS.name == out_cs.GCS.name:  # the same datum, no tx required
             return "#"
 
-        # cs_out = arcpy.SpatialReference(cs_out)
-        # shortest = "#"
         # if cs_in.GCS.datumCode != cs_out.GCS.datumCode:
-        lst = arcpy.ListTransformations(cs_in.name, cs_out)
+        try:
+            lst = arcpy.ListTransformations(cs_in, out_cs)
+        except Exception as e:
+            raise ValueError("cs_in= " + cs_in + " out_cs= " + out_cs + " e: " + str(e))
         if lst:
             shortest = min(lst, key=len)
         else:
-            raise ValueError("Datum transformation was not found for {0} (1) -> {2}".format(in_ds, cs_in.name, cs_out.name))
+            raise ValueError("Datum transformation was not found for {0} (1) -> {2}".format(in_ds, cs_in, out_cs))
+
+        if overrides:
+            ov = overrides.get(shortest, None)
+            if ov:
+                shortest = ov
 
         return shortest
+        # # get transformation
+        # shortest = ()
+        # cs_in = Describe(r_in).spatialReference
+        # # cs_in = arcpy.CreateSpatialReference_management(spatial_reference_template=r_in).re
+        # self.send_info(cs_in.GCS.datumCode)
+        # self.send_info(self.out_cs.GCS.datumCode)
+        # if cs_in.GCS.datumCode != self.out_cs.GCS.datumCode:
+        #     lst = arcpy.ListTransformations(cs_in, self.out_cs)
+        #     shortest = min(lst, key=len) if lst else ()
+        #     if not shortest:
+        #         raise ValueError("Datum transformation was not found for {0} -> {1}".format(cs_in.name, self.out_cs))
+        #     ov = self.overrides.get(shortest, None)
+        #     if ov:
+        #         shortest = ov
 
-    def get_srs(self, geodata, raise_unknown_error=False):
-        d = self.describe(geodata)
-        srs = d.get("dataset_spatialReference", "Unknown")
+    def get_srs(self, geodata, raise_unknown_error=False, as_object=False):
+        srs = arcpy.Describe(geodata).spatialReference
 
-        if "unknown" in srs.lower() and raise_unknown_error:
+        if "unknown" in srs.name.lower() and raise_unknown_error:
             raise UnknownSrsError
 
-        return srs
+        if as_object:
+            return srs
 
-    def validate_geodata(self, geodata, raster=False, vector=False):
+        return srs.name
+
+    def validate_geodata(self, geodata, raster=False, vector=False, srs_known=False):
         if not geodata_exists(geodata):
             raise DoesNotExistError(geodata)
         if raster and not self.is_raster(geodata):
             raise NotRasterError(geodata)
         if vector and not self.is_vector(geodata):
             raise NotVectorError(geodata)
+        if srs_known:
+            self.get_srs(geodata, raise_unknown_error=True)
 
     def compare_srs(self, srs1, srs2, raise_no_match_error=False, other_condition=True):
         if not other_condition:
