@@ -3,7 +3,6 @@ from base.geodata import raster_formats, resample_methods
 from base.class_decorators import results, geodata
 from base.method_decorators import input_tableview, input_output_table, parameter
 from arcpy import ProjectRaster_management, SpatialReference
-from base.utils import parse_proj_string_for_name
 
 tool_settings = {"label": "Reproject",
                  "description": "Reproject rasters...",

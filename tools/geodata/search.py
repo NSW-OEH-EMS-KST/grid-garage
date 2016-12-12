@@ -8,7 +8,6 @@ tool_settings = {"label": "Search",
                  "can_run_background": "True",
                  "category": "Geodata"}
 
-
 @geodata
 @results
 class SearchGeodataTool(BaseTool):
@@ -22,6 +21,19 @@ class SearchGeodataTool(BaseTool):
     @input_output_table
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
+
+    # def updateParameters(self, parameters):
+    #     BaseTool.updateParameters(self, parameters)
+    #     self.send_info(parameters)
+    #     ch = parameters[1].value.values  #enabled = parameters[4].enabled = parameters[2].value == 'STRETCH'
+    #     if parameters[0].valueAsText:
+    #         if not parameters[6].altered:
+    #             extent = arcpy.Describe(parameters[0]).extent
+    #         if extent.width > extent.height:
+    #             parameters[6].value = extent.width / 100
+    #         else:
+    #             parameters[6].value = extent.height / 100
+    #     return
 
     def initialise(self):
         p = self.get_parameter_dict()
