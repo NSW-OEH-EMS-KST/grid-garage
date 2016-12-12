@@ -19,7 +19,7 @@ class ReprojectRasterTool(BaseTool):
         self.out_fmt = self.out_cs = self.cellsz = self.resamp = self.rego = self.overrides = None
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:none"])
-    @parameter("output_cs", "Output Coordinate System", "GPCoordinateSystem", "Required", False, "Input", None, "outputCoordinateSystem", None, None)
+    @parameter("output_cs", "Output Spatial Reference", "Spatial Reference", "Required", False, "Input", None, "outputCoordinateSystem", None, None)
     @parameter("cell_size", "Cell Size", "GPSACellSize", "Required", False, "Input", None, "cellSize", None, None)
     @parameter("resample_type", "Resampling Method", "GPString", "Required", False, "Input", resample_methods, "resamplingMethod", None, None)
     @parameter("rego_point", "Registration Point", "GPPoint", "Optional", False, "Input", None, None, None, None)
@@ -33,10 +33,11 @@ class ReprojectRasterTool(BaseTool):
         pd = self.get_parameter_dict()
         self.send_info(pd)
         self.out_fmt = "" if pd['raster_format'].lower == 'esri grid' else pd["raster_format"]  # fix output extension
-        self.out_cs = pd["output_cs"]
+        self.out_cs = self.arc_parameters[2].value  # pd["output_cs"]
         # self.out_cs = parse_proj_string_for_name(self.out_cs)
-        self.send_info(self.out_cs)
-        self.out_cs = SpatialReference(self.out_cs)
+        self.send_info("SRS= " + str(self.out_cs))
+        self.send_info("srs type= " + str(type(self.out_cs)))
+        # self.out_cs = SpatialReference(self.out_cs)
         self.cellsz = "#" if not pd["cell_size"] else pd['cell_size']
         self.resamp = "#" if not pd["resample_type"] else pd['resample_type']
         self.rego = "#" if not pd['rego_point'] else pd['rego_point']  # fix empty value for arcgis
@@ -68,3 +69,9 @@ class ReprojectRasterTool(BaseTool):
         self.results.add({"geodata": r_out, "source": r_in, "metadata": "to do"})
         return
 
+    def execute(self, parameters, messages):
+        # just to get this fucking parameter as an object!
+        self.out_cs = parameters[2].value
+        self.send_info("SRS= " + str(self.out_cs))
+        self.send_info("srs type= " + str(type(self.out_cs)))
+        BaseTool.execute(self, parameters, messages)

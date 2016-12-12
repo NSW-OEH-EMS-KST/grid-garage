@@ -297,6 +297,14 @@ class GeodataUtils(object):
     def get_transformation(self, in_ds, out_cs, overrides=None):
 
         cs_in = self.get_srs(in_ds, raise_unknown_error=True, as_object=True)
+        # def parse_proj_string_for_name(proj_string):
+        #     # s = PROJCS['GDA_1994_Australia_Albers', GEOGCS[
+        #     #     'GCS_GDA_1994', DATUM['D_GDA_1994', SPHEROID['GRS_1980', 6378137.0, 298.257222101]], PRIMEM['Greenwich', 0.0],
+        #     #     UNIT['Degree', 0.0174532925199433]], PROJECTION['Albers'], PARAMETER['False_Easting', 0.0], PARAMETER[
+        #     #            'False_Northing', 0.0], PARAMETER['Central_Meridian', 132.0], PARAMETER['Standard_Parallel_1', -18.0],
+        #     #        PARAMETER['Standard_Parallel_2', -36.0], PARAMETER['Latitude_Of_Origin', 0.0], UNIT['Meter', 1.0]]
+        #     x, y = proj_string.split("[", 1)
+        #     return y.split(",")[0].strip("'")
 
         if cs_in.GCS.name == out_cs.GCS.name:  # the same datum, no tx required
             return "#"

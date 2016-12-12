@@ -93,7 +93,7 @@ class BaseTool(object):
 
     def execute(self, parameters, messages):
         """The source code of the tool."""
-        self.send_info("BaseTool.execute()")
+        # self.send_info("BaseTool.execute()")
 
         # check if we have a function to run
         if not self.execution_list:
