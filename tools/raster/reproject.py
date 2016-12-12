@@ -35,8 +35,8 @@ class ReprojectRasterTool(BaseTool):
         self.out_fmt = "" if pd['raster_format'].lower == 'esri grid' else pd["raster_format"]  # fix output extension
         self.out_cs = self.arc_parameters[2].value  # pd["output_cs"]
         # self.out_cs = parse_proj_string_for_name(self.out_cs)
-        self.send_info("SRS= " + str(self.out_cs))
-        self.send_info("srs type= " + str(type(self.out_cs)))
+        # self.send_info("SRS= " + str(self.out_cs))
+        # self.send_info("srs type= " + str(type(self.out_cs)))
         # self.out_cs = SpatialReference(self.out_cs)
         self.cellsz = "#" if not pd["cell_size"] else pd['cell_size']
         self.resamp = "#" if not pd["resample_type"] else pd['resample_type']
@@ -61,7 +61,7 @@ class ReprojectRasterTool(BaseTool):
 
         self.send_info(self.out_cs)
         tx = self.geodata.get_transformation(r_in, self.out_cs, self.overrides)
-        self.send_info("tx= "+tx)
+        # self.send_info("tx= "+tx)
         # do the business
         self.send_info("Projecting {0} into {1} -> {2}".format(r_in, self.out_cs, r_out))
         ProjectRaster_management(r_in, r_out, self.out_cs, geographic_transform=tx, resampling_type=self.resamp, cell_size=self.cellsz, Registration_Point=self.rego)
@@ -69,9 +69,9 @@ class ReprojectRasterTool(BaseTool):
         self.results.add({"geodata": r_out, "source": r_in, "metadata": "to do"})
         return
 
-    def execute(self, parameters, messages):
-        # just to get this fucking parameter as an object!
-        self.out_cs = parameters[2].value
-        self.send_info("SRS= " + str(self.out_cs))
-        self.send_info("srs type= " + str(type(self.out_cs)))
-        BaseTool.execute(self, parameters, messages)
+    # def execute(self, parameters, messages):
+    #     # just to get this fucking parameter as an object!
+    #     self.out_cs = parameters[2].value
+    #     self.send_info("SRS= " + str(self.out_cs))
+    #     self.send_info("srs type= " + str(type(self.out_cs)))
+    #     BaseTool.execute(self, parameters, messages)
