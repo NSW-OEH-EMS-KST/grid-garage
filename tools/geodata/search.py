@@ -28,6 +28,8 @@ class SearchGeodataTool(BaseTool):
         gt = gt.split(";")
         self.geodata_types = gt
 
+        self.send_info(p.get("workspaces"))
+
     def iterating(self):
         self.iterate_function_on_parameter(self.search, "workspaces", ["workspace"])
 
@@ -35,7 +37,7 @@ class SearchGeodataTool(BaseTool):
         ws = data["workspace"]
         for dt in self.geodata_types:
             self.send_info("Searching for {0} geodata types in {1}".format(dt, ws))
-            found = [{"geodata": v} for v in self.geodata.walk(ws, data_types=dt)]
+            found = [{"geodata": v} for v in self.geodata.walk(ws.strip("'"), data_types=dt)]
             if not found:
                 self.send_info("Nothing found")
             else:
