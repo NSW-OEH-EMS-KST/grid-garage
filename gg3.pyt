@@ -30,7 +30,7 @@ from tools.raster.set_no_data_value import SetNodataValueRasterTool
 from tools.raster.set_value_to_null import SetValueToNullRasterTool
 from tools.raster.transform import TransformRasterTool
 from tools.raster.tweak_values import TweakValuesRasterTool
-from tools.raster.zonal_counts import ZonalCountsRasterTool
+# from tools.raster.zonal_counts import ZonalCountsRasterTool
 # # metadata tools
 # from tools.metadata.search import SearchMetadataTool
 # from tools.metadata.tips_from_template import TipsFromTemplateMetadataTool
@@ -74,8 +74,8 @@ class Toolbox(object):
                         SetNodataValueRasterTool,
                         SetValueToNullRasterTool,
                         TransformRasterTool,
-                        TweakValuesRasterTool,
-                        ZonalCountsRasterTool}
+                        TweakValuesRasterTool}  # ,
+                        # ZonalCountsRasterTool}
 
         # metadata_tools = {SearchMetadataTool,
         #                   TipsFromTemplateMetadataTool,

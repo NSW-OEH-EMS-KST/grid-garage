@@ -106,7 +106,7 @@ class BaseTool(object):
             out_rasfmt_par.clearMessage()
             if out_ws_par.altered or out_rasfmt_par.altered:
                 ws = out_ws_par.value
-                if is_file_system(ws) and out_rasfmt_par.value != "Esri Grid":
+                if is_file_system(ws) and out_rasfmt_par.value == "Esri Grid":
                     out_rasfmt_par.setErrorMessage("Invalid raster format for workspace type")
 
         # BaseTool.updateMessages(self, parameters)
