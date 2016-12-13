@@ -26,7 +26,8 @@ class SetNodataValueRasterTool(BaseTool):
 
     def initialise(self):
         p = self.get_parameter_dict()
-        self.ndv = float(p["ndv"])
+        self.ndv = p["ndv"]
+        self.ndv = float(self.ndv) if "." in self.ndv else int(self.ndv)
         self.raster_format = "" if p['raster_format'].lower == 'esri grid' else p["raster_format"]  # fix output extension
 
     def iterate(self):
