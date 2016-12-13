@@ -27,8 +27,7 @@ class SearchGeodataTool(BaseTool):
         gt = p.get("geodata_types", "")
         gt = gt.split(";")
         self.geodata_types = gt
-
-        self.send_info(p.get("workspaces"))
+        self.geodata_types = ["Any"] if "Any" in self.geodata_types else self.geodata_types
 
     def iterating(self):
         self.iterate_function_on_parameter(self.search, "workspaces", ["workspace"])
