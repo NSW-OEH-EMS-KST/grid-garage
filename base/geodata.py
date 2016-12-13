@@ -100,6 +100,10 @@ def is_local_gdb(workspace):
     return describe_arc(workspace).workspaceType == "LocalDatabase"
 
 
+def is_file_system(workspace):
+    return describe_arc(workspace).workspaceType == "FileSystem"
+
+
 def get_search_cursor_rows(in_table, field_names, where_clause=None):
 
     def _get_search_cursor(in_table_sc, field_names_sc, where_clause_sc=where_clause, spatial_reference=None, explode_to_points=None, sql_clause=None):

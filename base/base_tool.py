@@ -9,7 +9,7 @@ import os
 import contextlib
 import ast
 from base.class_decorators import arcmap
-from base.geodata import get_search_cursor_rows
+from base.geodata import get_search_cursor_rows, is_file_system
 
 
 @arcmap
@@ -80,10 +80,53 @@ class BaseTool(object):
         """Modify the values and properties of parameters before internal
         validation is performed.  This method is called whenever a parameter
         has been changed."""
+        out_tbl_par = None
         for p in parameters:
-            v = p.value
-            if v == "#run_id#":
-                p.value = self.run_id
+            if p.name == "result_table_name":
+                out_tbl_par = p
+                break
+
+        # default table name
+        if out_tbl_par.value == "#run_id#":
+            out_tbl_par.value = self.run_id
+
+    def updateMessages(self, parameters):
+        out_ws_par = None
+        out_rasfmt_par = None
+        for p in parameters:
+            if p.name == "output_workspace":
+                out_ws_par = p
+                continue
+            elif p.name == "raster_format":
+                out_rasfmt_par = p
+                continue
+
+        if out_ws_par and out_rasfmt_par:
+            out_ws_par.clearMessage()
+            out_rasfmt_par.clearMessage()
+            if out_ws_par.altered or out_rasfmt_par.altered:
+                ws = out_ws_par.value
+                if is_file_system(ws) and out_rasfmt_par.value != "Esri Grid":
+                    out_rasfmt_par.setErrorMessage("Invalid raster format for workspace type")
+
+        # BaseTool.updateMessages(self, parameters)
+        # stretch = parameters[2].value == 'STRETCH'
+        # if stretch and not parameters[3].valueAsText:
+        #     parameters[3].setIDMessage("ERROR", 735, parameters[3].displayName)
+        # if stretch and not parameters[4].valueAsText:
+        #     parameters[4].setIDMessage("ERROR", 735, parameters[4].displayName)
+        return
+
+        # for p in parameters:
+        #     v = p.value
+        #     if v == "#run_id#":
+        #         p.value = self.run_id
+        #         break
+        # # raster format in workspace
+        # for p in parameters:
+        #     if p.name == "raster_format":
+
+
         return
 
     def updateMessages(self, parameters):
