@@ -182,6 +182,45 @@ def input_output_table(f):
     return wrapped
 
 
+def input_output_raster_format(f):
+#     @parameter("format", "Output Raster Format", "GPString", "Optional", False, "Input", raster_formats2, None, None, None)
+
+    # Format
+    par0 = parameter("output_raster_format", "Output Raster Format", "GPString", "Optional", False, "Input", raster_formats2, None, None, None)
+
+    # Compression
+    par1 = parameter("raster_compression", "Output Raster Compression", "GPSAGDBEnvCompression", "Optional", False, "Input", None, "compression", None, None)
+
+    # arcpy.env.compression = "compression_type {value}"
+
+    # @functools.wraps(f)
+    # def wrapped(*args, **kwargs):
+    #     params = f(*args, **kwargs)
+    #     pars = [par0, par1]
+    #     if params:
+    #         params.insert(0, pars)
+    #     else:
+    #         params = pars
+    #     return params
+    # return wrapped
+    pars = [par0, par1]
+
+    def decorator(f):
+        @functools.wraps(f)
+        def wrapper(*args, **kwargs):
+            params = f(*args, **kwargs)
+            if params:
+                params.insert(0, pars[0])
+                for param in pars[1:]:
+                    params.insert(1, param)
+            else:
+                params = pars
+            return params
+
+        return wrapper
+
+    return decorator
+
 arc_parameter_types_string = """
 Data type,datatype keyword,Description
 Address Locator,DEAddressLocator,A dataset, used for geocoding, that stores the address attributes, associated indexes, and rules that define the process for translating nonspatial descriptions of places to spatial data.

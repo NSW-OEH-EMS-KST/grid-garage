@@ -144,7 +144,7 @@ class GeodataUtils(object):
     def make_raster_name(like_name, out_wspace, ext='', suffix=''):
         _, __, r_name, r_ext = split_up_filename(like_name)
 
-        ext = "" if is_local_gdb(out_wspace) or ext == "Esri Grid" else ext
+        ext = "" if (is_local_gdb(out_wspace) or ext == "Esri Grid") else ext
         ext = "." + ext if (ext and ext[0] != ".") else ext
 
         raster_name = arcpy.ValidateTableName(r_name + suffix, out_wspace)

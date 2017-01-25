@@ -22,7 +22,7 @@ class ValuesAtPointsRasterTool(BaseTool):
         return
 
     @input_tableview("raster_table", "Table of Rasters", False, ["raster:geodata:"])
-    @parameter("featureclass", "Select Point Feature Dataset", "DEFeatureClass", "Required", False, "Input", ["Point"], None, None, None)
+    @parameter("points", "Point Features", "GPFeatureLayer", "Required", False, "Input", ["Point"], None, None, None)
     @input_output_table
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
