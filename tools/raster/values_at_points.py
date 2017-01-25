@@ -2,6 +2,7 @@ from base.base_tool import BaseTool
 from base.class_decorators import results, geodata
 from base.method_decorators import input_tableview, input_output_table, parameter
 from arcpy import GetCellValue_management
+from collections import OrderedDict
 
 tool_settings = {"label": "Values at Points",
                  "description": "Retrieves the values of rasters at specified points...",
@@ -30,7 +31,7 @@ class ValuesAtPointsRasterTool(BaseTool):
     def initialise(self):
         pars = self.get_parameter_dict()
 
-        self.points = pars.get("featureclass", [])
+        self.points = pars.get("points", [])
 
         d = self.geodata.describe(self.points)
         self.points_srs = d.get("dataset_spatialReference", "Unknown")
@@ -93,7 +94,9 @@ class ValuesAtPointsRasterTool(BaseTool):
         result_list = []
 
         for oid, val_dict in self.result_dict.iteritems():
-            row_dict = {"source_pt_id": oid}
+            # row_dict = {"source_pt_id": oid}
+            row_dict = OrderedDict()
+            row_dict["source_pt_id"] = oid
             for k, v in val_dict.iteritems():
                 row_dict[k] = v
             result_list.append(row_dict)
