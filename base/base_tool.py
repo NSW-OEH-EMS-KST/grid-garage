@@ -87,7 +87,7 @@ class BaseTool(object):
                 break
 
         # default table name
-        if out_tbl_par.value == "#run_id#":
+        if out_tbl_par and out_tbl_par.value == "#run_id#":
             out_tbl_par.value = self.run_id
 
     def updateMessages(self, parameters):
