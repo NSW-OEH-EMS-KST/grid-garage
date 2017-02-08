@@ -3,7 +3,9 @@ from base.class_decorators import results, geodata
 from base.method_decorators import input_tableview, input_output_table, parameter, transform_methods, raster_formats
 from base.geodata import DoesNotExistError
 from base.utils import split_up_filename
-import arcpy
+# from base import snippets
+import arcpy as ap
+from arcpy import env
 import numpy as np
 
 tool_settings = {"label": "Transform",
@@ -33,7 +35,7 @@ class TransformRasterTool(BaseTool):
 
     def updateParameters(self, parameters):
         BaseTool.updateParameters(self, parameters)
-        parameters[3].enabled = parameters[4].enabled = parameters[2].value == 'STRETCH'
+        parameters[3].enabled = parameters[4].enabled = (parameters[2].value == 'STRETCH')
         return
 
     def updateMessages(self, parameters):
@@ -49,8 +51,8 @@ class TransformRasterTool(BaseTool):
         p = self.get_parameter_dict()
         self.send_info(p)
         self.method = p["method"]
-        self.max_stretch = p["max_stretch"]
-        self.min_stretch = p["min_stretch"]
+        self.max_stretch = float(p["max_stretch"])
+        self.min_stretch = float(p["min_stretch"])
         self.raster_format = p["raster_format"]
 
     def iterate(self):
@@ -65,58 +67,105 @@ class TransformRasterTool(BaseTool):
 
         _, __, ras_name, ras_ext = split_up_filename(r_in)
         r_out = self.geodata.make_raster_name(r_in, self.results.output_workspace, self.raster_format)
-
         self.send_info("Transforming raster {0} -->> {1} using method {2}".format(r_in, r_out, self.method))
-        nd_out = None
-        vals = None
+
+        # get some properties
+        np_type_map = {"U1": "uint8", "U2": "uint8", "U4": "uint8", "U8": "uint8", "S8": "int8", "U16": "uint16", "S16": "int16", "U32": "uint32", "S32": "int32", "F32": "float32", "F64": "float64"}
+        rast = ap.Raster(r_in)
+        np_type = np_type_map[rast.pixelType]
+        xmin_in, ymin_in = rast.extent.XMin, rast.extent.YMin
+        xwidth_in, ywidth_in = rast.meanCellWidth, rast.meanCellHeight
+        ndv_in = rast.noDataValue
+        del rast
 
         self.send_info("...reading raster array...")
-        nd_in = arcpy.RasterToNumPyArray(r_in, nodata_to_value=np.nan)
-        self.send_info(nd_in)
+        array_in = ap.RasterToNumPyArray(r_in)
+        array_in = np.array(array_in, dtype=np_type)
+        self.send_info(array_in)
 
+        self.send_info("...masking array with '{}'...".format(ndv_in))
+        mask = np.where(array_in == ndv_in, True, False)
+        array_masked = np.ma.array(array_in, mask=mask)
+        self.send_info(array_masked)
+
+        mean, stdv, minv, maxv = array_masked.mean(), array_masked.std(), array_masked.min(), array_masked.max()
+        self.send_info('mean={} stdv={} max={} min={}'.format(mean, stdv, maxv, minv))
+
+        array_out = array_masked
         if self.method == "STANDARDISE":
-            self.send_info("...standardising...")
-            stdv = nd_in.std()
-            mean = nd_in.mean()
-            vals = '{0} std={1} mean={2}'.format(self.method, stdv, mean)
-            nd_out = (nd_in - mean) / stdv
+            array_out = (array_masked - mean) / stdv
 
-        elif self.method == "STRETCH":
-            self.send_info("...standardising...")
-            maxv = nd_in.max()
-            minv = nd_in.min()
-            vals = '{0} old_max={1} old_min={2} new_max={3} new_min={4}'.format(self.method, maxv, minv, self.max_stretch, self.min_stretch)
-            nd_out = (nd_in - minv) * self.max_stretch / (maxv - minv) + self.min_stretch
+        elif self.method == "STRETCH":  # (INVAL - INLO) * ((OUTUP-OUTLO)/(INUP-INLO)) + OUTLO
+            if minv == maxv:
+                raise ValueError("Minimum value = Maximum value, normalising is not applicable")
+            else:
+                scale = (self.max_stretch - self.min_stretch) / (maxv - minv)
+                array_out = (array_masked - minv) * scale + self.min_stretch
 
         elif self.method == "NORMALISE":
-            self.send_info("...normalising...")
-            maxv = nd_in.max()
-            minv = nd_in.min()
-            vals = '{0} old_max={1} old_min={2} new_max={3} new_min={4}'.format(self.method, maxv, minv, self.max_stretch, self.min_stretch)
-            nd_out = (nd_in - minv) / (maxv - minv)
+            if minv == maxv:
+                raise ValueError("Minimum value = Maximum value, normalising is not applicable")
+            else:
+                array_out = (array_masked - minv) / (maxv - minv)
 
         elif self.method == "LOG":
-            self.send_info("...logarithmicising...")
-            vals = '{0}'.format(self.method)
-            nd_out = nd_in.log()
+            array_out = array_masked.log()
 
         elif self.method == "SQUAREROOT":
-            self.send_info("...square-rooting...")
-            vals = '{0}'.format(self.method)
-            nd_out = r_in.sqrt()
+            array_out = array_masked.sqrt()
 
         elif self.method == "INVERT":
-            self.send_info("...inverting...")
-            maxv = nd_in.max()
-            minv = nd_in.min()
-            vals = '{0} max={1} min={2}'.format(self.method, maxv, minv)
-            nd_out = (nd_in - (maxv + minv)) * -1
+            array_out = (array_masked - (maxv + minv)) * -1
 
-        # save and exit
-        arcpy.env.overwriteOutput = True
-        arcpy.env.outputCoordinateSystem = r_in
-        arcpy.env.cellSize = r_in
-        ras_out = arcpy.NumPyArrayToRaster(nd_out, value_to_nodata=np.nan)
+        minv_qc, maxv_qc = array_out.min(), array_out.max()
+        self.send_info('{}, {}) --> ({}, {})\n{}'.format(minv, maxv, minv_qc, maxv_qc, array_out))
+
+
+        self.send_info("...casting to original data type...")
+        array_out = array_out.data.astype(np_type)
+        minv_qc, maxv_qc = array_out.min(), array_out.max()
+        self.send_info('{}, {}) --> ({}, {})\n{}'.format(minv, maxv, minv_qc, maxv_qc, array_out))
+
+        self.send_info("...saving to '{}'...".format(r_out))
+        env.overwriteOutput = True
+        env.outputCoordinateSystem = r_in
+        env.cellSize = r_in
+        env.Extent = r_in
+        env.snapRaster = r_in
+        ras_out = ap.NumPyArrayToRaster(array_out, ap.Point(xmin_in, ymin_in), xwidth_in, ywidth_in, ndv_in)
         ras_out.save(r_out)
-        self.results.add({"geodata": r_out, "source_geodata": r_in, "transform": vals})
+        # ap.SetRasterProperties_management(r_out, nodata=[["1", ndv_in]])
+        self.results.add({"geodata": r_out, "source_geodata": r_in, "transform": data})
         return
+
+# def set_nodata():
+#     import os
+#     # import Snippets
+#     from base.comtypes import client
+#     from base.comtypes.gen import esriGeoDatabase as esriGeoDatabase
+#     from base.comtypes.gen import esriDataSourcesRaster as esriDataSourcesRaster
+#
+#     # Absolute path to the raster
+#     raster = r'C:\Temp\myMultiBandRaster.tif'
+#
+#     # NoData values list for each of the 3 bands
+#     noDataValuesList = [15, 0, 34]
+#
+#     # Open the workspace
+#     pWSFactory = snippets.NewObj(esriDataSourcesRaster.RasterWorkspaceFactory, esriGeoDatabase.IWorkspaceFactory2)
+#     pWS = pWSFactory.OpenFromFile(os.path.dirname(raster), 0)
+#
+#     # Open the raster dataset
+#     pRasterWS = pWS.QueryInterface(esriDataSourcesRaster.IRasterWorkspace)  # Cast to 'IRasterWorkspace' to call 'OpenRasterDataset' function
+#     pRasterDataset = pRasterWS.OpenRasterDataset(os.path.basename(raster))
+#
+#     # Get access to bands
+#     pRasterBands = pRasterDataset.QueryInterface(esriDataSourcesRaster.IRasterBandCollection)
+#
+#     for index, val in enumerate(noDataValuesList):
+#         # Get band
+#         pBand = pRasterBands.Item(index)
+#         # Get corresponding properties object
+#         pPropsBand = pBand.QueryInterface(esriDataSourcesRaster.IRasterProps)
+#         # Set noData value
+#         pPropsBand.NoDataValue = val

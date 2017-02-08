@@ -129,7 +129,7 @@ class ResultsUtils(object):
                 writer = csv.DictWriter(csv_file, delimiter=',', lineterminator='\n', fieldnames=self.failure_fieldnames)
                 writer.writeheader()
 
-        msg = msg.strip().replace('\n', '|').replace('\r', '')
+        msg = msg.strip().replace('\n', ', ').replace('\r', '')
         # write the failure record
         with open(self.fail_csv, "ab") as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames=self.failure_fieldnames)
