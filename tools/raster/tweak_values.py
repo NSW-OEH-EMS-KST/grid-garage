@@ -2,8 +2,9 @@ from base.base_tool import BaseTool
 from base.class_decorators import results, geodata
 from base.method_decorators import input_tableview, input_output_table, parameter, raster_formats
 from base.geodata import DoesNotExistError
-from arcpy import Raster
+from arcpy import Raster, Describe
 from arcpy.sa import Con, Int
+from os.path import join
 
 tool_settings = {"label": "Tweak Values",
                  "description": "Tweaks...",
@@ -55,6 +56,15 @@ class TweakValuesRasterTool(BaseTool):
         self.iterate_function_on_tableview(self.tweak, "raster_table", ["raster"])
         return
 
+    def get_band_nodata(self, raster, bandindex=1):
+        d = Describe(join(raster, "Band_{}".format(bandindex)))
+        ndv = d.noDataValue
+        # v = ap.GetRasterProperties_management(raster, property)
+        # self.send_info(type(v))
+        # v = v.getOutput(0)
+        # print type(v)
+        return ndv
+
     def tweak(self, data):
         r_in = data["raster"]
         if not self.geodata.exists(r_in):
@@ -68,13 +78,22 @@ class TweakValuesRasterTool(BaseTool):
 
         if self.min_val:
             self.send_info('Setting minimum {0}...{1}'.format(self.min_val, self.under_min))
-            under = self.min_val if self.under_min == 'Minimum' else self.geodata.describe(r_in)["raster_band_noDataValue"]
+            under = self.min_val if self.under_min == 'Minimum' else self.get_band_nodata(r_in)  # self.geodata.describe(r_in)["raster_band_noDataValue"]
+            # self.send_info(under)
+            if under == "#":
+                raise ValueError("Raster '{}' does not have a nodata value".format(r_in))
+            # self.send_info(under)
             ras = Con(ras >= float(self.min_val), ras, float(under))
             vals.append('MIN {0}...{1} = {2}'.format(self.min_val, self.under_min, under))
 
         if self.max_val:
             self.send_info('Setting maximum {0}...{1}'.format(self.max_val, self.over_max))
-            over = self.max_val if self.over_max == 'Maximum' else self.geodata.describe(r_in)["raster_band_noDataValue"]
+            over = self.max_val if self.over_max == 'Maximum' else self.get_band_nodata(r_in)  # self.geodata.describe(r_in)["raster_band_noDataValue"]
+            # self.send_info(over)
+            if over == "#":
+                raise ValueError("Raster '{}' does not have a nodata value".format(r_in))
+                # over = None
+            # self.send_info(over)
             ras = Con(ras <= float(self.max_val), ras, float(over))
             vals.append('MAX {0}...{1}'.format(self.max_val, self.over_max, over))
 

@@ -37,7 +37,7 @@ class ReprojectRasterTool(BaseTool):
         # self.send_info("SRS= " + str(self.out_cs))
         # self.send_info("srs type= " + str(type(self.out_cs)))
         # self.out_cs = SpatialReference(self.out_cs)
-        self.cellsz = "#" if not pd["cell_size"] else pd['cell_size']
+        self.cellsz = "#"  if not pd["cell_size"] else str(pd['cell_size'])  # this seemed to solve an issue with unicode... strange
         self.resamp = "#" if not pd["resample_type"] else pd['resample_type']
         self.rego = "#" if not pd['rego_point'] else pd['rego_point']  # fix empty value for arcgis
         if pd["overrides"]:
@@ -45,7 +45,7 @@ class ReprojectRasterTool(BaseTool):
             self.overrides = {k: v for k, v in (override.split(":") for override in self.overrides)}   #if self.overrides else {"none": None}  # now a dict {a:b, c:d, ...}
         self.send_info("Transformation overrides: {0}".format(self.overrides))
 
-        self.send_info(self.out_cs)
+        self.send_info("Output CS: {0}".format(self.out_cs))
         return
 
     def iterate(self):
@@ -57,15 +57,13 @@ class ReprojectRasterTool(BaseTool):
         self.geodata.validate_geodata(r_in, raster=True, srs_known=True)
 
         r_out = self.geodata.make_raster_name(r_in, self.results.output_workspace, self.out_fmt)
-
-        self.send_info(self.out_cs)
         tx = self.geodata.get_transformation(r_in, self.out_cs, self.overrides)
-        # self.send_info("tx= "+tx)
+
         # do the business
-        self.send_info("Projecting {0} into {1} -> {2}".format(r_in, self.out_cs, r_out))
+        self.send_info("Projecting {0} into {1} -> {2}".format(r_in, self.out_cs.name, r_out))
         ProjectRaster_management(r_in, r_out, self.out_cs, geographic_transform=tx, resampling_type=self.resamp, cell_size=self.cellsz, Registration_Point=self.rego)
 
-        self.results.add({"geodata": r_out, "source": r_in, "metadata": "to do"})
+        self.send_info(self.results.add({"geodata": r_out, "source": r_in, "metadata": "to do"}))
         return
 
     # def execute(self, parameters, messages):

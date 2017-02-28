@@ -5,7 +5,7 @@ from base.geodata import DoesNotExistError
 from base.utils import split_up_filename
 # from base import snippets
 import arcpy as ap
-from arcpy import env
+# from arcpy import env
 import numpy as np
 
 tool_settings = {"label": "Transform",
@@ -59,86 +59,149 @@ class TransformRasterTool(BaseTool):
         self.iterate_function_on_tableview(self.transform, "raster_table", ["raster"])
         return
 
+    def get_property(self, raster, property):
+        v = ap.GetRasterProperties_management(raster, property)
+        self.send_info(type(v))
+        v = v.getOutput(0)
+        print type(v)
+        return float(v)
+
     def transform(self, data):
-        self.send_info(data)
         r_in = data["raster"]
         if not self.geodata.exists(r_in):
             raise DoesNotExistError(r_in)
 
-        _, __, ras_name, ras_ext = split_up_filename(r_in)
         r_out = self.geodata.make_raster_name(r_in, self.results.output_workspace, self.raster_format)
         self.send_info("Transforming raster {0} -->> {1} using method {2}".format(r_in, r_out, self.method))
+        self.send_info("... calculating statistics...")
+        ap.CalculateStatistics_management(r_in)
+        # raster_mean = float(ap.GetRasterProperties_management(r_in, "MEAN").getOutput(0))
+        # raster_std = float(ap.GetRasterProperties_management(r_in, "STD").getOutput(0))
+        # raster_min = float(ap.GetRasterProperties_management(r_in, "MINIMUM").getOutput(0))
+        # raster_max = float(ap.GetRasterProperties_management(r_in, "MAXIMUM").getOutput(0))
+        raster_mean = self.get_property(r_in, "MEAN")
+        raster_std = self.get_property(r_in, "STD")
+        raster_min = self.get_property(r_in, "MINIMUM")
+        raster_max = self.get_property(r_in, "MAXIMUM")
 
-        # get some properties
-        np_type_map = {"U1": "uint8", "U2": "uint8", "U4": "uint8", "U8": "uint8", "S8": "int8", "U16": "uint16", "S16": "int16", "U32": "uint32", "S32": "int32", "F32": "float32", "F64": "float64"}
-        rast = ap.Raster(r_in)
-        np_type = np_type_map[rast.pixelType]
-        xmin_in, ymin_in = rast.extent.XMin, rast.extent.YMin
-        xwidth_in, ywidth_in = rast.meanCellWidth, rast.meanCellHeight
-        ndv_in = rast.noDataValue
-        del rast
+        ras = ap.Raster(r_in)
 
-        self.send_info("...reading raster array...")
-        array_in = ap.RasterToNumPyArray(r_in)
-        array_in = np.array(array_in, dtype=np_type)
-        self.send_info(array_in)
-
-        self.send_info("...masking array with '{}'...".format(ndv_in))
-        mask = np.where(array_in == ndv_in, True, False)
-        array_masked = np.ma.array(array_in, mask=mask)
-        self.send_info(array_masked)
-
-        mean, stdv, minv, maxv = array_masked.mean(), array_masked.std(), array_masked.min(), array_masked.max()
-        self.send_info('mean={} stdv={} max={} min={}'.format(mean, stdv, maxv, minv))
-
-        array_out = array_masked
         if self.method == "STANDARDISE":
-            array_out = (array_masked - mean) / stdv
+            ras = (ras - raster_mean) / raster_std
 
         elif self.method == "STRETCH":  # (INVAL - INLO) * ((OUTUP-OUTLO)/(INUP-INLO)) + OUTLO
-            if minv == maxv:
+            if raster_min == raster_max:
                 raise ValueError("Minimum value = Maximum value, normalising is not applicable")
             else:
-                scale = (self.max_stretch - self.min_stretch) / (maxv - minv)
-                array_out = (array_masked - minv) * scale + self.min_stretch
+                scale = (self.max_stretch - self.min_stretch) / (raster_max - raster_min)
+                ras = (ras - raster_min) * scale + self.min_stretch
 
         elif self.method == "NORMALISE":
-            if minv == maxv:
+            if raster_min == raster_max:
                 raise ValueError("Minimum value = Maximum value, normalising is not applicable")
             else:
-                array_out = (array_masked - minv) / (maxv - minv)
+                ras = (ras - raster_min) / (raster_max - raster_min)
 
         elif self.method == "LOG":
-            array_out = array_masked.log()
+            ras = ap.sa.Ln(r_in)
 
         elif self.method == "SQUAREROOT":
-            array_out = array_masked.sqrt()
+            ras = ap.sa. SquareRoot(r_in)
 
         elif self.method == "INVERT":
-            array_out = (array_masked - (maxv + minv)) * -1
+            ras = (ras - (raster_max - raster_min)) * -1
 
-        minv_qc, maxv_qc = array_out.min(), array_out.max()
-        self.send_info('{}, {}) --> ({}, {})\n{}'.format(minv, maxv, minv_qc, maxv_qc, array_out))
+        # save and exit
+        self.send_info('Saving to {0}'.format(r_out))
+        ras.save(r_out)
 
-
-        self.send_info("...casting to original data type...")
-        array_out = array_out.data.astype(np_type)
-        minv_qc, maxv_qc = array_out.min(), array_out.max()
-        self.send_info('{}, {}) --> ({}, {})\n{}'.format(minv, maxv, minv_qc, maxv_qc, array_out))
-
-        self.send_info("...saving to '{}'...".format(r_out))
-        env.overwriteOutput = True
-        env.outputCoordinateSystem = r_in
-        env.cellSize = r_in
-        env.Extent = r_in
-        env.snapRaster = r_in
-        ras_out = ap.NumPyArrayToRaster(array_out, ap.Point(xmin_in, ymin_in), xwidth_in, ywidth_in, ndv_in)
-        ras_out.save(r_out)
-        # ap.SetRasterProperties_management(r_out, nodata=[["1", ndv_in]])
+        data["method"] = self.method
         self.results.add({"geodata": r_out, "source_geodata": r_in, "transform": data})
+
         return
 
-# def set_nodata():
+        # this numpy stuff.. numpyarraytoraster just not behaving
+        # self.send_info(data)
+        # r_in = data["raster"]
+        # if not self.geodata.exists(r_in):
+        #     raise DoesNotExistError(r_in)
+        #
+        # _, __, ras_name, ras_ext = split_up_filename(r_in)
+        # r_out = self.geodata.make_raster_name(r_in, self.results.output_workspace, self.raster_format)
+        # self.send_info("Transforming raster {0} -->> {1} using method {2}".format(r_in, r_out, self.method))
+        #
+        # # get some properties
+        # np_type_map = {"U1": "uint8", "U2": "uint8", "U4": "uint8", "U8": "uint8", "S8": "int8", "U16": "uint16", "S16": "int16", "U32": "uint32", "S32": "int32", "F32": "float32", "F64": "float64"}
+        # rast = ap.Raster(r_in)
+        # np_type = np_type_map[rast.pixelType]
+        # xmin_in, ymin_in = rast.extent.XMin, rast.extent.YMin
+        # xwidth_in, ywidth_in = rast.meanCellWidth, rast.meanCellHeight
+        # ndv_in = rast.noDataValue
+        # del rast
+        #
+        # self.send_info("...reading raster array...")
+        # array_in = ap.RasterToNumPyArray(r_in)
+        # array_in = np.array(array_in, dtype=np_type)
+        # self.send_info(array_in)
+        #
+        # self.send_info("...masking array with '{}'...".format(ndv_in))
+        # mask = np.where(array_in == ndv_in, True, False)
+        # array_masked = np.ma.array(array_in, mask=mask)
+        # self.send_info(array_masked)
+        #
+        # mean, stdv, minv, maxv = array_masked.mean(), array_masked.std(), array_masked.min(), array_masked.max()
+        # self.send_info('mean={} stdv={} max={} min={}'.format(mean, stdv, maxv, minv))
+        #
+        # array_out = array_masked
+        # if self.method == "STANDARDISE":
+        #     array_out = (array_masked - mean) / stdv
+        #
+        # elif self.method == "STRETCH":  # (INVAL - INLO) * ((OUTUP-OUTLO)/(INUP-INLO)) + OUTLO
+        #     if minv == maxv:
+        #         raise ValueError("Minimum value = Maximum value, normalising is not applicable")
+        #     else:
+        #         scale = (self.max_stretch - self.min_stretch) / (maxv - minv)
+        #         array_out = (array_masked - minv) * scale + self.min_stretch
+        #
+        # elif self.method == "NORMALISE":
+        #     if minv == maxv:
+        #         raise ValueError("Minimum value = Maximum value, normalising is not applicable")
+        #     else:
+        #         array_out = (array_masked - minv) / (maxv - minv)
+        #
+        # elif self.method == "LOG":
+        #     array_out = array_masked.log()
+        #
+        # elif self.method == "SQUAREROOT":
+        #     array_out = array_masked.sqrt()
+        #
+        # elif self.method == "INVERT":
+        #     array_out = (array_masked - (maxv + minv)) * -1
+        #
+        # minv_qc, maxv_qc = array_out.min(), array_out.max()
+        # self.send_info('{}, {}) --> ({}, {})\n{}'.format(minv, maxv, minv_qc, maxv_qc, array_out))
+        #
+        # self.send_info("...casting to original data type...")
+        # array_out = array_out.data.astype(np_type)
+        # minv_qc, maxv_qc = array_out.min(), array_out.max()
+        # self.send_info('{}, {}) --> ({}, {})\n{}'.format(minv, maxv, minv_qc, maxv_qc, array_out))
+        #
+        # self.send_info("...saving to '{}'...".format(r_out))
+        # ap.env.overwriteOutput = True
+        # ap.env.outputCoordinateSystem = r_in
+        # ap.env.cellSize = r_in
+        # ap.env.Extent = r_in
+        # ap.env.snapRaster = r_in
+        # ras_out = ap.NumPyArrayToRaster(array_out, ap.Point(xmin_in, ymin_in), xwidth_in, ywidth_in, ndv_in)
+        # ras_out.save(r_out)
+        # data["method"] = self.method
+        # self.results.add({"geodata": r_out, "source_geodata": r_in, "transform": data})
+
+        return
+
+
+
+    # def set_nodata():
 #     import os
 #     # import Snippets
 #     from base.comtypes import client
