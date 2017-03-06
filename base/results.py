@@ -5,6 +5,7 @@ import csv
 import traceback
 import sys
 import arcpy
+from log import LOG
 
 
 class ResultsUtils(object):
@@ -25,22 +26,26 @@ class ResultsUtils(object):
         self.output_workspace_type = ""
         self.output_workspace_parent = ""
 
-    def initialise(self, params):
-        self.result_table_output_parameter = params["result_table"]
-        self.fail_table_output_parameter = params["fail_table"]
+    def initialise(self, result_table_param, fail_table_param, out_workspace, result_table_name):
+        LOG.debug("IN")
 
-        self.output_workspace = params["output_workspace"]
+        self.result_table_output_parameter = result_table_param
+        self.fail_table_output_parameter = fail_table_param
+
+        self.output_workspace = out_workspace.value
         self.output_workspace_type = describe_arc(self.output_workspace).workspaceType
 
         self.output_workspace_parent = os.path.split(self.output_workspace)[0]
 
         if self.output_workspace_type == "RemoteDatabase":
-            raise ValueError("Remote database workspaces are not yet supported")
+            e = ValueError("Remote database workspaces are not yet supported")
+            LOG.debug(e)
+            raise e
 
         # if output is to a fgdb, put the csv into it's parent folder
         csv_ws = self.output_workspace_parent if self.output_workspace_type == "LocalDatabase" else self.output_workspace
 
-        tn = params["result_table_name"]
+        tn = result_table_name
         if tn:
             self.result_table_name = tn
             self.fail_table_name = tn + "_FAIL"
@@ -52,23 +57,28 @@ class ResultsUtils(object):
         ret = []
         try:
             os.remove(self.result_csv)
-            ret.append("Existing results csv at {0} removed".format(self.result_csv))
+            ret.append("Existing results csv at {} removed".format(self.result_csv))
         except:
             pass
         try:
             os.remove(self.fail_csv)
-            ret.append("Existing fail csv at {0} removed".format(self.fail_csv))
+            ret.append("Existing fail csv at {} removed".format(self.fail_csv))
         except:
             pass
 
         if self.output_workspace_type == "LocalDatabase":
-            ret.append("Temporary Results initialised:\nTemp Result CSV @ {0}\nTemp Failure CSV @ {1}".format(self.result_csv, self.fail_csv))
+            ret.append("Temporary Results initialised:")
         else:
-            ret.append("Results initialised:\nResult CSV @ {0}\nFailure CSV @ {1}".format(self.result_csv, self.fail_csv))
+            ret.append("Results initialised:")
 
-        return "\n".join(ret)
+        ret.append("Result CSV @ {}".format(self.result_csv))
+        ret.append("Failure CSV @ {}".format(self.fail_csv))
+
+        LOG.debug("OUT returning {}".format(ret))
+        return ret
 
     def add(self, result):
+        LOG.debug("IN")
         # writes a result to the temp CSV immediately, trade off between
         # runtime performance, RAM usage and FAILURE (i.e. recovery of results)
         if not result:  # in case a caller passes in None or []
@@ -99,29 +109,19 @@ class ResultsUtils(object):
                 writer.writerow(result)
                 self.result_count += 1
 
-        return "Result written: {0}".format(result)
+        result = "Result written: {}".format(result)
 
-    def fail(self, geodata, e, row, tool=None):
+        LOG.debug("OUT returning {}".format(result))
+        return result
+
+    def fail(self, geodata, row):
+        LOG.debug("IN")
+
         # writes a fail to the temp CSV immediately, trade off between
         # runtime performance, RAM usage and failure (recovery of results)
         if not self.fail_csv:
             raise ValueError("Fail CSV is not set")
 
-        tb = sys.exc_info()[2]
-        tbinfo = traceback.format_tb(tb)[0]
-        # Concatenate information together concerning the error into a message string
-        msg = "FAIL: " + tbinfo + str(sys.exc_info()[1])
-        # msgs = "ArcPy ERRORS:\n" + arcpy.GetMessages(2) + "\n"
-        # msg = pymsg + msgs
-        # self.warn()
-        if tool:
-            tool.send_warning(msg)
-        # arcpy.AddError(msgs)
-
-        # Print Python error messages for use in Python / Python Window
-        #
-        # print pymsg + "\n"
-        # print msgs
         # write the header on first call
         if not os.path.isfile(self.fail_csv):
             setattr(self, "failure_fieldnames", ["geodata", "failure", "row_data"])
@@ -129,57 +129,78 @@ class ResultsUtils(object):
                 writer = csv.DictWriter(csv_file, delimiter=',', lineterminator='\n', fieldnames=self.failure_fieldnames)
                 writer.writeheader()
 
+        tb = sys.exc_info()[2]
+        tbinfo = traceback.format_tb(tb)[0]
+        # Concatenate information together concerning the error into a message string
+        msg = tbinfo + str(sys.exc_info()[1])
         msg = msg.strip().replace('\n', ', ').replace('\r', '')
+
         # write the failure record
         with open(self.fail_csv, "ab") as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames=self.failure_fieldnames)
             writer.writerow({"geodata": geodata, "failure": msg, "row_data": str(row)})
             self.fail_count += 1
 
+        LOG.debug("OUT")
+
     def write(self):
-        return [self._write_results(), self._write_failures()]
+        LOG.debug("IN")
+
+        ret = self._write_results() + self._write_failures()
+
+        LOG.debug("OUT returning {}".format(ret))
+        return ret
 
     def _write_results(self):
+        LOG.debug("IN")
+
+        msg = []
+
         if not os.path.exists(self.result_csv):
-            return "No results"
+            msg.append("No results")
+        else:
+            if self.output_workspace_type == "LocalDatabase":  # it's an fgdb
+                try:
+                    self.result_table = table_conversion(self.result_csv, self.output_workspace, self.result_table_name)
+                    os.remove(self.result_csv)
+                except:
+                    self.result_table = os.path.join(self.output_workspace_parent, self.result_table_name + ".csv")
+                    copyfile(self.result_csv, self.result_table)
+                    os.remove(self.result_csv)
+                    err_msg = "Table to Table Conversion failed. Hoisted temporary result CSV to database parent directory...\n"
+            else:  # it's a directory
+                self.result_table = self.result_csv
 
-        err_msg = ""
-        if self.output_workspace_type == "LocalDatabase":  # it's an fgdb
-            try:
-                self.result_table = table_conversion(self.result_csv, self.output_workspace, self.result_table_name)
-                os.remove(self.result_csv)
-            except:
-                self.result_table = os.path.join(self.output_workspace_parent, self.result_table_name + ".csv")
-                copyfile(self.result_csv, self.result_table)
-                os.remove(self.result_csv)
-                err_msg = "Table to Table Conversion failed. Hoisted temporary result CSV to database parent directory...\n"
-        else:  # it's a directory
-            self.result_table = self.result_csv
+            self.result_table_output_parameter.value = self.result_table
+            msg.append("Final results at {0}".format(self.result_table))
 
-        self.result_table_output_parameter.value = self.result_table
-        return err_msg + "Final results at {0}".format(self.result_table)
+        LOG.debug("OUT returning {}".format(msg))
+        return msg
 
     def _write_failures(self):
-        if not os.path.exists(self.fail_csv):
-            return "No failures"
+        LOG.debug("IN")
 
-        if not self.fail_count:
-            return "No failures"
+        err_msg = []
 
-        err_msg = ""
-        if self.output_workspace_type != "FileSystem":  # it's a a fgdb or rmdb
-            try:
-                self.fail_table = table_conversion(self.fail_csv, self.output_workspace, self.fail_table_name)
-                os.remove(self.fail_csv)
-            except:
-                self.fail_table = os.path.join(self.output_workspace_parent, self.fail_table_name + ".csv")
-                copyfile(self.fail_csv, self.fail_table)
-                os.remove(self.fail_csv)
-                err_msg = "Table to Table Conversion failed. Hoisted temporary failure CSV to database parent directory...\n"
+        if not os.path.exists(self.fail_csv) or not self.fail_count:
+            err_msg.append("No failures")
         else:
-            self.fail_table = self.fail_csv
+            if self.output_workspace_type != "FileSystem":  # it's a a fgdb or rmdb
+                try:
+                    self.fail_table = table_conversion(self.fail_csv, self.output_workspace, self.fail_table_name)
+                    os.remove(self.fail_csv)
+                except:
+                    self.fail_table = os.path.join(self.output_workspace_parent, self.fail_table_name + ".csv")
+                    copyfile(self.fail_csv, self.fail_table)
+                    os.remove(self.fail_csv)
+                    err_msg.append("Table to Table Conversion failed. Hoisted temporary failure CSV to database parent directory...")
+            else:
+                self.fail_table = self.fail_csv
 
-        self.fail_table_output_parameter.value = self.fail_table
-        return err_msg + "Failures at {0}".format(self.fail_table)
+            self.fail_table_output_parameter.value = self.fail_table
+            err_msg.append("Failures at {0}".format(self.fail_table))
+
+        LOG.debug("OUT returning {}".format(err_msg))
+        return err_msg
 
 # this message based status thing above is pretty dodgy needs to be reworked sensibly

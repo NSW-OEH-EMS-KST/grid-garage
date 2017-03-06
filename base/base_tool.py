@@ -10,11 +10,16 @@ import contextlib
 import ast
 from base.class_decorators import arcmap
 from base.geodata import get_search_cursor_rows, is_file_system
+import base.log
 
 
 @arcmap
 class BaseTool(object):
     def __init__(self, settings):
+        self.log = base.log.LOG  # avoid an import for each tool module
+        self.tool_type = type(self).__name__
+        self.log.debug("IN " + self.tool_type)
+
         """Define the tool (tool name is the name of the class)."""
         # the essentials
         self.label = settings.get("label", "label not set")
@@ -26,7 +31,6 @@ class BaseTool(object):
         self.arc_parameters = []
         self.arc_messages = None
         # used as stamp for default names etc.
-        self.tool_type = type(self).__name__
         self.tool_time_open = utils.time_stamp()
         self.run_id = "{0}_{1}".format(self.tool_type, self.tool_time_open)
         # instance specific
@@ -34,6 +38,8 @@ class BaseTool(object):
         self.metadata = {}
         # state
         self.current_geodata = self.current_row = "Not set"
+
+        self.log.debug("OUT " + self.tool_type)
 
     @staticmethod
     def set_stylesheet():
@@ -49,9 +55,9 @@ class BaseTool(object):
         try:
             yield
         except Exception as e:
-            self.send_warning(e)
+            self.log.error(e)
             if hasattr(self, "results"):
-                self.results.fail(self.current_geodata, e, self.current_row)
+                self.results.fail(self.current_geodata, self.current_row)
 
     @staticmethod
     def evaluate(node_or_string):
@@ -77,6 +83,8 @@ class BaseTool(object):
         return True
 
     def updateParameters(self, parameters):
+        self.log.debug("IN")
+
         """Modify the values and properties of parameters before internal
         validation is performed.  This method is called whenever a parameter
         has been changed."""
@@ -90,7 +98,12 @@ class BaseTool(object):
         if out_tbl_par and out_tbl_par.value == "#run_id#":
             out_tbl_par.value = self.run_id
 
+        self.log.debug("OUT " + self.tool_type)
+        return
+
     def updateMessages(self, parameters):
+        self.log.debug("IN")
+
         out_ws_par = None
         out_rasfmt_par = None
         for p in parameters:
@@ -115,7 +128,6 @@ class BaseTool(object):
         #     parameters[3].setIDMessage("ERROR", 735, parameters[3].displayName)
         # if stretch and not parameters[4].valueAsText:
         #     parameters[4].setIDMessage("ERROR", 735, parameters[4].displayName)
-        return
 
         # for p in parameters:
         #     v = p.value
@@ -126,28 +138,29 @@ class BaseTool(object):
         # for p in parameters:
         #     if p.name == "raster_format":
 
-
-        return
-
-    def updateMessages(self, parameters):
-        """Modify the messages created by internal validation for each tool
-        parameter.  This method is called after internal validation."""
+        self.log.debug("OUT " + self.tool_type)
         return
 
     def execute(self, parameters, messages):
+        self.log.debug("IN")
+
         """The source code of the tool."""
-        # self.send_info("BaseTool.execute()")
 
         # check if we have a function to run
         if not self.execution_list:
             raise ValueError("Tool execution list is empty")
 
         # set the runtime object refs
-        self.arc_parameters = parameters
         self.arc_messages = messages
+        base.log.set_messages(messages)
+        self.arc_parameters = parameters
 
         if hasattr(self, "results"):
-            self.send_info(self.results.initialise(self.get_parameter_dict(["result_table", "fail_table"])))
+            init = self.results.initialise(self.get_parameter_by_name("result_table"),
+                                           self.get_parameter_by_name("fail_table"),
+                                           self.get_parameter_by_name("output_workspace").value,
+                                           self.get_parameter_by_name("result_table_name").value)
+            [self.log.info(x) for x in init]
 
         # run the functions
         for f in self.execution_list:
@@ -158,17 +171,29 @@ class BaseTool(object):
                 f()
 
         if hasattr(self, "results"):
-            self.send_info(self.results.write())
+            [self.log.info(w) for w in self.results.write()]
 
+        self.log.debug("OUT")
         return
 
     def get_parameter_dict(self, leave_as_object=()):
-        return {p.name: p if p.name in leave_as_object else p.valueAsText for p in self.arc_parameters}
+        self.log.debug("IN")
+
+        pd = {p.name: p if p.name in leave_as_object else p.valueAsText for p in self.arc_parameters}
+
+        self.log.debug("OUT returning {}".format(pd))
+        return pd
 
     def get_parameter_names(self):
-        return [p.name for p in self.arc_parameters]
+        self.log.debug("IN")
+
+        pn = [p.name for p in self.arc_parameters]
+
+        self.log.debug("OUT returning {}".format(pn))
+        return pn
 
     def iterate_function_on_tableview(self, func, parameter_name, key_names):
+        self.log.debug("IN")
 
         param = self.get_parameter_by_name(parameter_name)
         if param.datatype != "Table View":
@@ -181,7 +206,7 @@ class BaseTool(object):
         v = param.valueAsText
 
         # map fields
-        num_fields = len(key_names)                                                          # [rf1, rf2, ...]
+        num_fields = len(key_names)  # [rf1, rf2, ...]
         f_names = ["{0}_field_{1}".format(parameter_name, i) for i in range(0, num_fields)]  # [f_0, f_1, ...]
         f_vals = [self.get_parameter_by_name(f_name).valueAsText for f_name in f_names]
 
@@ -189,7 +214,7 @@ class BaseTool(object):
 
         # iterate
         total_items, count = len(rows), 0
-        self.send_info("{0} items to process".format(total_items))
+        self.log.info("{0} items to process".format(total_items))
         for r in rows:
             with self.error_handler():
                 count += 1
@@ -200,9 +225,12 @@ class BaseTool(object):
                 self.current_geodata = g
                 func(data)
 
+        self.log.debug("OUT")
         return
 
     def iterate_function_on_parameter(self, func, parameter_name, key_names):
+        self.log.debug("IN")
+
         param = self.get_parameter_by_name(parameter_name)
         multi_val = getattr(param, "multivalue", False)
 
@@ -216,10 +244,10 @@ class BaseTool(object):
 
         # iterate
         total_items, count = len(rows), 0
-        self.send_info("{0} items to process".format(total_items))
+        self.log.info("{0} items to process".format(total_items))
         for r in rows:
             with self.error_handler():
-                self.send_info(r)
+                self.log.info(r)
                 count += 1
                 r = utils.make_tuple(r)
                 self.current_row = r
@@ -229,16 +257,29 @@ class BaseTool(object):
 
                 func(data)
 
+        self.log.debug("OUT " + self.tool_type)
         return
 
     def send_info(self, message):
-        if not self.arc_messages:
-            print message
-        else:
-            self.arc_messages.addMessage(message)
+        self.log.debug("IN")
+
+        self.arc_messages.addMessage("!! self.send_info() is deprecated... use self.log.info() !!")
+        if not isinstance(message, list):
+            message = [message]
+
+        [self.arc_messages.addMessage(message) for _ in message]
+
+        self.log.debug("OUT returning None")
+        return
 
     def send_warning(self, message):
-        if not self.arc_messages:
-            print message
-        else:
-            self.arc_messages.addWarningMessage(message)
+        self.log.debug("IN")
+
+        self.arc_messages.addMessage("!! self.send_warning() is deprecated... use self.log.warn() !!")
+        if not isinstance(message, list):
+            message = [message]
+
+        [self.arc_messages.addWarningMessage(message) for _ in message]
+
+        self.log.debug("OUT returning None")
+        return

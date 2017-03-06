@@ -3,6 +3,7 @@ import os
 import collections
 import csv
 from base.utils import split_up_filename
+from base.log import LOG
 
 # arc_data_types = "Any,Container,Geo,FeatureDataset,FeatureClass,PlanarGraph,GeometricNetwork,Topology,Text,Table,RelationshipClass,RasterDataset,RasterBand,TIN,CadDrawing,RasterCatalog,Toolbox,Tool,NetworkDataset,Terrain,RepresentationClass,CadastralFabric,SchematicDataset,Locator"
 arc_data_types = "Any,CadDrawing,CadastralFabric,Container,FeatureClass,FeatureDataset,Geo,GeometricNetwork,LasDataset,Layer,Locator,Map,MosaicDataset,NetworkDataset,PlanarGraph,RasterCatalog,RasterDataset,RelationshipClass,RepresentationClass,Style,Table,Terrain,Text,Tin,Tool,Toolbox,Topology"
@@ -21,32 +22,34 @@ transform_methods = ["STANDARDISE", "STRETCH", "NORMALISE", "LOG", "SQUAREROOT",
 
 class DoesNotExistError(ValueError):
     def __init__(self, geodata):
-        super(DoesNotExistError, self).__init__("{0} does not exist".format(geodata))
+        super(DoesNotExistError, self).__init__(self, "{0} does not exist".format(geodata))
 
 
 class NotRasterError(ValueError):
     def __init__(self, geodata):
-        super(NotRasterError, self).__init__("{0} is not a raster dataset".format(geodata))
+        super(NotRasterError, self).__init__(self, "{0} is not a raster dataset".format(geodata))
 
 
 class NotVectorError(ValueError):
     def __init__(self, geodata):
-        super(NotVectorError, self).__init__("{0} is not a vector dataset".format(geodata))
+        super(NotVectorError, self).__init__(self, "{0} is not a vector dataset".format(geodata))
 
 
 class UnknownSrsError(ValueError):
     def __init__(self, geodata):
-        super(UnknownSrsError, self).__init__("Dataset '{0}' has an unknown spatial reference system".format(geodata))
+        super(UnknownSrsError, self).__init__(self, "Dataset '{0}' has an unknown spatial reference system".format(geodata))
 
 
 class UnmatchedSrsError(ValueError):
     def __init__(self, srs1, srs2):
-        super(UnmatchedSrsError, self).__init__("Spatial references do not match '{0}' != '{1}'".format(srs1, srs2))
+        super(UnmatchedSrsError, self).__init__(self, "Spatial references do not match '{0}' != '{1}'".format(srs1, srs2))
 
 
 # these few functions are not made methods so that back-end modules can import them easily for use
 
 def table_conversion(in_rows, out_path, out_name):
+    LOG.debug("IN")
+
     """ Copy a file-based table to a local database, returns full path to new table if successful"""
     fms = arcpy.FieldMappings()
     fms.addTable(in_rows)
@@ -76,16 +79,20 @@ def table_conversion(in_rows, out_path, out_name):
                         fms.replaceFieldMap(j, fm)
 
     except Exception as e:
-        arcpy.AddWarning("'{0}' validation failed: {1} {2}".format(in_rows, failed, str(e)))
+        # arcpy.AddWarning()
+        LOG.error("'{0}' validation failed: {1} {2}".format(in_rows, failed, str(e)))
 
     try:
         # TableToTable_conversion (in_rows, out_path, out_name, {where_clause}, {field_mapping}, {config_keyword})
         arcpy.TableToTable_conversion(in_rows, out_path, out_name, None, fms, None)
-        return os.path.join(out_path, out_name)
+        ret = os.path.join(out_path, out_name)
 
     except Exception as e:
-        arcpy.AddWarning(e.message)
-        return None
+        LOG.error(e)
+        ret = None
+
+    LOG.debug("OUT returning {}".format(ret))
+    return ret
 
 
 def describe_arc(geodata):
@@ -127,6 +134,8 @@ def geodata_exists(geodata):
 # the main class that is attributed to the tool as 'geodata'
 class GeodataUtils(object):
     def __init__(self):
+        LOG.debug("IN")
+
         self.table_conversion = table_conversion
         self.describe_arc = describe_arc
         self.is_local_gdb = is_local_gdb
@@ -138,6 +147,8 @@ class GeodataUtils(object):
         self.copy_feature = arcpy.CopyFeatures_management
         self.delete = arcpy.Delete_management
         self.clip = arcpy.Clip_analysis
+
+        LOG.debug("OUT returning None")
         return
 
     @staticmethod
@@ -318,11 +329,15 @@ class GeodataUtils(object):
         try:
             lst = arcpy.ListTransformations(cs_in, out_cs)
         except Exception as e:
-            raise ValueError("cs_in= " + cs_in + " out_cs= " + out_cs + " e: " + str(e))
+            e = ValueError("cs_in= " + cs_in + " out_cs= " + out_cs + " e: " + str(e))
+            LOG.debug("Raising {}".format(e))
+            raise e
         if lst:
             shortest = min(lst, key=len)
         else:
-            raise ValueError("Datum transformation was not found for {0} (1) -> {2}".format(in_ds, cs_in, out_cs))
+            e = ValueError("Datum transformation was not found for {0} (1) -> {2}".format(in_ds, cs_in, out_cs))
+            LOG.debug("Raising {}".format(e))
+            raise e
 
         if overrides:
             ov = overrides.get(shortest, None)
@@ -346,33 +361,60 @@ class GeodataUtils(object):
         #         shortest = ov
 
     def get_srs(self, geodata, raise_unknown_error=False, as_object=False):
+        LOG.debug("IN")
         srs = arcpy.Describe(geodata).spatialReference
 
         if "unknown" in srs.name.lower() and raise_unknown_error:
-            raise UnknownSrsError
+            e = UnknownSrsError(geodata)
+            LOG.debug("Raising {}".format(e))
+            raise e
 
         if as_object:
-            return srs
+            val = srs
+        else:
+            val = srs.name
 
-        return srs.name
+        LOG.debug("OUT returning {}".format(val))
+        return val
 
     def validate_geodata(self, geodata, raster=False, vector=False, srs_known=False):
+        LOG.debug("IN")
+
         if not geodata_exists(geodata):
-            raise DoesNotExistError(geodata)
+            e = DoesNotExistError(geodata)
+            LOG.debug("Raising {}".format(e))
+            raise e
         if raster and not self.is_raster(geodata):
-            raise NotRasterError(geodata)
+            # raise NotRasterError(geodata)
+            e = NotRasterError(geodata)
+            LOG.debug("Raising {}".format(e))
+            raise e
         if vector and not self.is_vector(geodata):
-            raise NotVectorError(geodata)
+            # raise NotVectorError(geodata)
+            e = NotVectorError(geodata)
+            LOG.debug("Raising {}".format(e))
+            raise e
         if srs_known:
             self.get_srs(geodata, raise_unknown_error=True)
 
-    def compare_srs(self, srs1, srs2, raise_no_match_error=False, other_condition=True):
-        if not other_condition:
-            return False
-        if srs1 == srs2:
-            return True
-        if raise_no_match_error:
-                raise UnmatchedSrsError(srs1, srs2)
+        LOG.debug("OUT returning None")
+        return
 
+    @staticmethod
+    def compare_srs(srs1, srs2, raise_no_match_error=False, other_condition=True):
+        LOG.debug("IN")
+
+        val = None
+        if not other_condition:
+            val = False
+        if srs1 == srs2:
+            val = True
+        if raise_no_match_error:
+            e = UnmatchedSrsError(srs1, srs2)
+            LOG.debug("Raising {}".format(e))
+            raise e
+
+        LOG.debug("OUT returning {}".format(val))
+        return val
 
 
