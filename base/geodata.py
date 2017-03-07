@@ -134,7 +134,7 @@ def geodata_exists(geodata):
 # the main class that is attributed to the tool as 'geodata'
 class GeodataUtils(object):
     def __init__(self):
-        LOG.debug("IN")
+        LOG.debug("IN - !!! THIS OBJECT HAS BEEN DEPRECATED IN FAVOUR OF SIMPLE IMPORTS FROM BASE.UTILS !!!")
 
         self.table_conversion = table_conversion
         self.describe_arc = describe_arc

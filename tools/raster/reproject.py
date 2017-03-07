@@ -1,15 +1,15 @@
 from base.base_tool import BaseTool
-from base.geodata import raster_formats, resample_methods
-from base.class_decorators import results, geodata
+from base.utils import raster_formats, resample_methods, validate_geodata, make_raster_name, get_transformation
+from base.class_decorators import results
 from base.method_decorators import input_tableview, input_output_table, parameter
-from arcpy import ProjectRaster_management, SpatialReference
+from arcpy import ProjectRaster_management
 
 tool_settings = {"label": "Reproject",
                  "description": "Reproject rasters...",
                  "can_run_background": "True",
                  "category": "Raster"}
 
-@geodata
+
 @results
 class ReprojectRasterTool(BaseTool):
     def __init__(self):
@@ -34,6 +34,7 @@ class ReprojectRasterTool(BaseTool):
 
         pd = self.get_parameter_dict()
         self.log.debug(pd)
+
         self.out_fmt = "" if pd['raster_format'].lower == 'esri grid' else pd["raster_format"]  # fix output extension
         self.out_cs = self.arc_parameters[2].value
         self.cellsz = "#" if not pd["cell_size"] else str(pd['cell_size'])  # this seemed to solve an issue with unicode... strange
@@ -56,10 +57,10 @@ class ReprojectRasterTool(BaseTool):
         self.log.debug("IN")
 
         r_in = data['raster']
-        self.geodata.validate_geodata(r_in, raster=True, srs_known=True)
+        validate_geodata(r_in, raster=True, srs_known=True)
 
-        r_out = self.geodata.make_raster_name(r_in, self.results.output_workspace, self.out_fmt)
-        tx = self.geodata.get_transformation(r_in, self.out_cs, self.overrides)
+        r_out = make_raster_name(r_in, self.results.output_workspace, self.out_fmt)
+        tx = get_transformation(r_in, self.out_cs, self.overrides)
 
         # do the business
         self.log.info("Projecting {0} into {1} -> {2}".format(r_in, self.out_cs.name, r_out))
