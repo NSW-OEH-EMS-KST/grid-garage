@@ -4,7 +4,6 @@ import os
 import csv
 import traceback
 import sys
-import arcpy
 from log import LOG
 
 

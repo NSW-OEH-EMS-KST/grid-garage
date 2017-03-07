@@ -57,10 +57,8 @@ class ReprojectRasterTool(BaseTool):
 
         r_in = data['raster']
         self.geodata.validate_geodata(r_in, raster=True, srs_known=True)
-        # self.log.debug("1")
 
         r_out = self.geodata.make_raster_name(r_in, self.results.output_workspace, self.out_fmt)
-        # self.log.debug("2")
         tx = self.geodata.get_transformation(r_in, self.out_cs, self.overrides)
 
         # do the business
@@ -72,10 +70,3 @@ class ReprojectRasterTool(BaseTool):
 
         self.log.debug("OUT")
         return
-
-    # def execute(self, parameters, messages):
-    #     # just to get this fucking parameter as an object!
-    #     self.out_cs = parameters[2].value
-    #     self.send_info("SRS= " + str(self.out_cs))
-    #     self.send_info("srs type= " + str(type(self.out_cs)))
-    #     BaseTool.execute(self, parameters, messages)

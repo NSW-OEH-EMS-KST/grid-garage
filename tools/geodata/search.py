@@ -1,14 +1,12 @@
 from base.base_tool import BaseTool
-from base.class_decorators import geodata, results
+from base.class_decorators import results
 from base.method_decorators import input_output_table, parameter
-from base.geodata import datatype_list
-
+from base.utils import datatype_list, walk
 tool_settings = {"label": "Search",
                  "description": "Search for identifiable geodata",
                  "can_run_background": "True",
                  "category": "Geodata"}
 
-@geodata
 @results
 class SearchGeodataTool(BaseTool):
     def __init__(self):
@@ -23,23 +21,31 @@ class SearchGeodataTool(BaseTool):
         return BaseTool.getParameterInfo(self)
 
     def initialise(self):
+        self.log.debug("IN")
+
         p = self.get_parameter_dict()
         gt = p.get("geodata_types", "")
         gt = gt.split(";")
         gt = ["Any"] if "Any" in gt else gt
         self.geodata_types = gt
 
+        self.log.debug("OUT")
+        return
+
     def iterating(self):
         self.iterate_function_on_parameter(self.search, "workspaces", ["workspace"])
 
     def search(self, data):
+        self.log.debug("IN data={}".format(data))
+
         ws = data["workspace"]
         for dt in self.geodata_types:
-            self.send_info("Searching for {0} geodata types in {1}".format(dt, ws))
-            found = [{"geodata": v} for v in self.geodata.walk(ws.strip("'"), data_types=dt)]
+            self.log.info("Searching for {0} geodata types in {1}".format(dt, ws))
+            found = [{"geodata": v} for v in walk(ws.strip("'"), data_types=dt)]
             if not found:
-                self.send_info("Nothing found")
+                self.log.info("Nothing found")
             else:
-                self.send_info(self.results.add(found))
+                self.log.info(self.results.add(found))
 
+        self.log.debug("OUT")
         return
