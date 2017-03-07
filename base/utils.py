@@ -481,12 +481,10 @@ def validate_geodata(geodata, raster=False, vector=False, srs_known=False):
         LOG.debug("Raising {}".format(e))
         raise e
     if raster and not is_raster(geodata):
-        # raise NotRasterError(geodata)
         e = NotRasterError(geodata)
         LOG.debug("Raising {}".format(e))
         raise e
     if vector and not is_vector(geodata):
-        # raise NotVectorError(geodata)
         e = NotVectorError(geodata)
         LOG.debug("Raising {}".format(e))
         raise e
