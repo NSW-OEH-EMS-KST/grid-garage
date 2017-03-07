@@ -1,7 +1,8 @@
 from base.base_tool import BaseTool
-from base.class_decorators import geodata, results
+from base.class_decorators import results
 from base.method_decorators import input_output_table, input_tableview
 from datetime import datetime
+from arcpy import Delete_management
 
 note = \
 """ Note (source ESRI):
@@ -19,7 +20,6 @@ tool_settings = {"label": "Delete",
                  "category": "Geodata"}
 
 
-@geodata
 @results
 class DeleteGeodataTool(BaseTool):
     def __init__(self):
@@ -36,11 +36,15 @@ class DeleteGeodataTool(BaseTool):
         return
 
     def process(self, data):
+        self.log.debug("IN data= {}".format(data))
+
         gd = data["geodata"]
+        self.log.info('Deleting {0}'.format(gd))
+        Delete_management(gd)
 
-        self.send_info('Deleting {0}'.format(gd))
-        self.geodata.delete(gd)
+        r = self.results.add({'deleted_geodata': gd, 'time-deleted': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]})
+        self.log.info(r)
 
-        self.results.add({'deleted_geodata': gd, 'time-deleted': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]})
+        self.log.debug("OUT")
         return
 
