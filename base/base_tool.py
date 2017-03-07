@@ -17,6 +17,7 @@ import base.log
 class BaseTool(object):
     def __init__(self, settings):
         self.log = base.log.LOG  # avoid an import for each tool module
+        self.log_file = base.log.LOG_FILE
         self.tool_type = type(self).__name__
         self.log.debug("IN " + self.tool_type)
 
@@ -142,6 +143,8 @@ class BaseTool(object):
         return
 
     def execute(self, parameters, messages):
+        self.arc_messages = messages
+        base.log.set_messages(messages)
         self.log.debug("IN")
 
         """The source code of the tool."""
@@ -150,10 +153,9 @@ class BaseTool(object):
         if not self.execution_list:
             raise ValueError("Tool execution list is empty")
 
-        # set the runtime object refs
-        self.arc_messages = messages
-        base.log.set_messages(messages)
         self.arc_parameters = parameters
+
+        self.log.info("Debugging log file is located at '{}'".format(self.log_file))
 
         if hasattr(self, "results"):
             init = self.results.initialise(self.get_parameter_by_name("result_table"),

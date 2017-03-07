@@ -246,13 +246,13 @@ def parse_proj_string_for_name(proj_string):
     return y.split(",")[0].strip("'")
 
 
-def make_raster_name(like_name, out_wspace, ext='', suffix=''):
+def make_raster_name(like_name, out_wspace, ext='', prefix='', suffix=''):
     _, __, r_name, r_ext = split_up_filename(like_name)
 
     ext = "" if (is_local_gdb(out_wspace) or ext == "Esri Grid") else ext
     ext = "." + ext if (ext and ext[0] != ".") else ext
 
-    raster_name = ap.ValidateTableName(r_name + suffix, out_wspace)
+    raster_name = ap.ValidateTableName(prefix + r_name + suffix, out_wspace)
     raster_name_full = os.path.join(out_wspace, raster_name)
 
     if ap.Exists(raster_name_full):
@@ -261,13 +261,13 @@ def make_raster_name(like_name, out_wspace, ext='', suffix=''):
     return os.path.join(out_wspace, raster_name + ext)
 
 
-def make_table_name(like_name, out_wspace, ext=''):
+def make_table_name(like_name, out_wspace, ext='', prefix='', suffix=''):
     _, __, gd_name, gd_ext = split_up_filename(like_name)
 
     ext = "" if is_local_gdb(out_wspace) else ext
     ext = "." + ext if (ext and ext[0] != ".") else ext
 
-    table_name = os.path.join(out_wspace, gd_name + ext)
+    table_name = os.path.join(out_wspace, prefix + gd_name + suffix + ext)
     if ap.Exists(table_name):
         table_name = ap.CreateUniqueName(gd_name, out_wspace)
     else:

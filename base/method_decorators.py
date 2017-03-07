@@ -182,6 +182,65 @@ def input_output_table(f):
     return wrapped
 
 
+def input_output_table_with_output_affixes(f):
+
+    # Result Table
+    par0 = arcpy.Parameter(displayName="Result Table",
+                           name="result_table",
+                           datatype=["GPTableView"],
+                           parameterType="Derived",
+                           direction="Output")
+
+    # Fail Table
+    par1 = arcpy.Parameter(displayName="Fail Table",
+                           name="fail_table",
+                           datatype=["GPTableView"],
+                           parameterType="Derived",
+                           direction="Output")
+
+    # Output Workspace
+    par2 = arcpy.Parameter(displayName="Output Workspace",
+                           name="output_workspace",
+                           datatype=["DEWorkspace"],
+                           parameterType="Required",
+                           direction="Input")
+    par2.defaultEnvironmentName = "workspace"
+
+    # Output filename suffix
+    par3 = arcpy.Parameter(displayName="Output Filename Prefix",
+                           name="output_filename_prefix",
+                           datatype="GPString",
+                           parameterType="Optional",
+                           direction="Input")
+
+    # Output filename suffix
+    par4 = arcpy.Parameter(displayName="Output Filename Suffix",
+                           name="output_filename_suffix",
+                           datatype="GPString",
+                           parameterType="Optional",
+                           direction="Input")
+
+    # Output Table Name
+    par5 = arcpy.Parameter(displayName="Result Table Name",
+                           name="result_table_name",
+                           datatype="GPString",
+                           parameterType="Required",
+                           direction="Input")
+
+    par5.value = "#run_id#"
+
+    @functools.wraps(f)
+    def wrapped(*args, **kwargs):
+        params = f(*args, **kwargs)
+        pars = [par0, par1, par2, par3]
+        if params:
+            params.insert(0, pars)
+        else:
+            params = pars
+        return params
+    return wrapped
+
+
 def input_output_raster_format(f):
 #     @parameter("format", "Output Raster Format", "GPString", "Optional", False, "Input", raster_formats2, None, None, None)
 

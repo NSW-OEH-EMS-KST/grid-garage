@@ -1,6 +1,6 @@
 from base.base_tool import BaseTool
 from base.class_decorators import results
-from base.method_decorators import input_tableview, input_output_table, parameter, raster_formats
+from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats
 from arcpy import Clip_management
 from base.utils import get_srs, validate_geodata, compare_srs, make_raster_name
 
@@ -32,7 +32,7 @@ class ClipRasterTool(BaseTool):
     @parameter("no_data_val", "Value for 'NoData'", "GPString", "Required", False, "Input", None, "nodata", None, None)
     @parameter("maintain_extent", "Maintain clipping extent", "GPString", "Optional", False, "Input", ["MAINTAIN_EXTENT", "NO_MAINTAIN_EXTENT"], None, None, None)
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
-    @input_output_table
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
 
