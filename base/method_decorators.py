@@ -232,7 +232,7 @@ def input_output_table_with_output_affixes(f):
     @functools.wraps(f)
     def wrapped(*args, **kwargs):
         params = f(*args, **kwargs)
-        pars = [par0, par1, par2, par3]
+        pars = [par0, par1, par2, par3, par4, par5]
         if params:
             params.insert(0, pars)
         else:
