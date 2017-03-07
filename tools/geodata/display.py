@@ -27,15 +27,15 @@ class DisplayGeodataTool(BaseTool):
         try:
             # see if it's a layer
             self.arcmap.add_layer(geodata, "BOTTOM")
-            self.send_info("Added layer {0} to display".format(geodata))
+            self.log.info("Added layer {0} to display".format(geodata))
         except Exception:
             try:
                 # see if it's a table
                 self.arcmap.add_tableview(geodata)
-                self.send_info("Added table {0} to display".format(geodata))
+                self.log.info("Added table {0} to display".format(geodata))
             except Exception as e:
                 # bugger it for now
-                self.send_warning("Could not add {0} to display: {1}".format(geodata, str(e)))
+                self.log.warn("Could not add {0} to display: {1}".format(geodata, str(e)))
         finally:
             # Refresh things
             self.arcmap.refresh_active_view()
