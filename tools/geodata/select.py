@@ -25,6 +25,11 @@ class SelectGeodataTool(BaseTool):
         return
 
     def process(self, data):
-        self.results.add(data)
+        self.log.debug("IN data= {}".format(data))
+
+        r = self.results.add(data)
+        self.log.info(r)
+
+        self.log.debug("OUT")
         return
 

@@ -12,7 +12,6 @@ class SearchGeodataTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterating]
-        self.geodata_types = []
 
     @parameter("workspaces", "Workspaces to Search", "DEWorkspace", "Required", True, "Input", None, None, None, None)
     @parameter("geodata_types", "Data Types", "GPString", "Required", True, "Input", datatype_list, None, None, None)
@@ -21,11 +20,9 @@ class SearchGeodataTool(BaseTool):
         return BaseTool.getParameterInfo(self)
 
     def initialise(self):
-        self.log.debug("IN")
+        self.log.debug("IN self.parameter_strings= {}".format(self.parameter_strings))
 
-        p = self.get_parameter_dict()
-        gt = p.get("geodata_types", "")
-        gt = gt.split(";")
+        gt = self.geodata_types.split(";")
         gt = ["Any"] if "Any" in gt else gt
         self.geodata_types = gt
 

@@ -29,7 +29,8 @@ class BaseTool(object):
         self.category = settings.get("category", False)
         self.stylesheet = self.set_stylesheet()
         # hold refs to arcgis args passed to Execute()
-        self.arc_parameters = []
+        self.parameter_strings = None
+        self.parameter_objects = None
         self.arc_messages = None
         # used as stamp for default names etc.
         self.tool_time_open = utils.time_stamp()
@@ -65,10 +66,10 @@ class BaseTool(object):
         return ast.literal_eval(node_or_string)
 
     def get_parameter_by_name(self, param_name):
-        if not self.arc_parameters:
+        if not self.parameter_objects:
             return
 
-        for param in self.arc_parameters:
+        for param in self.parameter_objects:
             n = getattr(param, "name", None)
             if n == param_name:
                 return param
@@ -153,9 +154,13 @@ class BaseTool(object):
         if not self.execution_list:
             raise ValueError("Tool execution list is empty")
 
-        self.arc_parameters = parameters
-
         self.log.info("Debugging log file is located at '{}'".format(self.log_file))
+
+        self.parameter_objects = parameters
+        self.parameter_strings = self.get_parameter_dict()
+        [setattr(self, k, v) for k, v in self.parameter_strings.iteritems()]
+
+        self.log.debug("Tool attributes set {}".format(self.__dict__))
 
         if hasattr(self, "results"):
             init = self.results.initialise(self.get_parameter_by_name("result_table"),
@@ -181,7 +186,18 @@ class BaseTool(object):
     def get_parameter_dict(self, leave_as_object=()):
         self.log.debug("IN")
 
-        pd = {p.name: p if p.name in leave_as_object else p.valueAsText for p in self.arc_parameters}
+        pd = {p.name: p if p.name in leave_as_object else (p.valueAsText or "#") for p in self.parameter_objects}
+        x = pd.get("raster_format", None)
+        if x:
+            pd["raster_format"] = "" if x.lower() == "esri grid" else '.' + x
+        x = pd.get("output_filename_prefix", None)
+        if x:
+            pd["output_filename_prefix"] = "" if x == "#" else x
+        x = pd.get("output_filename_suffix", None)
+        if x:
+            pd["output_filename_suffix"] = "" if x == "#" else x
+        # if hasattr(self, "output_filename_prefix"):
+        #     self.output_filename_prefix = "" if self.output_filename_prefix == "#" else self.output_filename_prefix
 
         self.log.debug("OUT returning {}".format(pd))
         return pd
@@ -189,7 +205,7 @@ class BaseTool(object):
     def get_parameter_names(self):
         self.log.debug("IN")
 
-        pn = [p.name for p in self.arc_parameters]
+        pn = [p.name for p in self.parameter_objects]
 
         self.log.debug("OUT returning {}".format(pn))
         return pn

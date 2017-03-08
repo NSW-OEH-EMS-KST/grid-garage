@@ -276,19 +276,19 @@ def make_table_name(like_name, out_wspace, ext='', prefix='', suffix=''):
     return os.path.join(out_wspace, table_name + ext)
 
 
-def make_vector_name(like_name, out_wspace, ext=''):
+def make_vector_name(like_name, out_wspace, ext='', prefix='', suffix=''):
     _, __, gd_name, gd_ext = split_up_filename(like_name)
 
     ext = "" if is_local_gdb(out_wspace) else ext
     ext = "." + ext if (ext and ext[0] != ".") else ext
 
-    table_name = os.path.join(out_wspace, gd_name + ext)
-    if ap.Exists(table_name):
-        table_name = ap.CreateUniqueName(gd_name, out_wspace)
+    vector_name = os.path.join(out_wspace, prefix + gd_name + suffix + ext)
+    if ap.Exists(vector_name):
+        vector_name = ap.CreateUniqueName(gd_name, out_wspace)
     else:
-        table_name = ap.ValidateTableName(gd_name, out_wspace)
+        vector_name = ap.ValidateTableName(gd_name, out_wspace)
 
-    return os.path.join(out_wspace, table_name + ext)
+    return os.path.join(out_wspace, vector_name + ext)
 
 
 def is_vector(item):

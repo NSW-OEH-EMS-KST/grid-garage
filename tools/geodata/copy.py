@@ -1,7 +1,9 @@
 from base.base_tool import BaseTool
-from base.class_decorators import geodata, results
-from base.method_decorators import input_output_table, input_tableview
+from base.class_decorators import results
+from base.method_decorators import input_output_table_with_output_affixes, input_tableview
 from os.path import splitext
+from base.utils import make_table_name
+from arcpy import Copy_management
 
 tool_settings = {"label": "Copy",
                  "description": "Make a simple copy of geodata",
@@ -9,7 +11,6 @@ tool_settings = {"label": "Copy",
                  "category": "Geodata"}
 
 
-@geodata
 @results
 class CopyGeodataTool(BaseTool):
     def __init__(self):
@@ -17,7 +18,7 @@ class CopyGeodataTool(BaseTool):
         self.execution_list = [self.iterate]
 
     @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
-    @input_output_table
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
 
@@ -26,16 +27,21 @@ class CopyGeodataTool(BaseTool):
         return
 
     def process(self, data):
+        self.log.debug("IN data= {}".format(data))
         gd = data["geodata"]
+
         ws = self.results.output_workspace
         ex = splitext(gd)[1]
-        ngd = self.geodata.make_table_name(gd, ws, ex)
+        ngd = make_table_name(gd, ws, ex, self.output_filename_prefix, self.output_filename_suffix)
 
-        self.send_info('copying {0} --> {1}'.format(gd, ngd))
-        # Copy_management(in_data, out_data, {data_type})
-        self.geodata.copy_geodata(gd, ngd)
+        self.log.info('Copying {0} --> {1}'.format(gd, ngd))
+        Copy_management(gd, ngd)
 
-        self.results.add({'geodata': ngd, 'copied_from': gd})
+        r = self.results.add({'geodata': ngd, 'copied_from': gd})
+        self.log.info(r)
+
+        self.log.debug("OUT")
         return
 
-"http://desktop.arcgis.com/en/arcmap/latest/tools/data-management-toolbox/copy.htm"
+# Copy_management(in_data, out_data, {data_type})
+# "http://desktop.arcgis.com/en/arcmap/latest/tools/data-management-toolbox/copy.htm"

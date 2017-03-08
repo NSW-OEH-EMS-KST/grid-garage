@@ -1,6 +1,6 @@
 from base.base_tool import BaseTool
 from base.class_decorators import geodata, results
-from base.method_decorators import input_output_table, input_tableview, parameter
+from base.method_decorators import input_output_table_with_output_affixes, input_tableview, parameter
 from base.utils import split_up_filename, join_up_filename
 
 tool_settings = {"label": "Generate Names",
@@ -15,13 +15,13 @@ class GenerateNamesGeodataTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterating]
-        self.prefix = self.suffix = self.replacements = None
+        # self.prefix = self.suffix = self.replacements = None
 
     @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
     @parameter("replacements", "Replacements", "GPString", "Optional", False, "Input", None, None, None, None)
     @parameter("prefix", "Prefix", "GPString", "Optional", False, "Input", None, None, None, None)
     @parameter("suffix", "Suffix", "GPString", "Optional", False, "Input", None, None, None, None)
-    @input_output_table
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
         return BaseTool.getParameterInfo(self)
 
@@ -47,21 +47,21 @@ class GenerateNamesGeodataTool(BaseTool):
 
     def initialise(self):
         pars = self.get_parameter_dict()
-        self.prefix = pars.get("prefix", None)
-        self.suffix = pars.get("suffix", None)
-        self.replacements = pars.get("replacements", None)
+        # self.prefix = pars.get("prefix", None)
+        # self.suffix = pars.get("suffix", None)
+        # self.replacements = pars.get("replacements", None)
 
         # look for an early exit as all parameters are optional
-        if not (self.replacements or self.prefix or self.suffix):
+        if not (self.replacements or self.output_filename_prefix or self.output_filename_suffix):
             self.send_warning('All optional parameters are empty. Nothing to do.')
             exit(1)
 
-        if self.replacements:  # s_,; p_,prefix_
+        if self.replacements:                                                                        # s_,; p_,prefix_
             try:
                 replace = self.replacements
-                replace = replace.split(';')  # ["s_,", "p_,prefix_"]
+                replace = replace.split(';')                                                         # ["s_,", "p_,prefix_"]
                 replace = [v.replace("'", "").replace('"', "").replace(" ", "") for v in replace]
-                replace = [v.split(",") for v in replace]  # [["s_", ""], ["p_", "prefix"]]
+                replace = [v.split(",") for v in replace]                                            # [["s_", ""], ["p_", "prefix"]]
                 # get rid of blanks and quotes - don't want them in geodata names
                 replace = [[v1.replace("'", "").replace(" ", "_"), v2.replace("'", "").replace(" ", "_")] for v1, v2 in replace]
                 self.replacements = replace
@@ -89,13 +89,13 @@ class GenerateNamesGeodataTool(BaseTool):
             for chars, new_chars in self.replacements:
                 new_name = new_name.replace(chars, new_chars)
 
-        new_name = self.prefix + new_name if self.prefix else new_name
-        new_name = new_name + self.suffix if self.suffix else new_name
+        # new_name = self.output_filename_prefix + new_name if self.output_filename_prefix else new_name
+        # new_name = new_name + self.suffix if self.suffix else new_name
 
         # get the new name elements for validation
         new_ws, new_base, new_name, new_ext = split_up_filename(new_name)
         if self.geodata.is_raster(gd):
-            new_full = self.geodata.make_raster_name(new_name, old_ws, old_ext)
+            new_full = self.geodata.make_raster_name(new_name, old_ws, old_ext, self.output_filename_prefix, self.output_filename_suffix)
         elif self.geodata.is_vector(gd):
             new_full = self.geodata.make_vector_name(new_name, old_ws, old_ext)
         else:

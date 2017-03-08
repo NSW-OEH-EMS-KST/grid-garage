@@ -166,20 +166,20 @@ class GeodataUtils(object):
 
         return os.path.join(out_wspace, raster_name + ext)
 
-    @staticmethod
-    def make_table_name(like_name, out_wspace, ext=''):
-        _, __, gd_name, gd_ext = split_up_filename(like_name)
-
-        ext = "" if is_local_gdb(out_wspace) else ext
-        ext = "." + ext if (ext and ext[0] != ".") else ext
-
-        table_name = os.path.join(out_wspace, gd_name + ext)
-        if arcpy.Exists(table_name):
-            table_name = arcpy.CreateUniqueName(gd_name, out_wspace)
-        else:
-            table_name = arcpy.ValidateTableName(gd_name, out_wspace)
-
-        return os.path.join(out_wspace, table_name + ext)
+    # @staticmethod
+    # def make_table_name(like_name, out_wspace, ext=''):
+    #     _, __, gd_name, gd_ext = split_up_filename(like_name)
+    #
+    #     ext = "" if is_local_gdb(out_wspace) else ext
+    #     ext = "." + ext if (ext and ext[0] != ".") else ext
+    #
+    #     table_name = os.path.join(out_wspace, gd_name + ext)
+    #     if arcpy.Exists(table_name):
+    #         table_name = arcpy.CreateUniqueName(gd_name, out_wspace)
+    #     else:
+    #         table_name = arcpy.ValidateTableName(gd_name, out_wspace)
+    #
+    #     return os.path.join(out_wspace, table_name + ext)
 
     @staticmethod
     def make_vector_name(like_name, out_wspace, ext=''):
