@@ -29,7 +29,7 @@ class ReprojectRasterTool(BaseTool):
         return BaseTool.getParameterInfo(self)
 
     def initialise(self):
-        self.log.debug("IN self.parameter_strings= {}".format(self.parameter_strings))
+        self.log.debug("IN")
 
         self.output_cs = self.parameter_objects[2].value  # need the object for later code to work
         self.cell_size = str(self.cell_size)  # this seemed to solve an issue with unicode... strange
@@ -47,7 +47,7 @@ class ReprojectRasterTool(BaseTool):
         return
 
     def reproject(self, data):
-        self.log.debug("IN")
+        self.log.debug("IN data= {}".format(data))
 
         r_in = data['raster']
         validate_geodata(r_in, raster=True, srs_known=True)
