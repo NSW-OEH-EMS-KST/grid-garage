@@ -16,35 +16,50 @@ import base.log
 @arcmap
 class BaseTool(object):
     def __init__(self, settings):
-        self.log = base.log.LOG  # avoid an import for each tool module
+        """ Define the tool (tool name is the name of the class).
+        Args:
+            settings (): A dictionary implemented in derived classes
+        """
+        self.log = base.log.LOG  # avoid requiring an import for each tool module
         self.log_file = base.log.LOG_FILE
         self.tool_type = type(self).__name__
         self.log.debug("IN " + self.tool_type)
 
-        """Define the tool (tool name is the name of the class)."""
         # the essentials
         self.label = settings.get("label", "label not set")
         self.description = settings.get("description", "description not set")
         self.canRunInBackground = settings.get("can_run_background", False)
         self.category = settings.get("category", False)
         self.stylesheet = self.set_stylesheet()
+
         # hold refs to arcgis args passed to Execute()
         self.parameter_strings = None
         self.parameter_objects = None
         self.arc_messages = None
+
         # used as stamp for default names etc.
         self.tool_time_open = utils.time_stamp()
         self.run_id = "{0}_{1}".format(self.tool_type, self.tool_time_open)
-        # instance specific
+
+        # instance specific, set in derived classes
         self.execution_list = []
         self.metadata = {}
+
         # state
         self.current_geodata = self.current_row = "Not set"
 
         self.log.debug("OUT " + self.tool_type)
+        return
 
     @staticmethod
     def set_stylesheet():
+        """ Set the tool stylesheet.
+
+        TODO: DOES NOT WORK !!!
+
+        Returns:
+
+        """
         style_path = os.path.split(os.path.realpath(__file__))[0]  # base
         style_path = os.path.split(style_path)[0]  # grid_garage_3
         style_path = os.path.join(style_path, "style")
@@ -54,6 +69,11 @@ class BaseTool(object):
 
     @contextlib.contextmanager
     def error_handler(self):
+        """ Provides an error-handling context for function execution.
+
+        Returns:
+
+        """
         try:
             yield
         except Exception as e:
@@ -66,6 +86,14 @@ class BaseTool(object):
         return ast.literal_eval(node_or_string)
 
     def get_parameter_by_name(self, param_name):
+        """ Returns a parameter based on its name
+
+        Args:
+            param_name (): The name of the parameter to return
+
+        Returns:
+
+        """
         if not self.parameter_objects:
             return
 
@@ -85,11 +113,18 @@ class BaseTool(object):
         return True
 
     def updateParameters(self, parameters):
+        """ Modify the values and properties of parameters before internal
+        validation is performed.  This method is called whenever a parameter
+        has been changed.
+
+        Args:
+            parameters (): The tool parameters
+
+        Returns:
+
+        """
         self.log.debug("IN")
 
-        """Modify the values and properties of parameters before internal
-        validation is performed.  This method is called whenever a parameter
-        has been changed."""
         out_tbl_par = None
         for p in parameters:
             if p.name == "result_table_name":
@@ -104,6 +139,14 @@ class BaseTool(object):
         return
 
     def updateMessages(self, parameters):
+        """
+
+        Args:
+            parameters (): The tool parameters
+
+        Returns:
+
+        """
         self.log.debug("IN")
 
         out_ws_par = None
@@ -144,11 +187,19 @@ class BaseTool(object):
         return
 
     def execute(self, parameters, messages):
+        """ The source code of the tool.
+
+        Args:
+            parameters (): The tool parameters
+            messages ():  Associated messages
+
+        Returns:
+
+        """
         self.arc_messages = messages
         base.log.set_messages(messages)
         self.log.debug("IN")
 
-        """The source code of the tool."""
 
         # check if we have a function to run
         if not self.execution_list:
@@ -184,9 +235,20 @@ class BaseTool(object):
         return
 
     def get_parameter_dict(self, leave_as_object=()):
+        """ Create a dictionary of parameters
+
+        Args:
+            leave_as_object (): A list of parameter names to leave as objects rather than return strings
+
+        Returns: A dictionary of parameters - strings or parameter objects
+
+        """
         self.log.debug("IN")
 
+        # create the dict
         pd = {p.name: p if p.name in leave_as_object else (p.valueAsText or "#") for p in self.parameter_objects}
+
+        # now fix some specific parameters
         x = pd.get("raster_format", None)
         if x:
             pd["raster_format"] = "" if x.lower() == "esri grid" else '.' + x
@@ -196,13 +258,16 @@ class BaseTool(object):
         x = pd.get("output_filename_suffix", None)
         if x:
             pd["output_filename_suffix"] = "" if x == "#" else x
-        # if hasattr(self, "output_filename_prefix"):
-        #     self.output_filename_prefix = "" if self.output_filename_prefix == "#" else self.output_filename_prefix
 
         self.log.debug("OUT returning {}".format(pd))
         return pd
 
     def get_parameter_names(self):
+        """ Create a dictionary of parameter names
+
+        Returns: A dictionary of parameter names
+
+        """
         self.log.debug("IN")
 
         pn = [p.name for p in self.parameter_objects]
@@ -211,6 +276,16 @@ class BaseTool(object):
         return pn
 
     def iterate_function_on_tableview(self, func, parameter_name, key_names):
+        """ Runs a function over the values in a tableview parameter - a common tool scenario
+
+        Args:
+            func (): Function to run
+            parameter_name (): Parameter to run on
+            key_names (): Fields in the rows to provide
+
+        Returns:
+
+        """
         self.log.debug("IN")
 
         param = self.get_parameter_by_name(parameter_name)
@@ -247,6 +322,16 @@ class BaseTool(object):
         return
 
     def iterate_function_on_parameter(self, func, parameter_name, key_names):
+        """ Runs a function over the values in a parameter - a less common tool scenario
+
+        Args:
+            func (): Function to run
+            parameter_name (): Parameter to run on
+            key_names (): Fields in the rows to provide
+
+        Returns:
+
+        """
         self.log.debug("IN")
 
         param = self.get_parameter_by_name(parameter_name)
@@ -279,6 +364,16 @@ class BaseTool(object):
         return
 
     def send_info(self, message):
+        """ Send an INFO message to logging handlers
+
+        DEPRECATED
+
+        Args:
+            message (): The message
+
+        Returns:
+
+        """
         self.log.debug("IN")
 
         self.arc_messages.addMessage("!! self.send_info() is deprecated... use self.log.info() !!")
@@ -291,6 +386,16 @@ class BaseTool(object):
         return
 
     def send_warning(self, message):
+        """ Send a WARN message to logging handlers
+
+        DEPRECATED
+
+        Args:
+            message (): The message
+
+        Returns:
+
+        """
         self.log.debug("IN")
 
         self.arc_messages.addMessage("!! self.send_warning() is deprecated... use self.log.warn() !!")

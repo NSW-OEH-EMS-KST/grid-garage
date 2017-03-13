@@ -35,7 +35,6 @@ class ClipRasterTool(BaseTool):
 
         self.polygon_srs = get_srs(self.polygons, raise_unknown_error=True) if self.polygons != "#" else None
         self.clipping_geometry = "ClippingGeometry" if self.clipping_geometry != "#" else "NONE"
-        # self.maintain_extent = self.maintain_extent or "#"
 
         self.log.debug("OUT")
         return
@@ -58,8 +57,7 @@ class ClipRasterTool(BaseTool):
         self.log.info("Clipping {0} -->> {1} ...".format(ras, ras_out))
         Clip_management(ras, self.rectangle, ras_out, self.polygons, self.no_data_val, self.clipping_geometry, self.maintain_extent)
 
-        r = self.results.add({"geodata": ras_out, "source_geodata": ras})
-        self.log.info(r)
+        self.log.info(self.results.add({"geodata": ras_out, "source_geodata": ras}))
 
         self.log.debug("OUT")
         return
