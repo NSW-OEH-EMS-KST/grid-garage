@@ -9,6 +9,8 @@ from log import LOG
 
 class ResultsUtils(object):
     def __init__(self):
+        """ Add class members """
+
         self.fail_table = ""
         self.fail_table_name = ""
         self.fail_count = 0
@@ -26,6 +28,17 @@ class ResultsUtils(object):
         self.output_workspace_parent = ""
 
     def initialise(self, result_table_param, fail_table_param, out_workspace, result_table_name):
+        """ Initialise the results for the instance
+
+        Args:
+            result_table_param (): Tool result table parameter
+            fail_table_param ():  Tool fail table parameter
+            out_workspace (): Output workspace
+            result_table_name (): Base name of result table
+
+        Returns: A list of strings reflection operations
+
+        """
         LOG.debug("IN")
 
         self.result_table_output_parameter = result_table_param
@@ -77,9 +90,19 @@ class ResultsUtils(object):
         return ret
 
     def add(self, result):
+        """ Write result record to CSV
+
+        Writes a result to the temp CSV immediately, trade off between
+        runtime performance, RAM usage and FAILURE (i.e. recovery of results)
+
+        Args:
+            result ():
+
+        Returns:
+
+        """
         LOG.debug("IN")
-        # writes a result to the temp CSV immediately, trade off between
-        # runtime performance, RAM usage and FAILURE (i.e. recovery of results)
+
         if not result:  # in case a caller passes in None or []
             return "Result was empty"
 
@@ -114,10 +137,20 @@ class ResultsUtils(object):
         return result
 
     def fail(self, geodata, row):
+        """ Write failure record to CSV
+
+        Writes a failure to the temp CSV immediately, trade off between
+        runtime performance, RAM usage and FAILURE (i.e. recovery of results)
+
+        Args:
+            geodata ():
+            row ():
+
+        Returns:
+
+        """
         LOG.debug("IN")
 
-        # writes a fail to the temp CSV immediately, trade off between
-        # runtime performance, RAM usage and failure (recovery of results)
         if not self.fail_csv:
             raise ValueError("Fail CSV is not set")
 
@@ -141,8 +174,14 @@ class ResultsUtils(object):
             self.fail_count += 1
 
         LOG.debug("OUT")
+        return
 
     def write(self):
+        """ Write the success and failure csv files to the final tables
+
+        Returns: A list of strings reflecting operation results
+
+        """
         LOG.debug("IN")
 
         ret = self._write_results() + self._write_failures()
@@ -151,6 +190,11 @@ class ResultsUtils(object):
         return ret
 
     def _write_results(self):
+        """ Write the result CSV rows to the final table
+
+        Returns: A list of strings reflecting operation status
+
+        """
         LOG.debug("IN")
 
         msg = []
@@ -177,6 +221,11 @@ class ResultsUtils(object):
         return msg
 
     def _write_failures(self):
+        """ Write the failure CSV rows to the final table
+
+        Returns: A list of strings reflecting operation status
+
+        """
         LOG.debug("IN")
 
         err_msg = []
@@ -202,4 +251,4 @@ class ResultsUtils(object):
         LOG.debug("OUT returning {}".format(err_msg))
         return err_msg
 
-# this message based status thing above is pretty dodgy needs to be reworked sensibly
+# this message based status thing above is pretty dodgy needs to be reworked sensibly, just a messy job to refactor as now interwoven through most tools

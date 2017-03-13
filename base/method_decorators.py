@@ -1,10 +1,27 @@
 import arcpy
 import functools
-# import here to allow easier import for tools
-from base.geodata import raster_formats, resample_methods, aggregation_methods, data_nodata, expand_trunc, stats_type, pixel_type, raster_formats2, transform_methods
+# import here to allow easier import for tools - AFTER REFACTORING GEODATA THIS IS LESS USEFUL TODO: REMOVE AND TEST ALL TOOLS?
+from base.utils import raster_formats, resample_methods, aggregation_methods, data_nodata, expand_trunc, stats_type, pixel_type, raster_formats2, transform_methods
 
 
 def parameter(name, display_name, data_type, parameter_type, multi_value, direction, value_list, default_environment, dependancy_list, default_value):
+    """ Wrap a function with a function that generates a generic parameter
+
+    Args:
+        name ():
+        display_name ():
+        data_type ():
+        parameter_type ():
+        multi_value ():
+        direction ():
+        value_list ():
+        default_environment ():
+        dependancy_list ():
+        default_value ():
+
+    Returns: Wrapped function
+
+    """
 
     validate_parameter(name, display_name, data_type, parameter_type, multi_value, direction, value_list, default_environment, dependancy_list, default_value)
 
@@ -46,6 +63,23 @@ def parameter(name, display_name, data_type, parameter_type, multi_value, direct
 
 
 def validate_parameter(name, display_name, data_type, parameter_type, multi_value, direction, value_list, default_environment, dependancy_list, default_value):
+    """ Ensure the arguments for the parameter wrappers are half-way sensible
+
+    Args:
+        name ():
+        display_name ():
+        data_type ():
+        parameter_type ():
+        multi_value ():
+        direction ():
+        value_list ():
+        default_environment ():
+        dependancy_list ():
+        default_value ():
+
+    Returns:
+
+    """
     if not isinstance(name, basestring):
         raise ValueError("name must be a string {0}".format(name))
 
@@ -88,6 +122,17 @@ def validate_parameter(name, display_name, data_type, parameter_type, multi_valu
 
 
 def input_tableview(name, display_name, multi_value, required_fields):
+    """ Wrap a function with a function that generates an input tableview parameter
+
+    Args:
+        name ():
+        display_name ():
+        multi_value ():
+        required_fields ():
+
+    Returns: Wrapped function
+
+    """
     if not isinstance(required_fields, (list, tuple)):
         raise ValueError("Required fields must be in a list ['x:y:z', ...]")  # def-time
 
@@ -138,6 +183,16 @@ def input_tableview(name, display_name, multi_value, required_fields):
 
 
 def input_output_table(f):
+    """ Wrap a function with a function that generates output table parameters
+
+    DEPRECATED. TOOLS SHOULD BE REFACTORED TO USE THE NEW FUNCTION BELOW
+
+    Args:
+        f ():
+
+    Returns:
+
+    """
 
     # Result Table
     par0 = arcpy.Parameter(displayName="Result Table",
@@ -183,6 +238,14 @@ def input_output_table(f):
 
 
 def input_output_table_with_output_affixes(f):
+    """ Wrap a function with a function that generates output table parameters including affixes
+
+    Args:
+        f ():
+
+    Returns:
+
+    """
 
     # Result Table
     par0 = arcpy.Parameter(displayName="Result Table",
@@ -242,7 +305,14 @@ def input_output_table_with_output_affixes(f):
 
 
 def input_output_raster_format(f):
-#     @parameter("format", "Output Raster Format", "GPString", "Optional", False, "Input", raster_formats2, None, None, None)
+    """ Wrap a function with a function that generates an output raster format parameter
+
+    Args:
+        f ():
+
+    Returns:
+
+    """
 
     # Format
     par0 = parameter("output_raster_format", "Output Raster Format", "GPString", "Optional", False, "Input", raster_formats2, None, None, None)
@@ -252,16 +322,6 @@ def input_output_raster_format(f):
 
     # arcpy.env.compression = "compression_type {value}"
 
-    # @functools.wraps(f)
-    # def wrapped(*args, **kwargs):
-    #     params = f(*args, **kwargs)
-    #     pars = [par0, par1]
-    #     if params:
-    #         params.insert(0, pars)
-    #     else:
-    #         params = pars
-    #     return params
-    # return wrapped
     pars = [par0, par1]
 
     def decorator(f):
@@ -418,6 +478,11 @@ Z Domain,GPZDomain,A range of lowest and highest possible values for z coordinat
 
 
 def arc_parameter_datatype_list():
+    """ Parse the 'arc_parameter_types_string' into a list
+
+    Returns: A list
+
+    """
 
     x = arc_parameter_types_string.split("\n")[1:-1]  # remove leading + trailing blanks
     x = [v.split(",", 2) for v in x]  # split the csv into a list
@@ -425,4 +490,9 @@ def arc_parameter_datatype_list():
 
 
 def arc_environment_list():
+    """ Wrap arcpy.ListEnvironments() - NOT USEFUL ANY MORE
+
+    Returns: A list of environments
+
+    """
     return arcpy.ListEnvironments()
