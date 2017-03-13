@@ -5,7 +5,6 @@ import csv
 from base.utils import split_up_filename
 from base.log import LOG
 
-# arc_data_types = "Any,Container,Geo,FeatureDataset,FeatureClass,PlanarGraph,GeometricNetwork,Topology,Text,Table,RelationshipClass,RasterDataset,RasterBand,TIN,CadDrawing,RasterCatalog,Toolbox,Tool,NetworkDataset,Terrain,RepresentationClass,CadastralFabric,SchematicDataset,Locator"
 arc_data_types = "Any,CadDrawing,CadastralFabric,Container,FeatureClass,FeatureDataset,Geo,GeometricNetwork,LasDataset,Layer,Locator,Map,MosaicDataset,NetworkDataset,PlanarGraph,RasterCatalog,RasterDataset,RelationshipClass,RepresentationClass,Style,Table,Terrain,Text,Tin,Tool,Toolbox,Topology"
 datatype_list = arc_data_types.split(",")
 
@@ -48,9 +47,18 @@ class UnmatchedSrsError(ValueError):
 # these few functions are not made methods so that back-end modules can import them easily for use
 
 def table_conversion(in_rows, out_path, out_name):
+    """ Copy a file-based table to a local database
+
+    Args:
+        in_rows (): Source table
+        out_path (): Path for output
+        out_name (): Destination table name
+
+    Returns: Full path to new table if successful
+
+    """
     LOG.debug("IN")
 
-    """ Copy a file-based table to a local database, returns full path to new table if successful"""
     fms = arcpy.FieldMappings()
     fms.addTable(in_rows)
 
@@ -96,6 +104,14 @@ def table_conversion(in_rows, out_path, out_name):
 
 
 def describe_arc(geodata):
+    """ Wraps arcpy.Describe()
+
+    Args:
+        geodata ():
+
+    Returns:
+
+    """
 
     if not geodata_exists(geodata):
         raise DoesNotExistError(geodata)
@@ -104,16 +120,55 @@ def describe_arc(geodata):
 
 
 def is_local_gdb(workspace):
+    """ Test if workspace is of type "LocalDatabase'
+
+    Args:
+        workspace (): The workspace
+
+    Returns:
+
+    """
     return describe_arc(workspace).workspaceType == "LocalDatabase"
 
 
 def is_file_system(workspace):
+    """ Test if workspace is of type "FileSystem'
+
+    Args:
+        workspace (): The workspace
+
+    Returns:
+
+    """
     return describe_arc(workspace).workspaceType == "FileSystem"
 
 
 def get_search_cursor_rows(in_table, field_names, where_clause=None):
+    """ Returns search cursor as a list of rows for easy iteration
+
+    Args:
+        in_table (): Source table
+        field_names (): Fields required
+        where_clause (): Optional filter
+
+    Returns: A list of SearchCursor rows
+
+    """
 
     def _get_search_cursor(in_table_sc, field_names_sc, where_clause_sc=where_clause, spatial_reference=None, explode_to_points=None, sql_clause=None):
+        """ Wraps arcpy.da.SearchCursor
+
+        Args:
+            in_table_sc (): Source table
+            field_names_sc (): Field names
+            where_clause_sc (): Optional filter
+            spatial_reference (): Optional see esri help
+            explode_to_points (): Optional see esri help
+            sql_clause (): Optional see esri help
+
+        Returns: SearchCursor object
+
+        """
         return arcpy.da.SearchCursor(in_table_sc, field_names_sc, where_clause_sc, spatial_reference, explode_to_points, sql_clause)
 
     # get a search cursor, listify it, release it
@@ -125,6 +180,14 @@ def get_search_cursor_rows(in_table, field_names, where_clause=None):
 
 
 def geodata_exists(geodata):
+    """ Wrapper for arcpy.Exists()
+
+    Args:
+        geodata ():
+
+    Returns: Boolean
+
+    """
     if geodata:
         return arcpy.Exists(geodata)
     else:
@@ -132,6 +195,7 @@ def geodata_exists(geodata):
 
 
 # the main class that is attributed to the tool as 'geodata'
+# DEPRECATED - THIS IDEA WAS A DUD - INTENDED TO ABSTRACT USE OF GDAL/ARCGIS BUT WON'T HAPPEN UNFORTUNATELY
 class GeodataUtils(object):
     def __init__(self):
         LOG.debug("IN - !!! THIS OBJECT HAS BEEN DEPRECATED IN FAVOUR OF SIMPLE IMPORTS FROM BASE.UTILS !!!")

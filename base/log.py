@@ -2,15 +2,27 @@ from os import makedirs, environ
 from os.path import join, exists
 import logging
 
+# basic settings
 APPDATA_PATH = join(environ["USERPROFILE"], "AppData", "Local", "GridGarage")
 LOG_FILE = join(APPDATA_PATH, "gg3.log")
 LOG = logging
+
+# set after import by base tool class
 ARC_MESSAGES = None
 
 
 class ArcLogHandler(logging.StreamHandler):
+    """ Logging handler to log messages to ArcGIS
+    """
     def emit(self, record):
+        """ Emit the record to the ArcGIS messages object
 
+        Args:
+            record (): The message record
+
+        Returns:
+
+        """
         if not ARC_MESSAGES:
             return
 
@@ -31,8 +43,17 @@ class ArcLogHandler(logging.StreamHandler):
 
 
 def set_messages(msgs):
+    """ Set the arc messages object for use by tools
+
+    Args:
+        msgs (): A ref to the messages
+
+    Returns:
+
+    """
     global ARC_MESSAGES
     ARC_MESSAGES = msgs
+    return
 
 
 try:
@@ -50,6 +71,7 @@ try:
     ah = ArcLogHandler()
     ah.setLevel(logging.INFO)
     logging.getLogger().addHandler(ah)
+
     logging.debug("ArcLogHandler added")
 
 except:

@@ -364,7 +364,7 @@ class BaseTool(object):
         return
 
     def send_info(self, message):
-        """ Send an INFO message to logging handlers
+        """ Send an INFO message to user
 
         DEPRECATED
 
@@ -386,7 +386,7 @@ class BaseTool(object):
         return
 
     def send_warning(self, message):
-        """ Send a WARN message to logging handlers
+        """ Send a WARN message to user
 
         DEPRECATED
 
