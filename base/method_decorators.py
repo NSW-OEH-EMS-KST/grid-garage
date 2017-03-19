@@ -58,7 +58,9 @@ def parameter(name, display_name, data_type, parameter_type, multi_value, direct
             else:
                 params = [par]
             return params
+
         return wrapped
+
     return decorated
 
 
