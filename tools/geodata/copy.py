@@ -43,7 +43,7 @@ class CopyGeodataTool(base.base_tool.BaseTool):
         self.log.info('Copying {0} --> {1}'.format(gd, ngd))
         Copy_management(gd, ngd)
 
-        r = self.results.add({'geodata': ngd, 'copied_from': gd})
+        r = self.result.add({'geodata': ngd, 'copied_from': gd})
         self.log.info(r)
 
         return

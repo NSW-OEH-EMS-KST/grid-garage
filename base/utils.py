@@ -116,13 +116,19 @@ def is_file_system(workspace):
 @base.log.log
 def get_search_cursor_rows(in_table, field_names, where_clause=None):
 
+    @base.log.log
     def _get_search_cursor(in_table_sc, field_names_sc, where_clause_sc=where_clause, spatial_reference=None, explode_to_points=None, sql_clause=None):
+
+        base.log.debug(locals())
+
         return ap.da.SearchCursor(in_table_sc, field_names_sc, where_clause_sc, spatial_reference, explode_to_points, sql_clause)
 
     # get a search cursor, listify it, release it
     sc = _get_search_cursor(in_table, field_names, where_clause_sc=where_clause)
     rows = [row for row in sc]
     del sc
+
+    base.log.debug("Returning rows = {}".format(rows))
 
     return rows
 

@@ -80,6 +80,6 @@ class CompareExtentsGeodataTool(base.base_tool.BaseTool):
             ("disjoint_aoi", dis), ("overlaps_aoi", ovr),
             ("equals_aoi", equ), ("touches_aoi", tch)])
 
-        self.log.info(self.results.add(r))
+        self.log.info(self.result.add(r))
 
         return

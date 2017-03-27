@@ -47,6 +47,7 @@ class SearchGeodataTool(base.base_tool.BaseTool):
             if not found:
                 self.log.info("Nothing found")
             else:
-                self.log.info(self.results.add(found))
+                self.log.info(self.result.add(found))
+
 
         return

@@ -32,7 +32,7 @@ class SelectGeodataTool(base.base_tool.BaseTool):
 
     def process(self, data):
 
-        self.results.add(data)
+        self.result.add(data)
 
         return
 

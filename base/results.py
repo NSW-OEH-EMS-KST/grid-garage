@@ -9,7 +9,7 @@ import base.log
 
 
 def result(cls):
-    setattr(cls, "results", ResultsUtils())
+    setattr(cls, "result", ResultsUtils())
     return cls
 
 

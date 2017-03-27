@@ -102,6 +102,6 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
             new_full = make_table_name(new_name, old_ws, old_ext, self.output_filename_prefix, self.output_filename_suffix)
 
         self.log.info("{0} -->> {1}".format(gd, new_full))
-        self.results.add({'geodata': gd, 'candidate_name': new_full, 'existing_base_name': old_base, 'candidate_base_name': new_base})
+        self.result.add({'geodata': gd, 'candidate_name': new_full, 'existing_base_name': old_base, 'candidate_base_name': new_base})
 
         return

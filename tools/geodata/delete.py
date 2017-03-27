@@ -47,7 +47,7 @@ class DeleteGeodataTool(base.base_tool.BaseTool):
         self.log.info('Deleting {0}'.format(gd))
         Delete_management(gd)
 
-        r = self.results.add({'deleted_geodata': gd, 'time-deleted': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]})
+        r = self.result.add({'deleted_geodata': gd, 'time-deleted': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]})
         self.log.info(r)
 
         return

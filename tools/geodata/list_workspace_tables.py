@@ -48,6 +48,6 @@ class ListWorkspaceTablesGeodataTool(base.base_tool.BaseTool):
             d["date_time_ex_name"] = match.group(0) if match else None
             dic_list.append(d)
 
-        self.log.info(self.results.add(dic_list))
+        self.log.info(self.result.add(dic_list))
 
         return
