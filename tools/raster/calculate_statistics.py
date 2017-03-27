@@ -42,6 +42,8 @@ class CalculateStatisticsRasterTool(base.base_tool.BaseTool):
         self.geodata.validate_geodata(ras, raster=True)
         CalculateStatistics_management(ras, self.x_skip_factor, self.y_skip_factor, self.ignore_values, self.skip_existing, self.area_of_interest)
 
+        self.result.add({"geodata": ras, "statistics": "built"})
+
         return
 
 "http://desktop.arcgis.com/en/arcmap/latest/tools/data-management-toolbox/calculate-statistics.htm"

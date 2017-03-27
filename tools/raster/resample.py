@@ -38,7 +38,7 @@ class ResampleRasterTool(base.base_tool.BaseTool):
 
         ras = data["raster"]
         base.utils.validate_geodata(ras, raster=True)
-        ras_out = base.utils.make_raster_name(ras, self.results.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+        ras_out = base.utils.make_raster_name(ras, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
 
         self.log.info("Resampling {0} -->> {1} ...".format(ras, ras_out))
         arcpy.Resample_management(ras, ras_out, self.cell_size, self.resample_type)

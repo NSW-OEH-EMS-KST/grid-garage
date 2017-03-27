@@ -67,7 +67,7 @@ class TransformRasterTool(base.base_tool.BaseTool):
         r_in = data["raster"]
         base.utils.validate_geodata(raster=True)
 
-        r_out = base.utils.make_raster_name(r_in, self.results.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+        r_out = base.utils.make_raster_name(r_in, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
         self.log.info("Transforming raster {0} -->> {1} using method {2}".format(r_in, r_out, self.method))
         self.log.info("\tCalculating statistics")
         ap.CalculateStatistics_management(r_in)

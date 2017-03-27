@@ -58,7 +58,7 @@ class ClipRasterTool(base.base_tool.BaseTool):
         if self.polygons != "#":
             compare_srs(ras_srs, self.polygon_srs, raise_no_match_error=True, other_condition=(self.clipping_geometry != "NONE"))
 
-        ras_out = make_raster_name(ras, self.results.output_workspace, self.raster_format, self.output_filename_prefix, self. output_filename_suffix)
+        ras_out = make_raster_name(ras, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self. output_filename_suffix)
         self.log.info("Clipping {0} -->> {1} ...".format(ras, ras_out))
         arcpy.Clip_management(ras, self.rectangle, ras_out, self.polygons, self.no_data_val, self.clipping_geometry, self.maintain_extent)
 

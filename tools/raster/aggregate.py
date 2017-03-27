@@ -53,7 +53,7 @@ class AggregateRasterTool(base.base_tool.BaseTool):
         ras = data["raster"]
         base.utils.validate_geodata(ras, raster=True)
 
-        ras_out = base.utils.make_raster_name(ras, self.results.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+        ras_out = base.utils.make_raster_name(ras, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
         self.send_info("Aggregating {0} -->> {1} ...".format(ras, ras_out))
         out = Aggregate(ras, self.cell_factor, self.aggregation_type, self.extent_handling, self.ignore_nodata)
         out.save(ras_out)
