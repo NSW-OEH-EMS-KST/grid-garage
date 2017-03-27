@@ -1,6 +1,6 @@
 import base.base_tool
 import base.results
-from base.method_decorators import input_tableview, input_output_table, parameter, raster_formats
+from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats
 from arcpy.sa import SetNull
 import base.utils
 
@@ -23,7 +23,7 @@ class SetValueToNullRasterTool(base.base_tool.BaseTool):
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:none"])
     @parameter("val_to_null", "Value to Set Null", "GPDouble", "Required", False, "Input", None, None, None, None)
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, "Esri Grid")
-    @input_output_table
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
 
         return base.base_tool.BaseTool.getParameterInfo(self)
