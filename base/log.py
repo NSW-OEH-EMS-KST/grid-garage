@@ -148,7 +148,7 @@ def error_trap(identifier=None, context=None):
         err(str(e))
         if context:
             if hasattr(context, "result"):
-                context.results.fail(context.current_geodata, context.current_row)
+                context.result.fail(context.current_geodata, context.current_row)
 
     return
 
