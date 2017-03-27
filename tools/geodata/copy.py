@@ -34,11 +34,11 @@ class CopyGeodataTool(base.base_tool.BaseTool):
         return
 
     def copy(self, data):
+
         gd = data["geodata"]
 
-        ws = self.results.output_workspace
-        ex = splitext(gd)[1]
-        ngd = make_table_name(gd, ws, ex, self.output_filename_prefix, self.output_filename_suffix)
+        ext = splitext(gd)[1]
+        ngd = make_table_name(gd, self.result.output_workspace, ext, self.output_filename_prefix, self.output_filename_suffix)
 
         self.log.info('Copying {0} --> {1}'.format(gd, ngd))
         Copy_management(gd, ngd)

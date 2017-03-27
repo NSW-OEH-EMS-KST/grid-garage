@@ -280,7 +280,7 @@ class BaseTool(object):
         Returns:
 
         """
-        base.log.debug("locals = ()".format(locals()))
+        base.log.debug("locals = {}".format(locals()))
         param = self.get_parameter_by_name(parameter_name)
         if param.datatype != "Table View":
             raise ValueError("That parameter is not a table or table view ({0})".format(param.name))

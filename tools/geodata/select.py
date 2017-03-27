@@ -14,7 +14,7 @@ class SelectGeodataTool(base.base_tool.BaseTool):
     def __init__(self):
 
         base.base_tool.BaseTool.__init__(self, tool_settings)
-        self.execution_list = [self.start_iteration]
+        self.execution_list = [self.iterate]
 
         return
 
@@ -24,7 +24,7 @@ class SelectGeodataTool(base.base_tool.BaseTool):
 
         return base.base_tool.BaseTool.getParameterInfo(self)
 
-    def start_iteration(self):
+    def iterate(self):
 
         self.iterate_function_on_parameter(self.process, "geodata", ["geodata"])
 
