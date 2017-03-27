@@ -1,5 +1,5 @@
-from base.base_tool import BaseTool
-from base.class_decorators import results
+import base.base_tool
+import base.results
 from base.method_decorators import input_output_table, parameter
 
 tool_settings = {"label": "Select",
@@ -8,12 +8,12 @@ tool_settings = {"label": "Select",
                  "category": "Geodata"}
 
 
-@results
-class SelectGeodataTool(BaseTool):
+@base.results.result
+class SelectGeodataTool(base.base_tool.BaseTool):
 
     def __init__(self):
 
-        BaseTool.__init__(self, tool_settings)
+        base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.start_iteration]
 
         return
@@ -22,7 +22,7 @@ class SelectGeodataTool(BaseTool):
     @input_output_table
     def getParameterInfo(self):
 
-        return BaseTool.getParameterInfo(self)
+        return base.base_tool.BaseTool.getParameterInfo(self)
 
     def start_iteration(self):
 

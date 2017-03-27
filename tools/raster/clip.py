@@ -1,23 +1,28 @@
-from base.base_tool import BaseTool
-from base.class_decorators import results
+import base.base_tool
+import base.results
 from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats
-from arcpy import Clip_management
+import arcpy
 from base.utils import get_srs, validate_geodata, compare_srs, make_raster_name
+
 
 tool_settings = {"label": "Clip",
                  "description": "Clips raster datasets",
                  "can_run_background": "True",
                  "category": "Raster"}
 
-""" MAINTAIN_EXTENT - Adjust the number of columns and rows, then resample pixels so as to exactly match the clipping extent specified.
-    NO_MAINTAIN_EXTENT - Maintain the cell alignment as the input raster and adjust the output extent accordingly."""
+# """ MAINTAIN_EXTENT - Adjust the number of columns and rows, then resample pixels so as to exactly match the clipping extent specified.
+#     NO_MAINTAIN_EXTENT - Maintain the cell alignment as the input raster and adjust the output extent accordingly."""
 
-@results
-class ClipRasterTool(BaseTool):
+
+@base.results.result
+class ClipRasterTool(base.base_tool.BaseTool):
+
     def __init__(self):
-        BaseTool.__init__(self, tool_settings)
+        base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
         self.polygon_srs = None
+
+        return
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("rectangle", "Rectangle", "GPExtent", "Required", False, "Input", None, "extent", None, None)
@@ -28,23 +33,23 @@ class ClipRasterTool(BaseTool):
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        return BaseTool.getParameterInfo(self)
+
+        return base.base_tool.BaseTool.getParameterInfo(self)
 
     def initialise(self):
-        self.log.debug("IN self.parameter_strings= {}".format(self.parameter_strings))
 
         self.polygon_srs = get_srs(self.polygons, raise_unknown_error=True) if self.polygons != "#" else None
         self.clipping_geometry = "ClippingGeometry" if self.clipping_geometry != "#" else "NONE"
 
-        self.log.debug("OUT")
         return
 
     def iterate(self):
+
         self.iterate_function_on_tableview(self.clip, "raster_table", ["raster"])
+
         return
 
     def clip(self, data):
-        self.log.debug("IN data= {}".format(data))
 
         ras = data["raster"]
         validate_geodata(ras, raster=True)
@@ -55,11 +60,10 @@ class ClipRasterTool(BaseTool):
 
         ras_out = make_raster_name(ras, self.results.output_workspace, self.raster_format, self.output_filename_prefix, self. output_filename_suffix)
         self.log.info("Clipping {0} -->> {1} ...".format(ras, ras_out))
-        Clip_management(ras, self.rectangle, ras_out, self.polygons, self.no_data_val, self.clipping_geometry, self.maintain_extent)
+        arcpy.Clip_management(ras, self.rectangle, ras_out, self.polygons, self.no_data_val, self.clipping_geometry, self.maintain_extent)
 
         self.log.info(self.results.add({"geodata": ras_out, "source_geodata": ras}))
 
-        self.log.debug("OUT")
         return
 
 # import arcpy

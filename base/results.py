@@ -8,6 +8,11 @@ import sys
 import base.log
 
 
+def result(cls):
+    setattr(cls, "results", ResultsUtils())
+    return cls
+
+
 class ResultsUtils(object):
     @base.log.log
     def __init__(self):

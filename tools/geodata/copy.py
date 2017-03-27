@@ -1,5 +1,5 @@
-from base.base_tool import BaseTool
-from base.class_decorators import results
+import base.base_tool
+import base.results
 from base.method_decorators import input_output_table_with_output_affixes, input_tableview
 from os.path import splitext
 from base.utils import make_table_name
@@ -11,23 +11,29 @@ tool_settings = {"label": "Copy",
                  "category": "Geodata"}
 
 
-@results
-class CopyGeodataTool(BaseTool):
+@base.results.result
+class CopyGeodataTool(base.base_tool.BaseTool):
+
     def __init__(self):
-        BaseTool.__init__(self, tool_settings)
+
+        base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
+
+        return
 
     @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        return BaseTool.getParameterInfo(self)
+
+        return base.base_tool.BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        self.iterate_function_on_tableview(self.process, "geodata_table", ["geodata"])
+
+        self.iterate_function_on_tableview(self.copy, "geodata_table", ["geodata"])
+
         return
 
-    def process(self, data):
-        self.log.debug("IN data= {}".format(data))
+    def copy(self, data):
         gd = data["geodata"]
 
         ws = self.results.output_workspace
@@ -40,7 +46,6 @@ class CopyGeodataTool(BaseTool):
         r = self.results.add({'geodata': ngd, 'copied_from': gd})
         self.log.info(r)
 
-        self.log.debug("OUT")
         return
 
 # Copy_management(in_data, out_data, {data_type})

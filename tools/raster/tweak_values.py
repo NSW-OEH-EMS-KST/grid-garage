@@ -1,10 +1,8 @@
-from base.base_tool import BaseTool
-from base.class_decorators import results
-from base.method_decorators import input_tableview, input_output_table, parameter, raster_formats
-from arcpy import Raster, Describe
-from arcpy.sa import Con, Int
-from os.path import join
-from base.utils import validate_geodata, make_raster_name
+import base.base_tool
+import base.results
+from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats
+import arcpy
+import base.utils
 
 tool_settings = {"label": "Tweak Values",
                  "description": "Tweaks raster cell values with simple mathematics and can integerise result",
@@ -12,10 +10,12 @@ tool_settings = {"label": "Tweak Values",
                  "category": "Raster"}
 
 
-@results
-class TweakValuesRasterTool(BaseTool):
+@base.results.result
+class TweakValuesRasterTool(base.base_tool.BaseTool):
+
     def __init__(self):
-        BaseTool.__init__(self, tool_settings)
+
+        base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
         self.min_val = None
         self.under_min = None
@@ -26,6 +26,8 @@ class TweakValuesRasterTool(BaseTool):
         self.integerise = None
         self.raster_format = None
 
+        return
+
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:none"])
     @parameter("min_val", "Minimum value", "GPDouble", "Optional", False, "Input", None, None, None, None)
     @parameter("under_min", "Values < Minumium", "GPString", "Optional", False, "Input", ["Minimum", "NoData"], None, None, "Minimum")
@@ -35,50 +37,39 @@ class TweakValuesRasterTool(BaseTool):
     @parameter("constant", "Constant Shift", "GPDouble", "Optional", False, "Input", None, None, None, None)
     @parameter("integerise", "integerise", "GPBoolean", "Optional", False, "Input", None, None, None, False)
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
-    @input_output_table
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        return BaseTool.getParameterInfo(self)
+
+        return base.base_tool.BaseTool.getParameterInfo(self)
 
     def initialise(self):
-        p = self.get_parameter_dict()
-        self.min_val = p["min_val"]
-        self.under_min = p["under_min"]
-        self.max_val = p["max_val"]
-        self.over_max = p["over_max"]
-        self.scalar = p["scaler"]
-        self.constant = p["constant"]
-        self.integerise = p["integerise"]
-        self.raster_format = p["raster_format"]
+        # p = self.get_parameter_dict()
+        # self.min_val = p["min_val"]
+        # self.under_min = p["under_min"]
+        # self.max_val = p["max_val"]
+        # self.over_max = p["over_max"]
+        # self.scalar = p["scaler"]
+        # self.constant = p["constant"]
+        # self.integerise = p["integerise"]
+        # self.raster_format = p["raster_format"]
         if not (self.min_val or self.max_val or self.constant or self.scalar or self.integerise):
             raise ValueError("No tweaks specified")
 
     def iterate(self):
+
         self.iterate_function_on_tableview(self.tweak, "raster_table", ["raster"])
+
         return
 
-    def get_band_nodata(self, raster, bandindex=1):
-        self.log.debug("IN raster={} bandindex= {}".format(raster, bandindex))
-
-        d = Describe(join(raster, "Band_{}".format(bandindex)))
-        ndv = d.noDataValue
-        # v = ap.GetRasterProperties_management(raster, property)
-        # self.send_info(type(v))
-        # v = v.getOutput(0)
-        # print type(v)
-
-        self.log.debug("OUT returning {}".format(ndv))
-        return ndv
-
     def tweak(self, data):
-        self.log.debug("IN data= {}".format(data))
 
         r_in = data["raster"]
-        validate_geodata(r_in, True)
+        base.utils.validate_geodata(r_in, raster=True)
 
-        r_out = make_raster_name(r_in, self.results.output_workspace, self.raster_format)
+        r_out = base.utils.make_raster_name(r_in, self.results.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
         self.log.info("Tweaking raster {0} -->> {1}".format(r_in, r_out))
 
-        ras = Raster(r_in)
+        ras = arcpy.Raster(r_in)
         vals = []
 
         if self.min_val:
@@ -88,7 +79,7 @@ class TweakValuesRasterTool(BaseTool):
             if under == "#":
                 raise ValueError("Raster '{}' does not have a nodata value".format(r_in))
             # self.send_info(under)
-            ras = Con(ras >= float(self.min_val), ras, float(under))
+            ras = arcpy.sa.Con(ras >= float(self.min_val), ras, float(under))
             vals.append('MIN {0}...{1} = {2}'.format(self.min_val, self.under_min, under))
 
         if self.max_val:
@@ -99,7 +90,7 @@ class TweakValuesRasterTool(BaseTool):
                 raise ValueError("Raster '{}' does not have a nodata value".format(r_in))
                 # over = None
             # self.send_info(over)
-            ras = Con(ras <= float(self.max_val), ras, float(over))
+            ras = arcpy.sa.Con(ras <= float(self.max_val), ras, float(over))
             vals.append('MAX {0}...{1}'.format(self.max_val, self.over_max, over))
 
         if self.scalar:
@@ -114,7 +105,7 @@ class TweakValuesRasterTool(BaseTool):
 
         if self.integerise:
             self.log.info('Integerising...')
-            ras = Int(ras)
+            ras = arcpy.sa.Int(ras)
             vals.append('integerised (truncation)')
 
         # save and exit
@@ -124,7 +115,6 @@ class TweakValuesRasterTool(BaseTool):
         r = self.results.add({"geodata": r_out, "source_geodata": r_in, "tweaks": ' & '.join(vals)})
         self.log.info(r)
 
-        self.log.debug("OUT")
         return
 
 # Con (in_conditional_raster, in_true_raster_or_constant, {in_false_raster_or_constant}, {where_clause})

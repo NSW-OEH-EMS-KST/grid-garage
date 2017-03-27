@@ -6,14 +6,12 @@ Created on Thu Sep  1 10:48:26 2016
 """
 import utils
 import os
-import contextlib
 import ast
-from base.class_decorators import arcmap
-from base.geodata import get_search_cursor_rows, is_file_system
+# from base.geodata import get_search_cursor_rows, is_file_system
 import base.log
+import base.utils
 
 
-@arcmap
 class BaseTool(object):
     @base.log.log
     def __init__(self, settings):
@@ -65,19 +63,19 @@ class BaseTool(object):
         xls2 = os.path.join(style_path, "MdDlgHelp.xsl")
         return ";".join([xls1, xls2])
 
-    @contextlib.contextmanager
-    def error_handler(self):
-        """ Provides an error-handling context for function execution.
-
-        Returns:
-
-        """
-        try:
-            yield
-        except Exception as e:
-            self.log.error(e)
-            if hasattr(self, "results"):
-                self.results.fail(self.current_geodata, self.current_row)
+    # @contextlib.contextmanager
+    # def error_handler(self):
+    #     """ Provides an error-handling context for function execution.
+    #
+    #     Returns:
+    #
+    #     """
+    #     try:
+    #         yield
+    #     except Exception as e:
+    #         self.log.error(e)
+    #         if hasattr(self, "results"):
+    #             self.results.fail(self.current_geodata, self.current_row)
 
     @staticmethod
     def evaluate(node_or_string):
@@ -164,7 +162,7 @@ class BaseTool(object):
             out_rasfmt_par.clearMessage()
             if out_ws_par.altered or out_rasfmt_par.altered:
                 ws = out_ws_par.value
-                if is_file_system(ws) and out_rasfmt_par.value == "Esri Grid":
+                if base.utils.is_file_system(ws) and out_rasfmt_par.value == "Esri Grid":
                     out_rasfmt_par.setErrorMessage("Invalid raster format for workspace type")
 
         # BaseTool.updateMessages(self, parameters)
@@ -211,8 +209,8 @@ class BaseTool(object):
 
         self.log.debug("Tool attributes set {}".format(self.__dict__))
 
-        if hasattr(self, "results"):
-            init = self.results.initialise(self.get_parameter_by_name("result_table"),
+        if hasattr(self, "result"):
+            init = self.result.initialise(self.get_parameter_by_name("result_table"),
                                            self.get_parameter_by_name("fail_table"),
                                            self.get_parameter_by_name("output_workspace").value,
                                            self.get_parameter_by_name("result_table_name").value)
@@ -226,8 +224,8 @@ class BaseTool(object):
             else:  # normal case, expecting a function
                 f()
 
-        if hasattr(self, "results"):
-            [self.log.info(w) for w in self.results.write()]
+        if hasattr(self, "result"):
+            [self.log.info(w) for w in self.result.write()]
 
         return
 
@@ -298,20 +296,22 @@ class BaseTool(object):
         f_names = ["{0}_field_{1}".format(parameter_name, i) for i in range(0, num_fields)]  # [f_0, f_1, ...]
         f_vals = [self.get_parameter_by_name(f_name).valueAsText for f_name in f_names]
 
-        rows = get_search_cursor_rows(v, f_vals)
+        rows = base.utils.get_search_cursor_rows(v, f_vals)
 
         # iterate
         total_items, count = len(rows), 0
         self.log.info("{0} items to process".format(total_items))
         for r in rows:
-            with self.error_handler():
+            with base.log.error_trap(None, self):
                 count += 1
                 r = utils.make_tuple(r)
                 self.current_row = r
                 data = {k: v for k, v in zip(key_names, r)}
                 g = data.get(key_names[0], None)  # convention: first key is geodata
                 self.current_geodata = g
+                self.log.debug("Executing {} with data= {}".format(func.__name__, data))
                 func(data)
+                self.log.debug("Execution OK")
 
         return
 
@@ -343,17 +343,16 @@ class BaseTool(object):
         total_items, count = len(rows), 0
         self.log.info("{0} items to process".format(total_items))
         for r in rows:
-            with self.error_handler():
-                self.log.info(r)
+            with base.log.error_trap(None, self):
                 count += 1
                 r = utils.make_tuple(r)
                 self.current_row = r
                 data = {k: v for k, v in zip(key_names, r)}
                 g = data.get("geodata", None)
                 self.current_geodata = g
-
+                self.log.debug("Executing {} with data= {}".format(func.__name__, data))
                 func(data)
-
+                self.log.debug("Execution OK")
         return
 
     @base.log.log

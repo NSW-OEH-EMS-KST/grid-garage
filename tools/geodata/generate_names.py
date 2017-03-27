@@ -1,7 +1,8 @@
-from base.base_tool import BaseTool
-from base.class_decorators import results
+import base.base_tool
+import base.results
 from base.method_decorators import input_output_table_with_output_affixes, input_tableview, parameter
 from base.utils import split_up_filename, is_raster, is_vector, make_raster_name, make_vector_name, make_table_name
+
 
 tool_settings = {"label": "Generate Names",
                  "description": "Generates candidate dataset names for later use in the 'Rename' Tool...",
@@ -9,17 +10,22 @@ tool_settings = {"label": "Generate Names",
                  "category": "Geodata"}
 
 
-@results
-class GenerateNamesGeodataTool(BaseTool):
+@base.results.result
+class GenerateNamesGeodataTool(base.base_tool.BaseTool):
+
     def __init__(self):
-        BaseTool.__init__(self, tool_settings)
-        self.execution_list = [self.initialise, self.iterating]
+
+        base.base_tool.BaseTool.__init__(self, tool_settings)
+        self.execution_list = [self.initialise, self.iterate]
+
+        return
 
     @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
     @parameter("replacements", "Replacements", "GPString", "Optional", False, "Input", None, None, None, None)
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        return BaseTool.getParameterInfo(self)
+
+        return base.base_tool.BaseTool.getParameterInfo(self)
 
     def test_duplicates(self):
         pass
@@ -42,7 +48,6 @@ class GenerateNamesGeodataTool(BaseTool):
         #     tool.warn('!* There may be non-unique new names. doh! Please check.')
 
     def initialise(self):
-        self.log.debug("IN")
 
         # look for an early exit as all parameters are optional
         if not (self.replacements or self.output_filename_prefix or self.output_filename_suffix):
@@ -64,15 +69,15 @@ class GenerateNamesGeodataTool(BaseTool):
             # reflect the changes
             self.log.info('Replacements to be made are: {0}'.format(replace))
 
-        self.log.debug("OUT")
         return
 
-    def iterating(self):
+    def iterate(self):
+
         self.iterate_function_on_tableview(self.process, "geodata_table", ["geodata"])
+
         return
 
     def process(self, data):
-        self.log.debug("IN data= {}".format(data))
 
         """ Make a candidate name from the original"""
         gd = data["geodata"]
@@ -99,5 +104,4 @@ class GenerateNamesGeodataTool(BaseTool):
         self.log.info("{0} -->> {1}".format(gd, new_full))
         self.results.add({'geodata': gd, 'candidate_name': new_full, 'existing_base_name': old_base, 'candidate_base_name': new_base})
 
-        self.log.debug("OUT")
         return

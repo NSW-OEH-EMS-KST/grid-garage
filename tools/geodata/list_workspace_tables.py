@@ -1,8 +1,9 @@
-from base.base_tool import BaseTool
-from base.class_decorators import results
+import base.base_tool
+import base.results
 from base.method_decorators import input_output_table, parameter
 from base.utils import split_up_filename, walk
 import re
+
 
 tool_settings = {"label": "List Workspace Tables",
                  "description": "List tables within a workspace",
@@ -10,22 +11,26 @@ tool_settings = {"label": "List Workspace Tables",
                  "category": "Geodata"}
 
 
-@results
-class ListWorkspaceTablesGeodataTool(BaseTool):
+@base.results.result
+class ListWorkspaceTablesGeodataTool(base.base_tool.BaseTool):
+
     def __init__(self):
-        BaseTool.__init__(self, tool_settings)
+        base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
+
+        return
 
     @parameter("workspaces", "Workspaces", "DEWorkspace", "Required", True, "Input", None, None, None, None)
     @input_output_table
     def getParameterInfo(self):
-        return BaseTool.getParameterInfo(self)
+
+        return base.base_tool.BaseTool.getParameterInfo(self)
 
     def iterate(self):
+
         self.iterate_function_on_parameter(self.list, "workspaces", ["workspace"])
 
     def list(self, data):
-        self.log.debug("IN data= {}".format(data))
 
         ws = data["workspace"]
         self.log.info("Searching for tables in {0}".format(ws))
@@ -45,5 +50,4 @@ class ListWorkspaceTablesGeodataTool(BaseTool):
 
         self.log.info(self.results.add(dic_list))
 
-        self.log.debug("OUT")
         return

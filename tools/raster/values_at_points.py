@@ -1,8 +1,9 @@
-from base.base_tool import BaseTool
-from base.class_decorators import results, geodata
+import base.base_tool
+import base.results
 from base.method_decorators import input_tableview, input_output_table, parameter
 from arcpy import GetCellValue_management
 from collections import OrderedDict
+import base.utils
 
 tool_settings = {"label": "Values at Points",
                  "description": "Retrieves the values of rasters at specified points...",
@@ -10,30 +11,28 @@ tool_settings = {"label": "Values at Points",
                  "category": "Raster"}
 
 
-@geodata
-@results
-class ValuesAtPointsRasterTool(BaseTool):
+@base.results.result
+class ValuesAtPointsRasterTool(base.base_tool.BaseTool):
     def __init__(self):
-        BaseTool.__init__(self, tool_settings)
+
+        base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterating, self.finish]
-        self.points = None
         self.point_rows = None
         self.points_srs = None
         self.result_dict = {}
+
         return
 
     @input_tableview("raster_table", "Table of Rasters", False, ["raster:geodata:"])
     @parameter("points", "Point Features", "GPFeatureLayer", "Required", False, "Input", ["Point"], None, None, None)
     @input_output_table
     def getParameterInfo(self):
-        return BaseTool.getParameterInfo(self)
+
+        return base.base_tool.BaseTool.getParameterInfo(self)
 
     def initialise(self):
-        pars = self.get_parameter_dict()
 
-        self.points = pars.get("points", [])
-
-        d = self.geodata.describe(self.points)
+        d = base.utils.describe(self.points)
         self.points_srs = d.get("dataset_spatialReference", "Unknown")
         source = d.get("general_catalogPath", None)
 
@@ -41,32 +40,29 @@ class ValuesAtPointsRasterTool(BaseTool):
             raise ValueError("Point dataset '{0}'has unknown spatial reference system ({1})".format(source, self.points_srs))
 
         self.point_rows = self.geodata.get_search_cursor_rows(self.points, ("SHAPE@XY", "OID@"))
-        self.send_info("{0} points found in '{1}'".format(len(self.point_rows), self.points))
+        self.log.info("{0} points found in '{1}'".format(len(self.point_rows), self.points))
+
         return
 
     def iterating(self):
+
         self.iterate_function_on_tableview(self.process, "raster_table", ["raster"])
+
         return
 
     def process(self, data):
-        self.send_info(data)
-        ras = data["raster"]
-        if not self.geodata.exists(ras):
-            raise ValueError("'{0}' does not exist".format(ras))
-        if not self.geodata.is_raster(ras):
-            raise ValueError("'{0}' is not a raster dataset".format(ras))
 
-        d = self.geodata.describe(ras)
+        ras = data["raster"]
+        base.utils.validate_geodata(ras, raster=True, srs_known=True)
+
+        d = base.utils.describe(ras)
         r_base = d.get("general_baseName", "None")
         ras_srs = d.get("dataset_spatialReference", "Unknown")
-
-        if "unknown" in ras_srs.lower():
-            raise ValueError("Raster '{0}' has an unknown spatial reference system".format(ras))
 
         if ras_srs != self.points_srs:  # hack!! needs doing properly
             raise ValueError("Spatial reference systems do not match ({0} != {1})".format(ras_srs, self.points_srs))
 
-        self.send_info("Extracting point values from {0}...".format(ras))
+        self.log.info("Extracting point values from {0}...".format(ras))
 
         for row in self.point_rows:
             oid = row[1]
@@ -91,6 +87,7 @@ class ValuesAtPointsRasterTool(BaseTool):
         return
 
     def finish(self):
+
         result_list = []
 
         for oid, val_dict in self.result_dict.iteritems():
@@ -102,4 +99,5 @@ class ValuesAtPointsRasterTool(BaseTool):
             result_list.append(row_dict)
 
         self.results.add(result_list)
+
         return

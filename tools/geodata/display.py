@@ -1,5 +1,7 @@
-from base.base_tool import BaseTool
+import base.base_tool
+import base.arcmap
 from base.method_decorators import input_tableview
+
 
 tool_settings = {"label": "Display",
                  "description": "Adds geodata to ArcMap document",
@@ -7,37 +9,43 @@ tool_settings = {"label": "Display",
                  "category": "Geodata"}
 
 
-class DisplayGeodataTool(BaseTool):
+class DisplayGeodataTool(base.base_tool.BaseTool):
+
     def __init__(self):
-        BaseTool.__init__(self, tool_settings)
-        self.execution_list = [self.start_iteration]
+
+        base.base_tool.BaseTool.__init__(self, tool_settings)
+        self.execution_list = [self.iterate]
+
+        return
 
     @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
     def getParameterInfo(self):
         """Define parameter definitions"""
-        return BaseTool.getParameterInfo(self)
+        return base.base_tool.BaseTool.getParameterInfo(self)
 
-    def start_iteration(self):
-        """The source code of the tool"""
-        with self.error_handler():
-            self.iterate_function_on_tableview(self.display_geodata, "geodata_table", ["geodata"])
+    def iterate(self):
+
+        self.iterate_function_on_tableview(self.display_geodata, "geodata_table", ["geodata"])
+
+        return
 
     def display_geodata(self, data):
+
         geodata = data["geodata"]
         try:
             # see if it's a layer
-            self.arcmap.add_layer(geodata, "BOTTOM")
+            base.arcmap.add_layer(geodata, "BOTTOM")
             self.log.info("Added layer {0} to display".format(geodata))
         except Exception:
             try:
                 # see if it's a table
-                self.arcmap.add_tableview(geodata)
+                base.arcmap.add_tableview(geodata)
                 self.log.info("Added table {0} to display".format(geodata))
             except Exception as e:
                 # bugger it for now
                 self.log.warn("Could not add {0} to display: {1}".format(geodata, str(e)))
         finally:
             # Refresh things
-            self.arcmap.refresh_active_view()
-            self.arcmap.refresh_toc()
+            base.arcmap.refresh_active_view()
+            base.arcmap.refresh_toc()
 

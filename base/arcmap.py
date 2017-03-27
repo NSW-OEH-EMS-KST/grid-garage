@@ -1,17 +1,21 @@
 import arcpy
 
 
-class ArcmapUtils(object):
-    def __init__(self):
-        self.get_mxd = get_mxd
-        self.save_mxd = save_mxd
-        self.list_layers = list_layers
-        self.get_dataframe0 = get_dataframe0
-        self.add_tableview = add_tableview
-        self.add_layer = add_layer
-        self.refresh_active_view = arcpy.RefreshActiveView
-        self.refresh_toc = arcpy.RefreshTOC
-        return
+# class ArcmapUtils(object):
+#     def __init__(self):
+#         self.get_mxd = get_mxd
+#         self.save_mxd = save_mxd
+#         self.list_layers = list_layers
+#         self.get_dataframe0 = get_dataframe0
+#         self.add_tableview = add_tableview
+#         self.add_layer = add_layer
+#         self.refresh_active_view = arcpy.RefreshActiveView
+#         self.refresh_toc = arcpy.RefreshTOC
+#         return
+
+
+refresh_active_view = arcpy.RefreshActiveView
+refresh_toc = arcpy.RefreshTOC
 
 
 def get_mxd():
@@ -25,8 +29,8 @@ def save_mxd():
     return
 
 
-def list_layers(self):
-    mxd = self.get_mxd()
+def list_layers():
+    mxd = get_mxd()
     return arcpy.mapping.ListLayers(mxd, "*") if mxd else None
 
 

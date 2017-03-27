@@ -525,3 +525,17 @@ def compare_srs(srs1, srs2, raise_no_match_error=False, other_condition=True):
         raise e
 
     return val
+
+
+@base.log.log
+def get_band_nodata(raster, bandindex=1):
+
+    d = ap.Describe(os.path.join(raster, "Band_{}".format(bandindex)))
+    ndv = d.noDataValue
+    # v = ap.GetRasterProperties_management(raster, property)
+    # self.send_info(type(v))
+    # v = v.getOutput(0)
+    # print type(v)
+
+    return ndv
+

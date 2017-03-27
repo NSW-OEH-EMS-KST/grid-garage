@@ -97,6 +97,10 @@ def configure_logging(arc_messages):
 
     global LOGGER
     LOGGER = logging.getLogger('gg3')
+
+    if len(LOGGER.handlers):  # then this has already been done for this logger instance
+        return
+
     LOGGER.setLevel(logging.DEBUG)
 
     formatter = logging.Formatter(fmt="%(asctime)s.%(msecs)03d %(levelname)s %(module)s %(funcName)s %(lineno)s %(message)s", datefmt="%Y%m%d %H%M%S")
@@ -118,7 +122,7 @@ def configure_logging(arc_messages):
 
 
 @contextmanager
-def error_trap(identifier=None):
+def error_trap(identifier=None, context=None):
     """ A context manager that traps and logs exception in its block.
         Usage:
         with error_trapping('optional description'):
@@ -142,6 +146,9 @@ def error_trap(identifier=None):
         say(_out)
     except Exception as e:
         err(str(e))
+        if context:
+            if hasattr(context, "results"):
+                context.results.fail(context.current_geodata, context.current_row)
 
     return
 

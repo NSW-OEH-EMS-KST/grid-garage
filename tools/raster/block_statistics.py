@@ -1,5 +1,5 @@
-from base.base_tool import BaseTool
-from base.class_decorators import results
+import base.base_tool
+import base.results
 from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, stats_type, data_nodata, raster_formats
 from arcpy.sa import BlockStatistics
 from base.utils import validate_geodata, make_raster_name
@@ -10,11 +10,15 @@ tool_settings = {"label": "Block Statistics",
                  "category": "Raster"}
 
 
-@results
-class BlockStatisticsRasterTool(BaseTool):
+@base.results.result
+class BlockStatisticsRasterTool(base.base_tool.BaseTool):
+
     def __init__(self):
-        BaseTool.__init__(self, tool_settings)
+
+        base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
+
+        return
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("neighbourhood", "Neighbourhood", "GPSANeighborhood", "Required", False, "Input", None, None, None, None)
@@ -23,14 +27,16 @@ class BlockStatisticsRasterTool(BaseTool):
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, raster_formats[0])
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        return BaseTool.getParameterInfo(self)
+
+        return base.base_tool.BaseTool.getParameterInfo(self)
 
     def iterate(self):
+
         self.iterate_function_on_tableview(self.block_statistics, "raster_table", ["raster"])
+
         return
 
     def block_statistics(self, data):
-        self.log.info("IN data= {}".format(data))
 
         ras = data["raster"]
         validate_geodata(ras, raster=True)
@@ -46,9 +52,8 @@ class BlockStatisticsRasterTool(BaseTool):
         r = self.results.add({"geodata": ras_out, "source_geodata": ras})
         self.log.info(r)
 
-        self.log.debug("OUT")
         return
 
 
-"http://desktop.arcgis.com/en/arcmap/latest/tools/spatial-analyst-toolbox/block-statistics.htm"
+# "http://desktop.arcgis.com/en/arcmap/latest/tools/spatial-analyst-toolbox/block-statistics.htm"
 
