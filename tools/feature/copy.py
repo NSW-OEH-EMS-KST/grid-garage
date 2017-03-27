@@ -58,7 +58,7 @@ class CopyFeatureTool(base.base_tool.BaseTool):
         # CopyFeatures_management(in_features, out_feature_class, {config_keyword}, {spatial_grid_1}, {spatial_grid_2}, {spatial_grid_3})
         arcpy.CopyFeatures_management(fc, nfc, self.config_kw, self.sg_1, self.sg_2, self.sg_3)
 
-        self.results.add({'geodata': nfc, 'copied_from': fc})
+        self.result.add({'geodata': nfc, 'copied_from': fc})
 
         return
 

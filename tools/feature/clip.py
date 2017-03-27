@@ -52,7 +52,7 @@ class ClipFeatureTool(base.base_tool.BaseTool):
         self.log.info("Clipping {0} -->> {1} ...".format(fc, fc_out))
         arcpy.Clip_analysis(fc, self.clip_features, fc_out, self.xy_tolerance)
 
-        self.results.add({"geodata": fc_out, "source_geodata": fc})
+        self.result.add({"geodata": fc_out, "source_geodata": fc})
 
         return
 
