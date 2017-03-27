@@ -50,6 +50,6 @@ class SetNodataValueRasterTool(base.base_tool.BaseTool):
         out_ras = arcpy.sa.Con(null_ras, self.ndv, ras, "#")
         out_ras.save(r_out)
 
-        self.results.add({"geodata": r_out, "source_geodata": ras})
+        self.result.add({"geodata": r_out, "source_geodata": ras})
 
         return

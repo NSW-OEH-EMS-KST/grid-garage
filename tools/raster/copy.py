@@ -82,7 +82,7 @@ class CopyRasterTool(base.base_tool.BaseTool):
         # CopyRaster_management (in_raster, out_rasterdataset, {config_keyword}, {background_value}, {nodata_value}, {onebit_to_eightbit}, {colormap_to_RGB}, {pixel_type}, {scale_pixel_value}, {RGB_to_Colormap}, {format}, {transform})
         arcpy.CopyRaster_management(ras, ras_out, self.config_keyword, self.background_value, self.nodata_value, self.onebit_to_eightbit, self.colormap_to_RGB, self.pixel_type, self.scale_pixel_value, self.RGB_to_Colormap, self.format, self.transform)
 
-        self.results.add({"geodata": ras_out, "source_geodata": ras})
+        self.result.add({"geodata": ras_out, "source_geodata": ras})
 
         return
 

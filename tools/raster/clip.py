@@ -62,7 +62,7 @@ class ClipRasterTool(base.base_tool.BaseTool):
         self.log.info("Clipping {0} -->> {1} ...".format(ras, ras_out))
         arcpy.Clip_management(ras, self.rectangle, ras_out, self.polygons, self.no_data_val, self.clipping_geometry, self.maintain_extent)
 
-        self.log.info(self.results.add({"geodata": ras_out, "source_geodata": ras}))
+        self.log.info(self.result.add({"geodata": ras_out, "source_geodata": ras}))
 
         return
 

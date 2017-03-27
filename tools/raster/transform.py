@@ -112,7 +112,7 @@ class TransformRasterTool(base.base_tool.BaseTool):
         ras.save(r_out)
 
         data["method"] = self.method
-        self.results.add({"geodata": r_out, "source_geodata": r_in, "transform": data})
+        self.result.add({"geodata": r_out, "source_geodata": r_in, "transform": data})
 
         return
 
@@ -191,7 +191,7 @@ class TransformRasterTool(base.base_tool.BaseTool):
         # ras_out = ap.NumPyArrayToRaster(array_out, ap.Point(xmin_in, ymin_in), xwidth_in, ywidth_in, ndv_in)
         # ras_out.save(r_out)
         # data["method"] = self.method
-        # self.results.add({"geodata": r_out, "source_geodata": r_in, "transform": data})
+        # self.result.add({"geodata": r_out, "source_geodata": r_in, "transform": data})
 
         # return
 

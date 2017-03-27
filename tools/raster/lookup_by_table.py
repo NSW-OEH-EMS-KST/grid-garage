@@ -48,7 +48,7 @@ class LookupByTableRasterTool(base.base_tool.BaseTool):
                 self.send_info(out)
                 self.send_info("Saving to {0}".format(ras_out))
                 out.save(ras_out)
-                self.results.add({"geodata": ras_out, "source_geodata": ras})
+                self.result.add({"geodata": ras_out, "source_geodata": ras})
             except Exception as e:
                 self.results.fail(ras, e, data, self)
 

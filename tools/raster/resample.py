@@ -43,7 +43,7 @@ class ResampleRasterTool(base.base_tool.BaseTool):
         self.log.info("Resampling {0} -->> {1} ...".format(ras, ras_out))
         arcpy.Resample_management(ras, ras_out, self.cell_size, self.resample_type)
 
-        self.log.info(self.results.add({"geodata": ras_out, "source_geodata": ras}))
+        self.log.info(self.result.add({"geodata": ras_out, "source_geodata": ras}))
 
         return
 

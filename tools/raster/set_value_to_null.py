@@ -45,7 +45,7 @@ class SetValueToNullRasterTool(base.base_tool.BaseTool):
         out_ras = SetNull(r_in, r_in, 'VALUE = {0}'.format(self.val_to_null))
         out_ras.save(r_out)
 
-        self.results.add({"geodata": r_out, "source_geodata": r_in})
+        self.result.add({"geodata": r_out, "source_geodata": r_in})
 
         return
 

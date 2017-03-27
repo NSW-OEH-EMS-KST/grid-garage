@@ -61,7 +61,7 @@ class ReprojectRasterTool(base.base_tool.BaseTool):
         self.log.info("Projecting {0} into {1} -> {2}".format(r_in, self.output_cs.name, r_out))
         arcpy.ProjectRaster_management(r_in, r_out, self.output_cs, geographic_transform=tx, resampling_type=self.resample_type, cell_size=self.cell_size, Registration_Point=self.rego_point)
 
-        r = self.results.add({"geodata": r_out, "source": r_in, "metadata": "to do"})
+        r = self.result.add({"geodata": r_out, "source": r_in, "metadata": "to do"})
         self.log.info(r)
 
         return

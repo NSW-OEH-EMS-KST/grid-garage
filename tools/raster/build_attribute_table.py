@@ -49,7 +49,7 @@ class BuildAttributeTableRasterTool(BaseTool):
         self.log.info("Building attribute table for {0}...".format(ras))
         arcpy.BuildRasterAttributeTable_management(ras, self.overwrite)
 
-        self.results.add({"geodata": ras, "attribute_table": "built"})
+        self.result.add({"geodata": ras, "attribute_table": "built"})
 
         return
 

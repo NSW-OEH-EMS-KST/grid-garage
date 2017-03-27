@@ -98,6 +98,6 @@ class ValuesAtPointsRasterTool(base.base_tool.BaseTool):
                 row_dict[k] = v
             result_list.append(row_dict)
 
-        self.results.add(result_list)
+        self.result.add(result_list)
 
         return

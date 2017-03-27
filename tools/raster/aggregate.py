@@ -58,7 +58,7 @@ class AggregateRasterTool(base.base_tool.BaseTool):
         out = Aggregate(ras, self.cell_factor, self.aggregation_type, self.extent_handling, self.ignore_nodata)
         out.save(ras_out)
 
-        self.results.add({"geodata": ras_out, "source_geodata": ras})
+        self.result.add({"geodata": ras_out, "source_geodata": ras})
 
         return
 

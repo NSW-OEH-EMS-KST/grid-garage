@@ -112,7 +112,7 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
         self.log.info('Saving to {0}'.format(r_out))
         ras.save(r_out)
 
-        r = self.results.add({"geodata": r_out, "source_geodata": r_in, "tweaks": ' & '.join(vals)})
+        r = self.result.add({"geodata": r_out, "source_geodata": r_in, "tweaks": ' & '.join(vals)})
         self.log.info(r)
 
         return
