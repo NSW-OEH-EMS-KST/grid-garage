@@ -15,15 +15,14 @@ import base.log
 
 @arcmap
 class BaseTool(object):
+    @base.log.log
     def __init__(self, settings):
         """ Define the tool (tool name is the name of the class).
         Args:
             settings (): A dictionary implemented in derived classes
         """
-        self.log = base.log.LOG  # avoid requiring an import for each tool module
-        self.log_file = base.log.LOG_FILE
+        self.log = base.log  # avoid requiring an import for each tool module
         self.tool_type = type(self).__name__
-        self.log.debug("IN " + self.tool_type)
 
         # the essentials
         self.label = settings.get("label", "label not set")
@@ -48,7 +47,6 @@ class BaseTool(object):
         # state
         self.current_geodata = self.current_row = "Not set"
 
-        self.log.debug("OUT " + self.tool_type)
         return
 
     @staticmethod
@@ -85,6 +83,7 @@ class BaseTool(object):
     def evaluate(node_or_string):
         return ast.literal_eval(node_or_string)
 
+    @base.log.log
     def get_parameter_by_name(self, param_name):
         """ Returns a parameter based on its name
 
@@ -104,14 +103,17 @@ class BaseTool(object):
 
         raise ValueError("Parameter {0} not found".format(param_name))
 
+    @base.log.log
     def getParameterInfo(self):
         """Define parameter definitions"""
         return []
 
+    @base.log.log
     def isLicensed(self):
         """Set whether tool is licensed to execute."""
         return True
 
+    @base.log.log
     def updateParameters(self, parameters):
         """ Modify the values and properties of parameters before internal
         validation is performed.  This method is called whenever a parameter
@@ -123,7 +125,6 @@ class BaseTool(object):
         Returns:
 
         """
-        self.log.debug("IN")
 
         out_tbl_par = None
         for p in parameters:
@@ -135,9 +136,9 @@ class BaseTool(object):
         if out_tbl_par and out_tbl_par.value == "#run_id#":
             out_tbl_par.value = self.run_id
 
-        self.log.debug("OUT " + self.tool_type)
         return
 
+    @base.log.log
     def updateMessages(self, parameters):
         """
 
@@ -147,7 +148,6 @@ class BaseTool(object):
         Returns:
 
         """
-        self.log.debug("IN")
 
         out_ws_par = None
         out_rasfmt_par = None
@@ -183,9 +183,9 @@ class BaseTool(object):
         # for p in parameters:
         #     if p.name == "raster_format":
 
-        self.log.debug("OUT " + self.tool_type)
         return
 
+    @base.log.log
     def execute(self, parameters, messages):
         """ The source code of the tool.
 
@@ -197,15 +197,13 @@ class BaseTool(object):
 
         """
         self.arc_messages = messages
-        base.log.set_messages(messages)
-        self.log.debug("IN")
-
+        base.log.configure_logging(messages)
 
         # check if we have a function to run
         if not self.execution_list:
             raise ValueError("Tool execution list is empty")
 
-        self.log.info("Debugging log file is located at '{}'".format(self.log_file))
+        self.log.info("Debugging log file is located at '{}'".format(base.log.LOG_FILE))
 
         self.parameter_objects = parameters
         self.parameter_strings = self.get_parameter_dict()
@@ -231,9 +229,9 @@ class BaseTool(object):
         if hasattr(self, "results"):
             [self.log.info(w) for w in self.results.write()]
 
-        self.log.debug("OUT")
         return
 
+    @base.log.log
     def get_parameter_dict(self, leave_as_object=()):
         """ Create a dictionary of parameters
 
@@ -243,7 +241,6 @@ class BaseTool(object):
         Returns: A dictionary of parameters - strings or parameter objects
 
         """
-        self.log.debug("IN")
 
         # create the dict
         pd = {p.name: p if p.name in leave_as_object else (p.valueAsText or "#") for p in self.parameter_objects}
@@ -259,22 +256,21 @@ class BaseTool(object):
         if x:
             pd["output_filename_suffix"] = "" if x == "#" else x
 
-        self.log.debug("OUT returning {}".format(pd))
         return pd
 
+    @base.log.log
     def get_parameter_names(self):
         """ Create a dictionary of parameter names
 
         Returns: A dictionary of parameter names
 
         """
-        self.log.debug("IN")
 
         pn = [p.name for p in self.parameter_objects]
 
-        self.log.debug("OUT returning {}".format(pn))
         return pn
 
+    @base.log.log
     def iterate_function_on_tableview(self, func, parameter_name, key_names):
         """ Runs a function over the values in a tableview parameter - a common tool scenario
 
@@ -286,7 +282,6 @@ class BaseTool(object):
         Returns:
 
         """
-        self.log.debug("IN")
 
         param = self.get_parameter_by_name(parameter_name)
         if param.datatype != "Table View":
@@ -318,9 +313,9 @@ class BaseTool(object):
                 self.current_geodata = g
                 func(data)
 
-        self.log.debug("OUT")
         return
 
+    @base.log.log
     def iterate_function_on_parameter(self, func, parameter_name, key_names):
         """ Runs a function over the values in a parameter - a less common tool scenario
 
@@ -332,7 +327,6 @@ class BaseTool(object):
         Returns:
 
         """
-        self.log.debug("IN")
 
         param = self.get_parameter_by_name(parameter_name)
         multi_val = getattr(param, "multivalue", False)
@@ -360,9 +354,9 @@ class BaseTool(object):
 
                 func(data)
 
-        self.log.debug("OUT " + self.tool_type)
         return
 
+    @base.log.log
     def send_info(self, message):
         """ Send an INFO message to user
 
@@ -374,7 +368,6 @@ class BaseTool(object):
         Returns:
 
         """
-        self.log.debug("IN")
 
         self.arc_messages.addMessage("!! self.send_info() is deprecated... use self.log.info() !!")
         if not isinstance(message, list):
@@ -382,9 +375,9 @@ class BaseTool(object):
 
         [self.arc_messages.addMessage(message) for _ in message]
 
-        self.log.debug("OUT returning None")
         return
 
+    @base.log.log
     def send_warning(self, message):
         """ Send a WARN message to user
 
@@ -396,7 +389,6 @@ class BaseTool(object):
         Returns:
 
         """
-        self.log.debug("IN")
 
         self.arc_messages.addMessage("!! self.send_warning() is deprecated... use self.log.warn() !!")
         if not isinstance(message, list):
@@ -404,5 +396,4 @@ class BaseTool(object):
 
         [self.arc_messages.addWarningMessage(message) for _ in message]
 
-        self.log.debug("OUT returning None")
         return

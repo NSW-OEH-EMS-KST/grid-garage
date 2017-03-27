@@ -1,13 +1,15 @@
-from base.geodata import describe_arc, table_conversion
-from shutil import copyfile
+# import base.geodata import describe_arc, table_conversion
+import base.utils
+import shutil
 import os
 import csv
 import traceback
 import sys
-from log import LOG
+import base.log
 
 
 class ResultsUtils(object):
+    @base.log.log
     def __init__(self):
         """ Add class members """
 
@@ -27,6 +29,7 @@ class ResultsUtils(object):
         self.output_workspace_type = ""
         self.output_workspace_parent = ""
 
+    @base.log.log
     def initialise(self, result_table_param, fail_table_param, out_workspace, result_table_name):
         """ Initialise the results for the instance
 
@@ -39,19 +42,18 @@ class ResultsUtils(object):
         Returns: A list of strings reflection operations
 
         """
-        LOG.debug("IN")
 
         self.result_table_output_parameter = result_table_param
         self.fail_table_output_parameter = fail_table_param
 
         self.output_workspace = out_workspace.value
-        self.output_workspace_type = describe_arc(self.output_workspace).workspaceType
+        self.output_workspace_type = base.utils.describe_arc(self.output_workspace).workspaceType
 
         self.output_workspace_parent = os.path.split(self.output_workspace)[0]
 
         if self.output_workspace_type == "RemoteDatabase":
             e = ValueError("Remote database workspaces are not yet supported")
-            LOG.debug(e)
+            base.log.debug(e)
             raise e
 
         # if output is to a fgdb, put the csv into it's parent folder
@@ -86,9 +88,9 @@ class ResultsUtils(object):
         ret.append("Result CSV @ {}".format(self.result_csv))
         ret.append("Failure CSV @ {}".format(self.fail_csv))
 
-        LOG.debug("OUT returning {}".format(ret))
         return ret
 
+    @base.log.log
     def add(self, result):
         """ Write result record to CSV
 
@@ -101,7 +103,6 @@ class ResultsUtils(object):
         Returns:
 
         """
-        LOG.debug("IN")
 
         if not result:  # in case a caller passes in None or []
             return "Result was empty"
@@ -133,9 +134,9 @@ class ResultsUtils(object):
 
         result = "Result written: {}".format(result)
 
-        LOG.debug("OUT returning {}".format(result))
         return result
 
+    @base.log.log
     def fail(self, geodata, row):
         """ Write failure record to CSV
 
@@ -149,7 +150,6 @@ class ResultsUtils(object):
         Returns:
 
         """
-        LOG.debug("IN")
 
         if not self.fail_csv:
             raise ValueError("Fail CSV is not set")
@@ -173,30 +173,26 @@ class ResultsUtils(object):
             writer.writerow({"geodata": geodata, "failure": msg, "row_data": str(row)})
             self.fail_count += 1
 
-        LOG.debug("OUT")
         return
 
+    @base.log.log
     def write(self):
         """ Write the success and failure csv files to the final tables
 
         Returns: A list of strings reflecting operation results
 
         """
-        LOG.debug("IN")
-
         ret = self._write_results() + self._write_failures()
 
-        LOG.debug("OUT returning {}".format(ret))
         return ret
 
+    @base.log.log
     def _write_results(self):
         """ Write the result CSV rows to the final table
 
         Returns: A list of strings reflecting operation status
 
         """
-        LOG.debug("IN")
-
         msg = []
 
         if not os.path.exists(self.result_csv):
@@ -204,11 +200,11 @@ class ResultsUtils(object):
         else:
             if self.output_workspace_type == "LocalDatabase":  # it's an fgdb
                 try:
-                    self.result_table = table_conversion(self.result_csv, self.output_workspace, self.result_table_name)
+                    self.result_table = base.utils.table_conversion(self.result_csv, self.output_workspace, self.result_table_name)
                     os.remove(self.result_csv)
                 except:
                     self.result_table = os.path.join(self.output_workspace_parent, self.result_table_name + ".csv")
-                    copyfile(self.result_csv, self.result_table)
+                    shutil.copyfile(self.result_csv, self.result_table)
                     os.remove(self.result_csv)
                     err_msg = "Table to Table Conversion failed. Hoisted temporary result CSV to database parent directory...\n"
             else:  # it's a directory
@@ -217,16 +213,15 @@ class ResultsUtils(object):
             self.result_table_output_parameter.value = self.result_table
             msg.append("Final results at {0}".format(self.result_table))
 
-        LOG.debug("OUT returning {}".format(msg))
         return msg
 
+    @base.log.log
     def _write_failures(self):
         """ Write the failure CSV rows to the final table
 
         Returns: A list of strings reflecting operation status
 
         """
-        LOG.debug("IN")
 
         err_msg = []
 
@@ -235,11 +230,11 @@ class ResultsUtils(object):
         else:
             if self.output_workspace_type != "FileSystem":  # it's a a fgdb or rmdb
                 try:
-                    self.fail_table = table_conversion(self.fail_csv, self.output_workspace, self.fail_table_name)
+                    self.fail_table = base.utils.table_conversion(self.fail_csv, self.output_workspace, self.fail_table_name)
                     os.remove(self.fail_csv)
                 except:
                     self.fail_table = os.path.join(self.output_workspace_parent, self.fail_table_name + ".csv")
-                    copyfile(self.fail_csv, self.fail_table)
+                    shutil.copyfile(self.fail_csv, self.fail_table)
                     os.remove(self.fail_csv)
                     err_msg.append("Table to Table Conversion failed. Hoisted temporary failure CSV to database parent directory...")
             else:
@@ -248,7 +243,6 @@ class ResultsUtils(object):
             self.fail_table_output_parameter.value = self.fail_table
             err_msg.append("Failures at {0}".format(self.fail_table))
 
-        LOG.debug("OUT returning {}".format(err_msg))
         return err_msg
 
 # this message based status thing above is pretty dodgy needs to be reworked sensibly, just a messy job to refactor as now interwoven through most tools

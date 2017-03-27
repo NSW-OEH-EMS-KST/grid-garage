@@ -2,8 +2,8 @@ import arcpy
 import os
 import collections
 import csv
-from base.utils import split_up_filename
-from base.log import LOG
+import base.utils
+import base.log
 
 arc_data_types = "Any,CadDrawing,CadastralFabric,Container,FeatureClass,FeatureDataset,Geo,GeometricNetwork,LasDataset,Layer,Locator,Map,MosaicDataset,NetworkDataset,PlanarGraph,RasterCatalog,RasterDataset,RelationshipClass,RepresentationClass,Style,Table,Terrain,Text,Tin,Tool,Toolbox,Topology"
 datatype_list = arc_data_types.split(",")
@@ -57,7 +57,6 @@ def table_conversion(in_rows, out_path, out_name):
     Returns: Full path to new table if successful
 
     """
-    LOG.debug("IN")
 
     fms = arcpy.FieldMappings()
     fms.addTable(in_rows)
@@ -88,7 +87,7 @@ def table_conversion(in_rows, out_path, out_name):
 
     except Exception as e:
         # arcpy.AddWarning()
-        LOG.error("'{0}' validation failed: {1} {2}".format(in_rows, failed, str(e)))
+        base.log.error("'{0}' validation failed: {1} {2}".format(in_rows, failed, str(e)))
 
     try:
         # TableToTable_conversion (in_rows, out_path, out_name, {where_clause}, {field_mapping}, {config_keyword})
@@ -96,10 +95,9 @@ def table_conversion(in_rows, out_path, out_name):
         ret = os.path.join(out_path, out_name)
 
     except Exception as e:
-        LOG.error(e)
+        base.log.error(e)
         ret = None
 
-    LOG.debug("OUT returning {}".format(ret))
     return ret
 
 
@@ -198,7 +196,7 @@ def geodata_exists(geodata):
 # DEPRECATED - THIS IDEA WAS A DUD - INTENDED TO ABSTRACT USE OF GDAL/ARCGIS BUT WON'T HAPPEN UNFORTUNATELY
 class GeodataUtils(object):
     def __init__(self):
-        LOG.debug("IN - !!! THIS OBJECT HAS BEEN DEPRECATED IN FAVOUR OF SIMPLE IMPORTS FROM BASE.UTILS !!!")
+        base.log.debug("!!! THIS OBJECT HAS BEEN DEPRECATED IN FAVOUR OF SIMPLE IMPORTS FROM BASE.UTILS !!!")
 
         self.table_conversion = table_conversion
         self.describe_arc = describe_arc
@@ -212,12 +210,11 @@ class GeodataUtils(object):
         self.delete = arcpy.Delete_management
         self.clip = arcpy.Clip_analysis
 
-        LOG.debug("OUT returning None")
         return
 
     @staticmethod
     def make_raster_name(like_name, out_wspace, ext='', suffix=''):
-        _, __, r_name, r_ext = split_up_filename(like_name)
+        _, __, r_name, r_ext = base.uitls.split_up_filename(like_name)
 
         ext = "" if (is_local_gdb(out_wspace) or ext == "Esri Grid") else ext
         ext = "." + ext if (ext and ext[0] != ".") else ext
@@ -247,7 +244,7 @@ class GeodataUtils(object):
 
     @staticmethod
     def make_vector_name(like_name, out_wspace, ext=''):
-        _, __, gd_name, gd_ext = split_up_filename(like_name)
+        _, __, gd_name, gd_ext = base.utils.split_up_filename(like_name)
 
         ext = "" if is_local_gdb(out_wspace) else ext
         ext = "." + ext if (ext and ext[0] != ".") else ext
@@ -394,13 +391,13 @@ class GeodataUtils(object):
             lst = arcpy.ListTransformations(cs_in, out_cs)
         except Exception as e:
             e = ValueError("cs_in= " + cs_in + " out_cs= " + out_cs + " e: " + str(e))
-            LOG.debug("Raising {}".format(e))
+            base.log.debug("Raising {}".format(e))
             raise e
         if lst:
             shortest = min(lst, key=len)
         else:
             e = ValueError("Datum transformation was not found for {0} (1) -> {2}".format(in_ds, cs_in, out_cs))
-            LOG.debug("Raising {}".format(e))
+            base.log.debug("Raising {}".format(e))
             raise e
 
         if overrides:
@@ -425,12 +422,11 @@ class GeodataUtils(object):
         #         shortest = ov
 
     def get_srs(self, geodata, raise_unknown_error=False, as_object=False):
-        LOG.debug("IN")
         srs = arcpy.Describe(geodata).spatialReference
 
         if "unknown" in srs.name.lower() and raise_unknown_error:
             e = UnknownSrsError(geodata)
-            LOG.debug("Raising {}".format(e))
+            base.log.debug("Raising {}".format(e))
             raise e
 
         if as_object:
@@ -438,35 +434,31 @@ class GeodataUtils(object):
         else:
             val = srs.name
 
-        LOG.debug("OUT returning {}".format(val))
         return val
 
     def validate_geodata(self, geodata, raster=False, vector=False, srs_known=False):
-        LOG.debug("IN")
 
         if not geodata_exists(geodata):
             e = DoesNotExistError(geodata)
-            LOG.debug("Raising {}".format(e))
+            base.log.debug("Raising {}".format(e))
             raise e
         if raster and not self.is_raster(geodata):
             # raise NotRasterError(geodata)
             e = NotRasterError(geodata)
-            LOG.debug("Raising {}".format(e))
+            base.log.debug("Raising {}".format(e))
             raise e
         if vector and not self.is_vector(geodata):
             # raise NotVectorError(geodata)
             e = NotVectorError(geodata)
-            LOG.debug("Raising {}".format(e))
+            base.log.debug("Raising {}".format(e))
             raise e
         if srs_known:
             self.get_srs(geodata, raise_unknown_error=True)
 
-        LOG.debug("OUT returning None")
         return
 
     @staticmethod
     def compare_srs(srs1, srs2, raise_no_match_error=False, other_condition=True):
-        LOG.debug("IN")
 
         val = None
         if not other_condition:
@@ -475,10 +467,9 @@ class GeodataUtils(object):
             val = True
         if raise_no_match_error:
             e = UnmatchedSrsError(srs1, srs2)
-            LOG.debug("Raising {}".format(e))
+            base.log.debug("Raising {}".format(e))
             raise e
 
-        LOG.debug("OUT returning {}".format(val))
         return val
 
 

@@ -12,24 +12,27 @@ tool_settings = {"label": "Select",
 class SelectGeodataTool(BaseTool):
 
     def __init__(self):
+
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.start_iteration]
+
+        return
 
     @parameter("geodata", "Select Geodata", "GPType", "Required", True, "Input", None, None, None, None)
     @input_output_table
     def getParameterInfo(self):
+
         return BaseTool.getParameterInfo(self)
 
     def start_iteration(self):
+
         self.iterate_function_on_parameter(self.process, "geodata", ["geodata"])
+
         return
 
     def process(self, data):
-        self.log.debug("IN data= {}".format(data))
 
-        r = self.results.add(data)
-        self.log.info(r)
+        self.results.add(data)
 
-        self.log.debug("OUT")
         return
 
