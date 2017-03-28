@@ -23,8 +23,8 @@ class TransformRasterTool(base.base_tool.BaseTool):
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:none"])
     @parameter("method", "Method", "GPString", "Required", False, "Input", transform_methods, None, None, transform_methods[0])
-    @parameter("max_stretch", "Stretch to maximum value", "GPDouble", "Optional", False, "Input", None, None, None, None)
-    @parameter("min_stretch", "Stretch to minimum value", "GPDouble", "Optional", False, "Input", None, None, None, None)
+    @parameter("max_stretch", "Stretch to maximum value", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
+    @parameter("min_stretch", "Stretch to minimum value", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table_with_output_affixes
     def getParameterInfo(self):

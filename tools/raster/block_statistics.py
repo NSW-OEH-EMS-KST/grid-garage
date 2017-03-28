@@ -22,8 +22,8 @@ class BlockStatisticsRasterTool(base.base_tool.BaseTool):
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("neighbourhood", "Neighbourhood", "GPSANeighborhood", "Required", False, "Input", None, None, None, None)
-    @parameter("statistics_type", "Statistics", "GPString", "Optional", False, "Input", stats_type, None, None, stats_type[0])
-    @parameter("ignore_nodata", "No Data Treatment", "GPString", "Optional", False, "Input", data_nodata, None, None, data_nodata[0])
+    @parameter("statistics_type", "Statistics", "GPString", "Optional", False, "Input", stats_type, None, None, stats_type[0], "Options")
+    @parameter("ignore_nodata", "No Data Treatment", "GPString", "Optional", False, "Input", data_nodata, None, None, data_nodata[0], "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, raster_formats[0])
     @input_output_table_with_output_affixes
     def getParameterInfo(self):

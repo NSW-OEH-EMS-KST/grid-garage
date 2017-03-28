@@ -22,7 +22,7 @@ class ReclassByTableRasterTool(base.base_tool.BaseTool):
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @input_tableview("in_remap_table", "Remap Table", False, ["Output Value::", "To Value::", "From Value::"])
-    @parameter("missing_values", "Missing value treatment", "GPString", "Optional", False, "Input", data_nodata, None, None, data_nodata[0])
+    @parameter("missing_values", "Missing value treatment", "GPString", "Optional", False, "Input", data_nodata, None, None, data_nodata[0], "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, "Esri Grid")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):

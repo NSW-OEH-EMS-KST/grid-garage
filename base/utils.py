@@ -275,7 +275,7 @@ def make_raster_name(like_name, out_wspace, ext='', prefix='', suffix=''):
     if ap.Exists(raster_name_full):
         base.log.debug("{} exists calling CreateUniqueName()".format(raster_name_full))
         raster_name = ap.CreateUniqueName(raster_name + ext, out_wspace)
-        base.log.debug(" New named after calling CreateUniqueName() is {}".format(raster_name))
+        base.log.debug(" New name after calling CreateUniqueName() is {}".format(raster_name))
 
     return os.path.join(out_wspace, raster_name + ext)
 

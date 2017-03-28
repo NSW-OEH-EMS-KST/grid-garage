@@ -20,11 +20,11 @@ class CalculateStatisticsRasterTool(base.base_tool.BaseTool):
         return
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
-    @parameter("x_skip_factor", "X Skip Factor", "GPLong", "Optional", False, "Input", None, None, None, None)
-    @parameter("y_skip_factor", "Y Skip Factor", "GPLong", "Optional", False, "Input", None, None, None, None)
-    @parameter("ignore_values", "Ignore Values", "GPLong", "Optional", True, "Input", None, None, None, None)
-    @parameter("skip_existing", "Existing Statistics", "GPString", "Optional", False, "Input", ["OVERWRITE", "SKIP_EXISTING"], None, None, "OVERWRITE")
-    @parameter("area_of_interest", "Area of Interest", "GPFeatureLayer", "Optional", False, "Input", ["Polygon"], None, None, None)
+    @parameter("x_skip_factor", "X Skip Factor", "GPLong", "Optional", False, "Input", None, None, None, None, "Options")
+    @parameter("y_skip_factor", "Y Skip Factor", "GPLong", "Optional", False, "Input", None, None, None, None, "Options")
+    @parameter("ignore_values", "Ignore Values", "GPLong", "Optional", True, "Input", None, None, None, None, "Options")
+    @parameter("skip_existing", "Existing Statistics", "GPString", "Optional", False, "Input", ["OVERWRITE", "SKIP_EXISTING"], None, None, "OVERWRITE", "Options")
+    @parameter("area_of_interest", "Area of Interest", "GPFeatureLayer", "Optional", False, "Input", ["Polygon"], None, None, None, "Options")
     @input_output_table
     def getParameterInfo(self):
 

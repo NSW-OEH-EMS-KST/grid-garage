@@ -4,7 +4,7 @@ import functools
 from base.utils import raster_formats, resample_methods, aggregation_methods, data_nodata, expand_trunc, stats_type, pixel_type, raster_formats2, transform_methods
 
 
-def parameter(name, display_name, data_type, parameter_type, multi_value, direction, value_list, default_environment, dependancy_list, default_value):
+def parameter(name, display_name, data_type, parameter_type, multi_value, direction, value_list, default_environment, dependancy_list, default_value, category=None):
     """ Wrap a function with a function that generates a generic parameter
 
     Args:
@@ -25,7 +25,7 @@ def parameter(name, display_name, data_type, parameter_type, multi_value, direct
 
     validate_parameter(name, display_name, data_type, parameter_type, multi_value, direction, value_list, default_environment, dependancy_list, default_value)
 
-    par = arcpy.Parameter(name=name, displayName=display_name, datatype=data_type, parameterType=parameter_type, multiValue=multi_value, direction=direction)
+    par = arcpy.Parameter(name=name, displayName=display_name, datatype=data_type, parameterType=parameter_type, multiValue=multi_value, direction=direction, category=category)
 
     if value_list:  # and data_type == "GPString":
         if value_list[0] == "Range" and len(value_list) == 3:  # a range, probably need to extend this usage a bit in hindsight
@@ -276,14 +276,16 @@ def input_output_table_with_output_affixes(f):
                            name="output_filename_prefix",
                            datatype="GPString",
                            parameterType="Optional",
-                           direction="Input")
+                           direction="Input",
+                           category="Output Filename Affixes")
 
     # Output filename suffix
     par4 = arcpy.Parameter(displayName="Output Filename Suffix",
                            name="output_filename_suffix",
                            datatype="GPString",
                            parameterType="Optional",
-                           direction="Input")
+                           direction="Input",
+                           category="Output Filename Affixes")
 
     # Output Table Name
     par5 = arcpy.Parameter(displayName="Result Table Name",

@@ -18,30 +18,20 @@ class CopyRasterTool(base.base_tool.BaseTool):
 
         base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
-        # self.config_keyword = None
-        # self.background_value = None
-        # self.nodata_value = None
-        # self.onebit_to_eightbit = None
-        # self.colormap_to_RGB = None
-        # self.pixel_type = None
-        # self.scale_pixel_value = None
-        # self.RGB_to_Colormap = None
-        # self.format = None
-        # self.transform = None
 
         return
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
-    @parameter("config_keyword", "Config Keyword", "GPString", "Optional", False, "Input", None, None, None, None)
-    @parameter("background_value", "Background Value", "GPDouble", "Optional", False, "Input", None, None, None, None)
-    @parameter("nodata_value", "NoData Value", "GPString", "Optional", False, "Input", None, None, None, None)
-    @parameter("onebit_to_eightbit", "1 bit to 8 bit", "GPString", "Optional", False, "Input", ["NONE", "OneBitTo8Bit"], None, None, "NONE")
-    @parameter("colormap_to_RGB", "Colourmap to RGB", "GPString", "Optional", False, "Input", ["NONE", "ColormapToRGB"], None, None, "NONE")
-    @parameter("pixel_type", "Pixel Type", "GPString", "Optional", False, "Input", pixel_type, None, None, None)
-    @parameter("scale_pixel_value", "Scale Pixel value", "GPString", "Optional", False, "Input", ["NONE", "ScalePixelValue"], None, None, None)
-    @parameter("RGB_to_Colormap", "RGB to Colourmap", "GPString", "Optional", False, "Input", ["NONE", "RGBToColormap"], None, None, None)
-    @parameter("format", "Output Raster Format", "GPString", "Optional", False, "Input", raster_formats2, None, None, None)
-    @parameter("transform", "Transform", "GPString", "Optional", False, "Input", None, None, None, None)
+    @parameter("config_keyword", "Config Keyword", "GPString", "Optional", False, "Input", None, None, None, None, "Options")
+    @parameter("background_value", "Background Value", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
+    @parameter("nodata_value", "NoData Value", "GPString", "Optional", False, "Input", None, None, None, None, "Options")
+    @parameter("onebit_to_eightbit", "1 bit to 8 bit", "GPString", "Optional", False, "Input", ["NONE", "OneBitTo8Bit"], None, None, "NONE", "Options")
+    @parameter("colormap_to_RGB", "Colourmap to RGB", "GPString", "Optional", False, "Input", ["NONE", "ColormapToRGB"], None, None, "NONE", "Options")
+    @parameter("pixel_type", "Pixel Type", "GPString", "Optional", False, "Input", pixel_type, None, None, None, "Options")
+    @parameter("scale_pixel_value", "Scale Pixel value", "GPString", "Optional", False, "Input", ["NONE", "ScalePixelValue"], None, None, None, "Options")
+    @parameter("RGB_to_Colormap", "RGB to Colourmap", "GPString", "Optional", False, "Input", ["NONE", "RGBToColormap"], None, None, None, "Options")
+    @parameter("format", "Output Raster Format", "GPString", "Optional", False, "Input", raster_formats2, None, None, None, "Options")
+    @parameter("transform", "Transform", "GPString", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, raster_formats[0])
     @input_output_table_with_output_affixes
     def getParameterInfo(self):

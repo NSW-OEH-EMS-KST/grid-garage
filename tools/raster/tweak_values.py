@@ -29,13 +29,13 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
         return
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:none"])
-    @parameter("min_val", "Minimum value", "GPDouble", "Optional", False, "Input", None, None, None, None)
-    @parameter("under_min", "Values < Minumium", "GPString", "Optional", False, "Input", ["Minimum", "NoData"], None, None, "Minimum")
-    @parameter("max_val", "Maximum value", "GPDouble", "Optional", False, "Input", None, None, None, None)
-    @parameter("over_max", "Values > Maxumium", "GPString", "Optional", False, "Input", ["Maximum", "NoData"], None, None, "Maximum")
-    @parameter("scaler", "Scale Factor", "GPDouble", "Optional", False, "Input", None, None, None, None)
-    @parameter("constant", "Constant Shift", "GPDouble", "Optional", False, "Input", None, None, None, None)
-    @parameter("integerise", "integerise", "GPBoolean", "Optional", False, "Input", None, None, None, False)
+    @parameter("min_val", "Minimum value", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
+    @parameter("under_min", "Values < Minumium", "GPString", "Optional", False, "Input", ["Minimum", "NoData"], None, None, "Minimum", "Options")
+    @parameter("max_val", "Maximum value", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
+    @parameter("over_max", "Values > Maxumium", "GPString", "Optional", False, "Input", ["Maximum", "NoData"], None, None, "Maximum", "Options")
+    @parameter("scaler", "Scale Factor", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
+    @parameter("constant", "Constant Shift", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
+    @parameter("integerise", "integerise", "GPBoolean", "Optional", False, "Input", None, None, None, False, "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table_with_output_affixes
     def getParameterInfo(self):

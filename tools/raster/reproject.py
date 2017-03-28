@@ -23,8 +23,8 @@ class ReprojectRasterTool(base.base_tool.BaseTool):
     @parameter("output_cs", "Output Spatial Reference", "Spatial Reference", "Required", False, "Input", None, "outputCoordinateSystem", None, None)
     @parameter("cell_size", "Cell Size", "GPSACellSize", "Required", False, "Input", None, "cellSize", None, None)
     @parameter("resample_type", "Resampling Method", "GPString", "Required", False, "Input", resample_methods, "resamplingMethod", None, None)
-    @parameter("rego_point", "Registration Point", "GPPoint", "Optional", False, "Input", None, None, None, None)
-    @parameter("overrides", "Transformation Overrides", "GPString", "Optional", False, "Input", None, None, None, None)
+    @parameter("rego_point", "Registration Point", "GPPoint", "Optional", False, "Input", None, None, None, None, "Options")
+    @parameter("overrides", "Transformation Overrides", "GPString", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table_with_output_affixes
     def getParameterInfo(self):

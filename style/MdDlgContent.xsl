@@ -9,7 +9,7 @@
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 <xsl:variable name="BackgroundColor">White</xsl:variable>
-<xsl:variable name="BackgroundImage">"url('oehbw.gif')"</xsl:variable>
+<xsl:variable name="BackgroundImage">url('oehbw.gif')</xsl:variable>
 <xsl:variable name="BackgroundPosition">bottom right</xsl:variable>
 <xsl:variable name="BackgroundRepeat">no-repeat</xsl:variable>
 

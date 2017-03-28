@@ -26,10 +26,10 @@ class ClipRasterTool(base.base_tool.BaseTool):
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("rectangle", "Rectangle", "GPExtent", "Required", False, "Input", None, "extent", None, None)
-    @parameter("polygons", "Polygon feature(s) to clip by", "GPFeatureLayer", "Optional", False, "Input", ["Polygon"], None, None, None)
-    @parameter("clipping_geometry", "Use features for clipping", "GPBoolean", "Optional", False, "Input", None, None, None, None)
-    @parameter("no_data_val", "Value for 'NoData'", "GPString", "Required", False, "Input", None, "nodata", None, None)
-    @parameter("maintain_extent", "Maintain clipping extent", "GPString", "Optional", False, "Input", ["MAINTAIN_EXTENT", "NO_MAINTAIN_EXTENT"], None, None, None)
+    @parameter("polygons", "Polygon feature(s) to clip by", "GPFeatureLayer", "Optional", False, "Input", ["Polygon"], None, None, None, "Options")
+    @parameter("clipping_geometry", "Use features for clipping", "GPBoolean", "Optional", False, "Input", None, None, None, None, "Options")
+    @parameter("no_data_val", "Value for 'NoData'", "GPString", "Optional", False, "Input", None, "nodata", None, None, "Options")
+    @parameter("maintain_extent", "Maintain clipping extent", "GPString", "Optional", False, "Input", ["MAINTAIN_EXTENT", "NO_MAINTAIN_EXTENT"], None, None, None, "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
