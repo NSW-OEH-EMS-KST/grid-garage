@@ -23,7 +23,7 @@ class ClipFeatureTool(base.base_tool.BaseTool):
 
     @input_tableview("feature_table", "Table of Features", False, ["feature:geodata:"])
     @parameter("clip_features", "Clip Features", "DEFeatureClass", "Required", False, "Input", ["Polygon"], None, None, None)
-    @parameter("xy_tolerance", "XY Tolerance", "GPLinearUnit", "Optional", False, "Input", None, None, None, None)
+    @parameter("xy_tolerance", "XY Tolerance", "GPLinearUnit", "Optional", False, "Input", None, None, None, None, "Options")
     @input_output_table
     def getParameterInfo(self):
 

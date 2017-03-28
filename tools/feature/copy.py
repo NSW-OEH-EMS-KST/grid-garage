@@ -23,9 +23,9 @@ class CopyFeatureTool(base.base_tool.BaseTool):
 
     @input_tableview("features_table", "Table for Features", False, ["feature:geodata:"])
     @parameter("config_kw", "Config Keyword", "GPString", "Optional", False, "Input", None, "configKeyword", None, None)
-    @parameter("sg_1", "Spatial Grid 1", "GPDouble", "Optional", False, "Input", None, None, None, 0)
-    @parameter("sg_2", "Spatial Grid 2", "GPDouble", "Optional", False, "Input", None, None, None, 0)
-    @parameter("sg_3", "Spatial Grid 3", "GPDouble", "Optional", False, "Input", None, None, None, 0)
+    @parameter("sg_1", "Spatial Grid 1", "GPDouble", "Optional", False, "Input", None, None, None, 0, "Options")
+    @parameter("sg_2", "Spatial Grid 2", "GPDouble", "Optional", False, "Input", None, None, None, 0, "Options")
+    @parameter("sg_3", "Spatial Grid 3", "GPDouble", "Optional", False, "Input", None, None, None, 0, "Options")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
 
