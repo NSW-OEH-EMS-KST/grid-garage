@@ -269,11 +269,13 @@ def make_raster_name(like_name, out_wspace, ext='', prefix='', suffix=''):
     ext = "" if (is_local_gdb(out_wspace) or ext == "Esri Grid") else ext
     ext = "." + ext if (ext and ext[0] != ".") else ext
 
-    raster_name = ap.ValidateTableName(prefix + r_name + suffix, out_wspace)
-    raster_name_full = os.path.join(out_wspace, raster_name)
+    raster_name = ap.ValidateTableName(prefix + r_name + suffix + ext, out_wspace)
+    raster_name_full = os.path.join(out_wspace, raster_name + ext)
 
     if ap.Exists(raster_name_full):
-        raster_name = ap.CreateUniqueName(raster_name, out_wspace)
+        base.log.debug("{} exists calling CreateUniqueName()".format(raster_name_full))
+        raster_name = ap.CreateUniqueName(raster_name + ext, out_wspace)
+        base.log.debug(" New named after calling CreateUniqueName() is {}".format(raster_name))
 
     return os.path.join(out_wspace, raster_name + ext)
 

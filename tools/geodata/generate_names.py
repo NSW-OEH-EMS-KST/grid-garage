@@ -1,7 +1,7 @@
 import base.base_tool
 import base.results
 from base.method_decorators import input_output_table_with_output_affixes, input_tableview, parameter
-from base.utils import split_up_filename, is_raster, is_vector, make_raster_name, make_vector_name, make_table_name
+from base.utils import split_up_filename, is_raster, is_vector, make_raster_name, make_vector_name, make_table_name, get_search_cursor_rows
 
 
 tool_settings = {"label": "Generate Names",
@@ -16,7 +16,7 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
     def __init__(self):
 
         base.base_tool.BaseTool.__init__(self, tool_settings)
-        self.execution_list = [self.initialise, self.iterate]
+        self.execution_list = [self.initialise, self.iterate, self.test_duplicates]
 
         return
 
@@ -28,24 +28,29 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
         return base.base_tool.BaseTool.getParameterInfo(self)
 
     def test_duplicates(self):
-        pass
-        # """
-        # Test for duplicate names.
-        #
-        # """
-        # tool.info('Testing new names for duplication...')
-        # table = tool.get_parameter_as_text(0)
-        # rows = tool.search_cursor(table, ['candidate_item'])
-        # value_set = set()
+        """
+        Test for duplicate names.
+
+        """
+        self.log.info('Testing new names for duplication...')
+        table = self.result.result_csv  # self.get_parameter_by_name("result_table").valueAsText()  # tool.get_parameter_as_text(0)
+        self.log.debug(table)
+        rows = get_search_cursor_rows(table, ['candidate_name'])
+        self.log.debug(rows)
+        values = [x for x, in rows]
+        value_set = set(values)
+        duplicates = values - value_set
+
         # i = 0
         # for x, in rows:
         #     value_set.add(x)
         #     i += 1
         # value_set = sorted(value_set)
         # if len(value_set) == i:
-        #     tool.info('New item names (full) appear to be unique. Das is gut.')
-        # else:
-        #     tool.warn('!* There may be non-unique new names. doh! Please check.')
+        if not duplicates:
+            self.log.info('New item names (full) appear to be unique. Das is gut mein freund...')
+        else:
+            self.log.warn(['!! There seems to be non-unique new names. DOH! Please check.', duplicates])
 
     def initialise(self):
 

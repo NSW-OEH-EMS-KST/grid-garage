@@ -32,16 +32,6 @@ class AggregateRasterTool(base.base_tool.BaseTool):
 
         return base.base_tool.BaseTool.getParameterInfo(self)
 
-    # def initialise(self):
-    #     # p = self.get_parameter_dict()
-    #     # self.cell_factor = int(p["cell_factor"])
-    #     # self.aggregation_type = p["aggregation_type"] if p["aggregation_type"] else "#"
-    #     # self.extent_handling = p["extent_handling"] if p["extent_handling"] else "#"
-    #     # self.ignore_nodata = p["ignore_nodata"] if p["ignore_nodata"] else "#"
-    #     # self.raster_format = p["raster_format"]
-    #
-    #     return
-
     def iterate(self):
 
         self.iterate_function_on_tableview(self.aggregate, "raster_table", ["raster"])
@@ -54,7 +44,7 @@ class AggregateRasterTool(base.base_tool.BaseTool):
         base.utils.validate_geodata(ras, raster=True)
 
         ras_out = base.utils.make_raster_name(ras, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
-        self.send_info("Aggregating {0} -->> {1} ...".format(ras, ras_out))
+        self.log.info("Aggregating {0} -->> {1} ...".format(ras, ras_out))
         out = Aggregate(ras, self.cell_factor, self.aggregation_type, self.extent_handling, self.ignore_nodata)
         out.save(ras_out)
 

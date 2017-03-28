@@ -194,12 +194,12 @@ class BaseTool(object):
         Returns:
 
         """
-        self.arc_messages = messages
-        base.log.configure_logging(messages)
-
         # check if we have a function to run
         if not self.execution_list:
             raise ValueError("Tool execution list is empty")
+
+        self.arc_messages = messages
+        base.log.configure_logging(messages)
 
         self.log.info("Debugging log file is located at '{}'".format(base.log.LOG_FILE))
 
@@ -211,18 +211,19 @@ class BaseTool(object):
 
         if hasattr(self, "result"):
             init = self.result.initialise(self.get_parameter_by_name("result_table"),
-                                           self.get_parameter_by_name("fail_table"),
-                                           self.get_parameter_by_name("output_workspace").value,
-                                           self.get_parameter_by_name("result_table_name").value)
+                                          self.get_parameter_by_name("fail_table"),
+                                          self.get_parameter_by_name("output_workspace").value,
+                                          self.get_parameter_by_name("result_table_name").value)
             [self.log.info(x) for x in init]
 
         # run the functions
-        for f in self.execution_list:
-            if isinstance(f, (list, tuple)):  # expecting to feed a function a function
-                f1, f2 = f  # for now just limit to 2 deep
-                f1(f2)
-            else:  # normal case, expecting a function
-                f()
+        with self.log.error_trap("Running execution list"):
+            for f in self.execution_list:
+                if isinstance(f, (list, tuple)):  # expecting to feed a function a function
+                    f1, f2 = f  # for now just limit to 2 deep
+                    f1(f2)
+                else:  # normal case, expecting a function
+                    f()
 
         if hasattr(self, "result"):
             [self.log.info(w) for w in self.result.write()]
