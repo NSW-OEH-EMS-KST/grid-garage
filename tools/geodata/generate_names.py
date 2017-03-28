@@ -38,19 +38,13 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
         rows = get_search_cursor_rows(table, ['candidate_name'])
         self.log.debug(rows)
         values = [x for x, in rows]
-        value_set = set(values)
-        duplicates = values - value_set
+        duplicates = set([x for x in values if values.count(x) > 1])
+        duplicates = list(duplicates)  # nicer print
 
-        # i = 0
-        # for x, in rows:
-        #     value_set.add(x)
-        #     i += 1
-        # value_set = sorted(value_set)
-        # if len(value_set) == i:
         if not duplicates:
             self.log.info('New item names (full) appear to be unique. Das is gut mein freund...')
         else:
-            self.log.warn(['!! There seems to be non-unique new names. DOH! Please check.', duplicates])
+            self.log.warn(['!! There seems to be non-unique new names. DOH! Please check the following...'] + duplicates)
 
     def initialise(self):
 
