@@ -2,6 +2,8 @@ import base.base_tool
 import base.results
 from base.method_decorators import input_tableview, input_output_table, parameter
 from arcpy import CalculateStatistics_management
+import base.utils
+
 
 tool_settings = {"label": "Calculate Statistics",
                  "description": "Calculates raster band statistics",
@@ -39,7 +41,7 @@ class CalculateStatisticsRasterTool(base.base_tool.BaseTool):
     def calculate(self, data):
 
         ras = data["raster"]
-        self.geodata.validate_geodata(ras, raster=True)
+        base.utils.validate_geodata(ras, raster=True)
         CalculateStatistics_management(ras, self.x_skip_factor, self.y_skip_factor, self.ignore_values, self.skip_existing, self.area_of_interest)
 
         self.result.add({"geodata": ras, "statistics": "built"})
