@@ -38,8 +38,12 @@ class ClipRasterTool(base.base_tool.BaseTool):
 
     def initialise(self):
 
-        self.polygon_srs = get_srs(self.polygons, raise_unknown_error=True) if self.polygons != "#" else None
-        self.clipping_geometry = "ClippingGeometry" if self.clipping_geometry != "#" else "NONE"
+        if self.clipping_geometry == "true":  # really ESRI, fuck me!
+            self.clipping_geometry = "ClippingGeometry"
+            self.polygon_srs = get_srs(self.polygons, raise_unknown_error=True) if self.polygons != "#" else None
+        else:
+            self.clipping_geometry = "NONE"
+            self.polygons = "#"
 
         return
 
@@ -55,6 +59,7 @@ class ClipRasterTool(base.base_tool.BaseTool):
         validate_geodata(ras, raster=True, srs_known=True)
         ras_srs = get_srs(ras, raise_unknown_error=True)
         self.log.debug("raster srs = {}".format(ras_srs))
+
         if self.polygons != "#":
             compare_srs(ras_srs, self.polygon_srs, raise_no_match_error=True, other_condition=(self.clipping_geometry != "NONE"))
 
