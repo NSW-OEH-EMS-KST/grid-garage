@@ -52,7 +52,7 @@ class ClipRasterTool(base.base_tool.BaseTool):
     def clip(self, data):
 
         ras = data["raster"]
-        validate_geodata(ras, raster=True)
+        validate_geodata(ras, raster=True, srs_known=True)
         ras_srs = get_srs(ras, raise_unknown_error=True)
         self.log.debug("raster srs = {}".format(ras_srs))
         if self.polygons != "#":

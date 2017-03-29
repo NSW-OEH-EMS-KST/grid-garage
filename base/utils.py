@@ -483,6 +483,7 @@ def get_transformation(in_ds, out_cs, overrides=None):
 
 @base.log.log
 def get_srs(geodata, raise_unknown_error=False, as_object=False):
+
     srs = ap.Describe(geodata).spatialReference
 
     if "unknown" in srs.name.lower() and raise_unknown_error:
@@ -522,17 +523,19 @@ def validate_geodata(geodata, raster=False, vector=False, srs_known=False):
 @base.log.log
 def compare_srs(srs1, srs2, raise_no_match_error=False, other_condition=True):
 
-    val = None
-    if not other_condition:
-        val = False
-    if srs1 == srs2:
-        val = True
-    if raise_no_match_error:
-        e = UnmatchedSrsError(srs1, srs2)
-        base.log.debug("Raising {}".format(e))
-        raise e
+    return_value = False
 
-    return val
+    if not other_condition:
+        return_value = False
+    elif srs1 == srs2:
+        return_value = True
+    else:
+        if raise_no_match_error:
+            e = UnmatchedSrsError(srs1, srs2)
+            base.log.debug("Raising {}".format(e))
+            raise e
+
+    return return_value
 
 
 @base.log.log
