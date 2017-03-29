@@ -17,7 +17,7 @@ class CopyRasterTool(base.base_tool.BaseTool):
     def __init__(self):
 
         base.base_tool.BaseTool.__init__(self, tool_settings)
-        self.execution_list = [self.initialise, self.iterate]
+        self.execution_list = [self.iterate]
 
         return
 
@@ -38,20 +38,20 @@ class CopyRasterTool(base.base_tool.BaseTool):
 
         return base.base_tool.BaseTool.getParameterInfo(self)
 
-    def initialise(self):
-        # p = self.get_parameter_dict()
-        # self.config_keyword = p["config_keyword"] if p["config_keyword"] else "#"
-        # self.background_value = p["background_value"] if p["background_value"] else "#"
-        # self.nodata_value = p["nodata_value"] if p["nodata_value"] else "#"
-        # self.onebit_to_eightbit = p["onebit_to_eightbit"] if p["onebit_to_eightbit"] else "NONE"
-        # self.colormap_to_RGB = p["colormap_to_RGB"] if p["colormap_to_RGB"] else "NONE"
-        # self.pixel_type = p["pixel_type"] if p["pixel_type"] else "#"
-        # self.scale_pixel_value = p["scale_pixel_value"] if p["scale_pixel_value"] else "NONE"
-        # self.RGB_to_Colormap = p["RGB_to_Colormap"] if p["RGB_to_Colormap"] else "NONE"
-        # self.format = p["format"] if p["format"] else ""
-        # self.transform = p["transform"] if p["transform"] else "#"
-
-        return
+    # def initialise(self):
+    #     # p = self.get_parameter_dict()
+    #     # self.config_keyword = p["config_keyword"] if p["config_keyword"] else "#"
+    #     # self.background_value = p["background_value"] if p["background_value"] else "#"
+    #     # self.nodata_value = p["nodata_value"] if p["nodata_value"] else "#"
+    #     # self.onebit_to_eightbit = p["onebit_to_eightbit"] if p["onebit_to_eightbit"] else "NONE"
+    #     # self.colormap_to_RGB = p["colormap_to_RGB"] if p["colormap_to_RGB"] else "NONE"
+    #     # self.pixel_type = p["pixel_type"] if p["pixel_type"] else "#"
+    #     # self.scale_pixel_value = p["scale_pixel_value"] if p["scale_pixel_value"] else "NONE"
+    #     # self.RGB_to_Colormap = p["RGB_to_Colormap"] if p["RGB_to_Colormap"] else "NONE"
+    #     # self.format = p["format"] if p["format"] else ""
+    #     # self.transform = p["transform"] if p["transform"] else "#"
+    #
+    #     return
 
     def iterate(self):
 
@@ -61,19 +61,17 @@ class CopyRasterTool(base.base_tool.BaseTool):
 
     def copy(self, data):
 
-        self.log.info(data)
         ras = data["raster"]
-        self.log.info(ras)
+
         base.utils.validate_geodata(ras, raster=True)
-        # self.send_info("validate_geodata done")
-        # self.send_info([ras, self.results.output_workspace, self.format])
         ras_out = base.utils.make_raster_name(ras, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
-        self.send_info("Copying {0} -->> {1} ...".format(ras, ras_out))
-        # CopyRaster_management (in_raster, out_rasterdataset, {config_keyword}, {background_value}, {nodata_value}, {onebit_to_eightbit}, {colormap_to_RGB}, {pixel_type}, {scale_pixel_value}, {RGB_to_Colormap}, {format}, {transform})
+
+        self.log.info("Copying {0} -->> {1} ...".format(ras, ras_out))
         arcpy.CopyRaster_management(ras, ras_out, self.config_keyword, self.background_value, self.nodata_value, self.onebit_to_eightbit, self.colormap_to_RGB, self.pixel_type, self.scale_pixel_value, self.RGB_to_Colormap, self.format, self.transform)
 
         self.result.add({"geodata": ras_out, "source_geodata": ras})
 
         return
 
-"http://desktop.arcgis.com/en/arcmap/latest/tools/data-management-toolbox/copy-raster.htm"
+# "http://desktop.arcgis.com/en/arcmap/latest/tools/data-management-toolbox/copy-raster.htm"
+# CopyRaster_management (in_raster, out_rasterdataset, {config_keyword}, {background_value}, {nodata_value}, {onebit_to_eightbit}, {colormap_to_RGB}, {pixel_type}, {scale_pixel_value}, {RGB_to_Colormap}, {format}, {transform})
