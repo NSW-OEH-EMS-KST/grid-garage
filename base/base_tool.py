@@ -13,6 +13,7 @@ import base.utils
 
 
 class BaseTool(object):
+
     @base.log.log
     def __init__(self, settings):
         """ Define the tool (tool name is the name of the class).
@@ -51,8 +52,6 @@ class BaseTool(object):
     def set_stylesheet():
         """ Set the tool stylesheet.
 
-        TODO: DOES NOT WORK !!!
-
         Returns:
 
         """
@@ -82,7 +81,7 @@ class BaseTool(object):
         return ast.literal_eval(node_or_string)
 
     @base.log.log
-    def get_parameter_by_name(self, param_name):
+    def get_parameter_by_name(self, param_name, raise_not_found_error=False):
         """ Returns a parameter based on its name
 
         Args:
@@ -91,15 +90,18 @@ class BaseTool(object):
         Returns:
 
         """
-        if not self.parameter_objects:
-            return
+        if self.parameter_objects:
 
-        for param in self.parameter_objects:
-            n = getattr(param, "name", None)
-            if n == param_name:
-                return param
+            for param in self.parameter_objects:
+                n = getattr(param, "name", None)
+                if n == param_name:
 
-        raise ValueError("Parameter {0} not found".format(param_name))
+                    return param
+
+        if raise_not_found_error:
+            raise ValueError("Parameter {0} not found".format(param_name))
+
+        return
 
     @base.log.log
     def getParameterInfo(self):
@@ -147,23 +149,18 @@ class BaseTool(object):
 
         """
 
-        out_ws_par = None
-        out_rasfmt_par = None
-        for p in parameters:
-            if p.name == "output_workspace":
-                out_ws_par = p
-                continue
-            elif p.name == "raster_format":
-                out_rasfmt_par = p
-                continue
-
-        if out_ws_par and out_rasfmt_par:
-            out_ws_par.clearMessage()
-            out_rasfmt_par.clearMessage()
-            if out_ws_par.altered or out_rasfmt_par.altered:
-                ws = out_ws_par.value
-                if base.utils.is_file_system(ws) and out_rasfmt_par.value == "Esri Grid":
-                    out_rasfmt_par.setErrorMessage("Invalid raster format for workspace type")
+        # out_ws_par = self.get_parameter_by_name("output_workspace")  # None
+        # out_rasfmt_par = self.get_parameter_by_name("raster_format")  # None
+        #
+        # if out_ws_par and out_rasfmt_par:
+        #     out_ws_par.clearMessage()
+        #     out_rasfmt_par.clearMessage()
+        #     if out_ws_par.altered or out_rasfmt_par.altered:
+        #         ws = out_ws_par.value
+        #         fmt = out_rasfmt_par.value
+        #         self.log.debug("ws={} fmt={}".format(ws, fmt))
+        #         if base.utils.is_local_gdb(ws) and fmt != "Esri Grid":
+        #             out_rasfmt_par.setErrorMessage("Invalid raster format for workspace type")
 
         # BaseTool.updateMessages(self, parameters)
         # stretch = parameters[2].value == 'STRETCH'
@@ -171,15 +168,6 @@ class BaseTool(object):
         #     parameters[3].setIDMessage("ERROR", 735, parameters[3].displayName)
         # if stretch and not parameters[4].valueAsText:
         #     parameters[4].setIDMessage("ERROR", 735, parameters[4].displayName)
-
-        # for p in parameters:
-        #     v = p.value
-        #     if v == "#run_id#":
-        #         p.value = self.run_id
-        #         break
-        # # raster format in workspace
-        # for p in parameters:
-        #     if p.name == "raster_format":
 
         return
 
@@ -248,9 +236,11 @@ class BaseTool(object):
         x = pd.get("raster_format", None)
         if x:
             pd["raster_format"] = "" if x.lower() == "esri grid" else '.' + x
+
         x = pd.get("output_filename_prefix", None)
         if x:
             pd["output_filename_prefix"] = "" if x == "#" else x
+
         x = pd.get("output_filename_suffix", None)
         if x:
             pd["output_filename_suffix"] = "" if x == "#" else x

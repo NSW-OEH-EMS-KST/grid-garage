@@ -33,13 +33,19 @@ class ReprojectRasterTool(base.base_tool.BaseTool):
 
     def initialise(self):
 
+        self.log.debug("initialise locals={}".format(locals()))
+
         self.output_cs = self.parameter_objects[2].value  # need the object for later code to work
         self.cell_size = str(self.cell_size)  # this seemed to solve an issue with unicode... strange
-        if self.overrides:
-            self.overrides = self.overrides.replace(" ", "").split(",")  # now a list "a:b, c:d, ..."
-            self.overrides = {k: v for k, v in (override.split(":") for override in self.overrides)}   #if self.overrides else {"none": None}  # now a dict {a:b, c:d, ...}
-        self.log.info("Transformation overrides: {0}".format(self.overrides))
-        self.log.info("Output CS: {0}".format(self.output_cs.name))
+
+        if self.overrides != "#":
+            try:
+                self.overrides = self.overrides.replace(" ", "").split(",")  # now a list "a:b, c:d, ..."
+                self.overrides = {k: v for k, v in (override.split(",") for override in self.overrides)}   #if self.overrides else {"none": None}  # now a dict {a:b, c:d, ...}
+            except:
+                raise ValueError("There is a problem with specified overrides. should be something like 'a:b, c:d,...'")
+
+        self.log.info(["Transformation overrides: {0}".format(self.overrides), "Output CS: {0}".format(self.output_cs.name)])
 
         return
 
@@ -50,6 +56,8 @@ class ReprojectRasterTool(base.base_tool.BaseTool):
         return
 
     def reproject(self, data):
+
+        self.log.debug("reproject locals={}".format(locals()))
 
         r_in = data['raster']
         validate_geodata(r_in, raster=True, srs_known=True)

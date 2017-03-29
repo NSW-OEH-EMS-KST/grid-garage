@@ -5,6 +5,7 @@ import os
 import inspect
 import logging
 
+
 # basic settings
 APPDATA_PATH = os.path.join(os.environ["USERPROFILE"], "AppData", "Local", "GridGarage")
 LOG_FILE = os.path.join(APPDATA_PATH, "gg3.log")
@@ -12,9 +13,13 @@ LOG_FILE = os.path.join(APPDATA_PATH, "gg3.log")
 LOGGER = None
 
 
+def make_tuple(ob):
+
+    return ob if isinstance(ob, (list, tuple)) else [ob]
+
+
 def debug(message):
-    if not isinstance(message, list):
-        message = [message]
+    message = make_tuple(message)
 
     if LOGGER:
         [LOGGER.debug(msg) for msg in message]
@@ -23,8 +28,7 @@ def debug(message):
 
 
 def info(message):
-    if not isinstance(message, list):
-        message = [message]
+    message = make_tuple(message)
 
     if LOGGER:
         [LOGGER.info(msg) for msg in message]
@@ -33,8 +37,7 @@ def info(message):
 
 
 def warn(message):
-    if not isinstance(message, list):
-        message = [message]
+    message = make_tuple(message)
 
     if LOGGER:
         [LOGGER.warn(msg) for msg in message]
@@ -43,8 +46,7 @@ def warn(message):
 
 
 def error(message):
-    if not isinstance(message, list):
-        message = [message]
+    message = make_tuple(message)
 
     if LOGGER:
         [LOGGER.error(msg) for msg in message]
