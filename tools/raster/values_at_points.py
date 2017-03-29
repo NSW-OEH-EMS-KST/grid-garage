@@ -39,7 +39,7 @@ class ValuesAtPointsRasterTool(base.base_tool.BaseTool):
         if "unknown" in self.points_srs.lower():
             raise ValueError("Point dataset '{0}'has unknown spatial reference system ({1})".format(source, self.points_srs))
 
-        self.point_rows = self.geodata.get_search_cursor_rows(self.points, ("SHAPE@XY", "OID@"))
+        self.point_rows = base.utils.get_search_cursor_rows(self.points, ("SHAPE@XY", "OID@"))
         self.log.info("{0} points found in '{1}'".format(len(self.point_rows), self.points))
 
         return
