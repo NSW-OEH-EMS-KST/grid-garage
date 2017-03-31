@@ -17,14 +17,14 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
 
         base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
-        self.min_val = None
-        self.under_min = None
-        self.max_val = None
-        self.over_max = None
-        self.scalar = None
-        self.constant = None
-        self.integerise = None
-        self.raster_format = None
+        # self.min_val = None
+        # self.under_min = None
+        # self.max_val = None
+        # self.over_max = None
+        # self.scalar = None
+        # self.constant = None
+        # self.integerise = None
+        # self.raster_format = None
 
         return
 
@@ -74,7 +74,7 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
 
         if self.min_val:
             self.log.info('Setting minimum {0}...{1}'.format(self.min_val, self.under_min))
-            under = self.min_val if self.under_min == 'Minimum' else self.get_band_nodata(r_in)  # self.geodata.describe(r_in)["raster_band_noDataValue"]
+            under = self.min_val if self.under_min == 'Minimum' else base.utils.get_band_nodata(r_in)  # self.geodata.describe(r_in)["raster_band_noDataValue"]
             # self.send_info(under)
             if under == "#":
                 raise ValueError("Raster '{}' does not have a nodata value".format(r_in))
@@ -84,7 +84,7 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
 
         if self.max_val:
             self.log.info('Setting maximum {0}...{1}'.format(self.max_val, self.over_max))
-            over = self.max_val if self.over_max == 'Maximum' else self.get_band_nodata(r_in)  # self.geodata.describe(r_in)["raster_band_noDataValue"]
+            over = self.max_val if self.over_max == 'Maximum' else base.utils.get_band_nodata(r_in)  # self.geodata.describe(r_in)["raster_band_noDataValue"]
             # self.send_info(over)
             if over == "#":
                 raise ValueError("Raster '{}' does not have a nodata value".format(r_in))

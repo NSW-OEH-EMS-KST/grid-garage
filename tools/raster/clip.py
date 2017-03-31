@@ -38,7 +38,7 @@ class ClipRasterTool(base.base_tool.BaseTool):
 
     def initialise(self):
 
-        if self.clipping_geometry == "true":  # really ESRI, fuck me!
+        if self.clipping_geometry:  # == "true":  # really ESRI, fuck me!
             self.clipping_geometry = "ClippingGeometry"
             self.polygon_srs = get_srs(self.polygons, raise_unknown_error=True) if self.polygons != "#" else None
         else:
