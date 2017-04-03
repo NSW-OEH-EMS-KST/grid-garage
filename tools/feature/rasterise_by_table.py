@@ -53,7 +53,7 @@ class RasteriseByTableTool(BaseTool):
         for field in target_fields:
             r_out = "not set"
             try:
-                r_out = base.utils.make_raster_name("{0}_{1}".format(splitext(feat_ds)[0], field), self.result.output_workspace, self.output_filename_prefix, self.output_filename_suffix)
+                r_out = base.utils.make_raster_name("{0}_{1}".format(splitext(feat_ds)[0], field), self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
                 self.log.info("Rasterising {0} on {1} -> {2}".format(feat_ds, field, r_out))
                 FeatureToRaster_conversion(feat_ds, field, r_out)
                 self.result.add({"geodata": r_out, "source_geodata": feat_ds, "source_field": field})
