@@ -31,14 +31,6 @@ class CopyFeatureTool(base.base_tool.BaseTool):
 
         return base.base_tool.BaseTool.getParameterInfo(self)
 
-    # def initialise(self):
-    # #     p = self.get_parameter_dict()
-    # #     self.config_kw = p["config_kw"]if p["config_kw"] else "#"
-    # #     self.sg_1 = p["sg_1"] if p["sg_1"] else 0
-    # #     self.sg_2 = p["sg_2"] if p["sg_2"] else 0
-    # #     self.sg_3 = p["sg_3"] if p["sg_2"] else 0
-    #     return
-
     def iterate(self):
 
         self.iterate_function_on_tableview(self.process, "features_table", ["feature"])
@@ -48,14 +40,13 @@ class CopyFeatureTool(base.base_tool.BaseTool):
     def process(self, data):
 
         fc = data["feature"]
-        self.geodata.validate_geodata(fc, vector=True)
+        base.utils.validate_geodata(fc, vector=True)
 
-        ws = self.results.output_workspace
+        ws = self.result.output_workspace
         ex = splitext(fc)[1]
         nfc = base.utils.make_vector_name(fc, ws, ex)
 
         self.log.info('copying {0} --> {1}'.format(fc, nfc))
-        # CopyFeatures_management(in_features, out_feature_class, {config_keyword}, {spatial_grid_1}, {spatial_grid_2}, {spatial_grid_3})
         arcpy.CopyFeatures_management(fc, nfc, self.config_kw, self.sg_1, self.sg_2, self.sg_3)
 
         self.result.add({'geodata': nfc, 'copied_from': fc})

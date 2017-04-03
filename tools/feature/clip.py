@@ -1,6 +1,6 @@
 import base.base_tool
 import base.results
-from base.method_decorators import input_output_table, input_tableview, parameter
+from base.method_decorators import input_output_table_with_output_affixes, input_tableview, parameter
 import arcpy
 import base.utils
 
@@ -21,10 +21,11 @@ class ClipFeatureTool(base.base_tool.BaseTool):
 
         return
 
+    # @parameter("clip_features", "Clip Features", "DEFeatureClass", "Required", False, "Input", ["Polygon"], None, None, None)
     @input_tableview("feature_table", "Table of Features", False, ["feature:geodata:"])
-    @parameter("clip_features", "Clip Features", "DEFeatureClass", "Required", False, "Input", ["Polygon"], None, None, None)
+    @parameter("clip_features", "Clip Features", "GPFeatureLayer", "Required", False, "Input", ["Polygon"], None, None, None,)
     @parameter("xy_tolerance", "XY Tolerance", "GPLinearUnit", "Optional", False, "Input", None, None, None, None, "Options")
-    @input_output_table
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
 
         return base.base_tool.BaseTool.getParameterInfo(self)
@@ -47,7 +48,7 @@ class ClipFeatureTool(base.base_tool.BaseTool):
 
         # parse input name, construct output name
         fc_ws, fc_base, fc_name, fc_ext = base.utils.split_up_filename(fc)
-        fc_out = base.utils.make_vector_name(fc, self.results.output_workspace, fc_ext, self.output_filename_prefix, self.output_filename_suffix)
+        fc_out = base.utils.make_vector_name(fc, self.result.output_workspace, fc_ext, self.output_filename_prefix, self.output_filename_suffix)
 
         self.log.info("Clipping {0} -->> {1} ...".format(fc, fc_out))
         arcpy.Clip_analysis(fc, self.clip_features, fc_out, self.xy_tolerance)

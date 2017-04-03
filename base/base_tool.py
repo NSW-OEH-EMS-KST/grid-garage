@@ -194,8 +194,8 @@ class BaseTool(object):
         self.parameter_objects = parameters
         self.parameter_strings = self.get_parameter_dict()
         [setattr(self, k, v) for k, v in self.parameter_strings.iteritems()]
-        [setattr(self, k, True) for k, v in self.parameter_strings.iteritems() if v == 'true']
-        [setattr(self, k, False) for k, v in self.parameter_strings.iteritems() if v == 'false']
+        [setattr(self, k, True) for k, v in self.parameter_strings.iteritems() if v in ['true', 'True']]
+        [setattr(self, k, False) for k, v in self.parameter_strings.iteritems() if v in ['false', 'False']]
 
         self.log.debug("Tool attributes set {}".format(self.__dict__))
 

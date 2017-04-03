@@ -271,12 +271,6 @@ def make_raster_name(like_name, out_wspace, ext='', prefix='', suffix=''):
 
     raster_name = ap.ValidateTableName(prefix + r_name + suffix, out_wspace)
     raster_name = ap.CreateUniqueName(raster_name, out_wspace)
-    # raster_name_full = os.path.join(out_wspace, raster_name + ext)
-
-    # if ap.Exists(raster_name_full):
-    #     base.log.debug("{} exists calling CreateUniqueName()".format(raster_name_full))
-    #     raster_name = ap.CreateUniqueName(raster_name + ext, out_wspace)
-    #     base.log.debug(" New name after calling CreateUniqueName() is {}".format(raster_name))
 
     return os.path.join(out_wspace, raster_name + ext)
 
@@ -289,26 +283,20 @@ def make_table_name(like_name, out_wspace, ext='', prefix='', suffix=''):
     ext = "." + ext if (ext and ext[0] != ".") else ext
 
     table_name = ap.ValidateTableName(prefix + t_name + suffix, out_wspace)
-    table_name_full = os.path.join(out_wspace, table_name)
-
-    if ap.Exists(table_name_full):
-        table_name = ap.CreateUniqueName(table_name, out_wspace)
+    table_name = ap.CreateUniqueName(table_name, out_wspace)
 
     return os.path.join(out_wspace, table_name + ext)
 
 
 @base.log.log
 def make_vector_name(like_name, out_wspace, ext='', prefix='', suffix=''):
-    _, __, gd_name, gd_ext = split_up_filename(like_name)
+    _, __, v_name, v_ext = split_up_filename(like_name)
 
     ext = "" if is_local_gdb(out_wspace) else ext
     ext = "." + ext if (ext and ext[0] != ".") else ext
 
-    vector_name = os.path.join(out_wspace, prefix + gd_name + suffix + ext)
-    if ap.Exists(vector_name):
-        vector_name = ap.CreateUniqueName(gd_name, out_wspace)
-    else:
-        vector_name = ap.ValidateTableName(gd_name, out_wspace)
+    vector_name = ap.ValidateTableName(prefix + v_name + suffix, out_wspace)
+    vector_name = ap.CreateUniqueName(vector_name, out_wspace)
 
     return os.path.join(out_wspace, vector_name + ext)
 
@@ -540,14 +528,15 @@ def compare_srs(srs1, srs2, raise_no_match_error=False, other_condition=True):
 
 
 @base.log.log
-def get_band_nodata(raster, bandindex=1):
+def get_band_nodata_value(raster, bandindex=1):
 
     d = ap.Describe(os.path.join(raster, "Band_{}".format(bandindex)))
-    ndv = d.noDataValue
-    # v = ap.GetRasterProperties_management(raster, property)
-    # self.send_info(type(v))
-    # v = v.getOutput(0)
-    # print type(v)
+    try:
+        ndv = d.noDataValue
+    except:
+        ndv = "#"
+
+    base.log.debug("ndv={}".format(ndv))
 
     return ndv
 
