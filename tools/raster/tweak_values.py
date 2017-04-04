@@ -21,13 +21,13 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
         return
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:none"])
-    @parameter("integerise", "Integerise Values", "GPBoolean", "Optional", False, "Input", None, None, None, False, "Options")
+    @parameter("scalar", "Scale Factor", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
+    @parameter("constant", "Constant Shift", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("min_val", "Minimum value", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("under_min", "Values Under Minumium", "GPString", "Optional", False, "Input", ["Minimum", "NoData"], None, None, "Minimum", "Options")
     @parameter("max_val", "Maximum value", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("over_max", "Values Over Maximum", "GPString", "Optional", False, "Input", ["Maximum", "NoData"], None, None, "Maximum", "Options")
-    @parameter("scalar", "Scale Factor", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
-    @parameter("constant", "Constant Shift", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
+    @parameter("integerise", "Integerise Result", "GPBoolean", "Optional", False, "Input", None, None, None, False, "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
@@ -59,8 +59,18 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
         tweaks = []
         ndv = base.utils.get_band_nodata_value(r_in)
 
+        if self.scalar != "#":
+            self.log.info('\tScaling by {}'.format(self.scalar))
+            ras *= float(self.scalar)
+            tweaks.append('scaled by {}'.format(self.scalar))
+
+        if self.constant != "#":
+            self.log.info('\tTranslating by {}'.format(self.constant))
+            ras += float(self.constant)
+            tweaks.append('translated by {}'.format(self.constant))
+
         if self.min_val != "#":
-            self.log.info('Setting minimum {}...{}'.format(self.min_val, self.under_min))
+            self.log.info('\tSetting minimum to {} values under will go to {}'.format(self.min_val, self.under_min))
             under = self.min_val if self.under_min == 'Minimum' else ndv
             if under == "#":
                 raise ValueError("Raster '{}' does not have a nodata value".format(r_in))
@@ -68,30 +78,20 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
             tweaks.append('Minimum set to {} under set to {}'.format(self.min_val, under))
 
         if self.max_val != "#":
-            self.log.info('Setting maximum {}...{}'.format(self.max_val, self.over_max))
+            self.log.info('\tSetting maximum to {} values over will go to {}'.format(self.max_val, self.over_max))
             over = self.max_val if self.over_max == 'Maximum' else ndv
             if over == "#":
                 raise ValueError("Raster '{}' does not have a nodata value".format(r_in))
             ras = arcpy.sa.Con(ras <= float(self.max_val), ras, float(over))
             tweaks.append('Maximum set to {} over set to {}'.format(self.max_val, over))
 
-        if self.scalar != "#":
-            self.log.info('Scaling...{}'.format(self.scalar))
-            ras *= float(self.scalar)
-            tweaks.append('scaled by {}'.format(self.scalar))
-
-        if self.constant != "#":
-            self.log.info('Translating...{}'.format(self.constant))
-            ras += float(self.constant)
-            tweaks.append('translated by {}'.format(self.constant))
-
         if self.integerise != "#":
-            self.log.info('Integerising...')
+            self.log.info('\tIntegerising...')
             ras = arcpy.sa.Int(ras)
             tweaks.append('integerised (truncation)')
 
         # save and exit
-        self.log.info('Saving to {}'.format(r_out))
+        self.log.info('\tSaving to {}'.format(r_out))
         ras.save(r_out)
 
         r = self.result.add({"geodata": r_out, "source_geodata": r_in, "tweaks": ' & '.join(tweaks)})

@@ -11,6 +11,7 @@ tool_settings = {"label": "Transform",
                  "can_run_background": "True",
                  "category": "Raster"}
 
+
 @base.results.result
 class TransformRasterTool(base.base_tool.BaseTool):
 
@@ -58,23 +59,20 @@ class TransformRasterTool(base.base_tool.BaseTool):
     def get_property(self, raster, property):
 
         v = ap.GetRasterProperties_management(raster, property)
-        self.log.info(type(v))
         v = v.getOutput(0)
+        self.log.debug("for raster {} property {} has type {} ".format(raster, property, type(v)))
 
         return float(v)
 
     def transform(self, data):
         r_in = data["raster"]
-        base.utils.validate_geodata(raster=True)
+        base.utils.validate_geodata(r_in, raster=True)
 
         r_out = base.utils.make_raster_name(r_in, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
-        self.log.info("Transforming raster {0} -->> {1} using method {2}".format(r_in, r_out, self.method))
+        self.log.info("Transforming raster {} using method {}".format(r_in, self.method))
         self.log.info("\tCalculating statistics")
         ap.CalculateStatistics_management(r_in)
-        # raster_mean = float(ap.GetRasterProperties_management(r_in, "MEAN").getOutput(0))
-        # raster_std = float(ap.GetRasterProperties_management(r_in, "STD").getOutput(0))
-        # raster_min = float(ap.GetRasterProperties_management(r_in, "MINIMUM").getOutput(0))
-        # raster_max = float(ap.GetRasterProperties_management(r_in, "MAXIMUM").getOutput(0))
+
         raster_mean = self.get_property(r_in, "MEAN")
         raster_std = self.get_property(r_in, "STD")
         raster_min = self.get_property(r_in, "MINIMUM")
@@ -108,7 +106,7 @@ class TransformRasterTool(base.base_tool.BaseTool):
             ras = (ras - (raster_max - raster_min)) * -1
 
         # save and exit
-        self.send_info('\tSaving to {0}'.format(r_out))
+        self.log.info('\tSaving to {0}'.format(r_out))
         ras.save(r_out)
 
         data["method"] = self.method
