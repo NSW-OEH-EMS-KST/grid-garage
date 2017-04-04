@@ -7,7 +7,6 @@ Created on Thu Sep  1 10:48:26 2016
 import utils
 import os
 import ast
-# from base.geodata import get_search_cursor_rows, is_file_system
 import base.log
 import base.utils
 
@@ -61,20 +60,6 @@ class BaseTool(object):
         xls1 = os.path.join(style_path, "MdDlgContent.xsl")
         xls2 = os.path.join(style_path, "MdDlgHelp.xsl")
         return ";".join([xls1, xls2])
-
-    # @contextlib.contextmanager
-    # def error_handler(self):
-    #     """ Provides an error-handling context for function execution.
-    #
-    #     Returns:
-    #
-    #     """
-    #     try:
-    #         yield
-    #     except Exception as e:
-    #         self.log.error(e)
-    #         if hasattr(self, "results"):
-    #             self.results.fail(self.current_geodata, self.current_row)
 
     @staticmethod
     def evaluate(node_or_string):
@@ -194,8 +179,8 @@ class BaseTool(object):
         self.parameter_objects = parameters
         self.parameter_strings = self.get_parameter_dict()
         [setattr(self, k, v) for k, v in self.parameter_strings.iteritems()]
-        [setattr(self, k, True) for k, v in self.parameter_strings.iteritems() if v in ['true', 'True']]
-        [setattr(self, k, False) for k, v in self.parameter_strings.iteritems() if v in ['false', 'False']]
+        [setattr(self, k, True) for k, v in self.parameter_strings.iteritems() if v in ['true', 'True']]  # ESRI string to bool
+        [setattr(self, k, False) for k, v in self.parameter_strings.iteritems() if v in ['false', 'False']]  # ESRI string to bool
 
         self.log.debug("Tool attributes set {}".format(self.__dict__))
 
@@ -207,12 +192,15 @@ class BaseTool(object):
             [self.log.info(x) for x in init]
 
         # run the functions
-        with self.log.error_trap("Running execution list"):
+        with self.log.error_trap(self):
             for f in self.execution_list:
                 if isinstance(f, (list, tuple)):  # expecting to feed a function a function
                     f1, f2 = f  # for now just limit to 2 deep
+                    # f1 = base.log.log(f1)
+                    # f2 = base.log.log(f2)
                     f1(f2)
                 else:  # normal case, expecting a function
+                    # f = base.log.log(f)
                     f()
 
         if hasattr(self, "result"):
@@ -273,6 +261,7 @@ class BaseTool(object):
         Returns:
 
         """
+        fname = func.__name__
         base.log.debug("locals = {}".format(locals()))
         param = self.get_parameter_by_name(parameter_name)
         if param.datatype != "Table View":
@@ -290,21 +279,28 @@ class BaseTool(object):
         f_vals = [self.get_parameter_by_name(f_name).valueAsText for f_name in f_names]
 
         rows = base.utils.get_search_cursor_rows(v, f_vals)
+        if not rows:
+            raise ValueError("No records to process.")
 
         # iterate
         total_items, count = len(rows), 0
         self.log.info("{0} items to process".format(total_items))
         for r in rows:
-            with base.log.error_trap(None, self):
+            try:
                 count += 1
                 r = utils.make_tuple(r)
                 self.current_row = r
                 data = {k: v for k, v in zip(key_names, r)}
                 g = data.get(key_names[0], None)  # convention: first key is geodata
                 self.current_geodata = g
-                self.log.debug("Executing {} with data= {}".format(func.__name__, data))
+                self.log.debug("Executing {} with data= {}".format(fname, data))
+                # func = base.log.log(func, self)
                 func(data)
                 self.log.debug("Execution OK")
+            except:
+                self.log.error("error executing " + fname)
+                if hasattr(self, "result"):
+                    self.result.fail(self.current_geodata, self.current_row)
 
         return
 
@@ -323,6 +319,7 @@ class BaseTool(object):
 
         param = self.get_parameter_by_name(parameter_name)
         multi_val = getattr(param, "multivalue", False)
+        fname = func.__name__
 
         if param.datatype == "Table View":
             raise ValueError("Function deprecation, use 'iterate_function_on_tableview'")
@@ -336,16 +333,22 @@ class BaseTool(object):
         total_items, count = len(rows), 0
         self.log.info("{0} items to process".format(total_items))
         for r in rows:
-            with base.log.error_trap(None, self):
+            try:
                 count += 1
                 r = utils.make_tuple(r)
                 self.current_row = r
                 data = {k: v for k, v in zip(key_names, r)}
                 g = data.get("geodata", None)
                 self.current_geodata = g
-                self.log.debug("Executing {} with data= {}".format(func.__name__, data))
+                self.log.debug("Executing {} with data= {}".format(fname, data))
+                # func = base.log.log(func, self)
                 func(data)
-                self.log.debug("Execution OK")
+                self.log.debug("Execution complete")
+            except:
+                self.log.error("error executing " + fname)
+                if hasattr(self, "result"):
+                    self.result.fail(self.current_geodata, self.current_row)
+
         return
 
     @base.log.log

@@ -1,9 +1,10 @@
 from __future__ import print_function
-from contextlib import contextmanager
-from functools import wraps
+import contextlib
+import functools
 import os
 import inspect
 import logging
+# from base.base_tool import BaseTool
 
 
 # basic settings
@@ -123,24 +124,31 @@ def configure_logging(arc_messages):
     return
 
 
-@contextmanager
-def error_trap(identifier=None, context=None):
+# @contextlib.contextmanager
+# def error_trap(identifier, context):
+@contextlib.contextmanager
+def error_trap(context):
+
     """ A context manager that traps and logs exception in its block.
         Usage:
         with error_trapping('optional description'):
             might_raise_exception()
         this_will_always_be_called()
     """
-    identifier = identifier or inspect.getframeinfo(inspect.currentframe())[2]
-    _in = "IN  " + identifier
-    _out = "OUT " + identifier
+
+    idx = getattr(context, "__name__", None)
+    if not idx:
+        idx = getattr(context, "name", None)
+    if not idx:
+        idx = inspect.getframeinfo(inspect.currentframe())[2]
+
+    _in = "IN context= " + idx
+    _out = "OUT context= " + idx
 
     if not LOGGER:
-        say = print
-        err = print
+        say = err = print
     else:
-        say = LOGGER.debug
-        err = LOGGER.error
+        say, err = LOGGER.debug, LOGGER.error
 
     try:
         say(_in)
@@ -148,19 +156,25 @@ def error_trap(identifier=None, context=None):
         say(_out)
     except Exception as e:
         err(str(e))
-        if context:
-            if hasattr(context, "result"):
-                context.result.fail(context.current_geodata, context.current_row)
+        raise e
+        # if isinstance(context, BaseTool):
+        #     raise e
+        # say("error, context is " + idx)
+        # if context:
+        #     if hasattr(context, "result"):
+        #         context.result.fail(context.current_geodata, context.current_row)
+        #     else:
+        #         say("context has no result attribute")
 
     return
 
 
 def log(f):
     """ A decorator to trap and log exceptions """
-    @wraps(f)
+    @functools.wraps(f)
     def wrapper(*args, **kwargs):
-        with error_trap(f.__name__):
-                return f(*args, **kwargs)
+        with error_trap(f):
+            return f(*args, **kwargs)
 
     return wrapper
 

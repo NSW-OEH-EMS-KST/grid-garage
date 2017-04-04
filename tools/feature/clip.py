@@ -9,7 +9,7 @@ tool_settings = {"label": "Clip",
                  "can_run_background": "True",
                  "category": "Feature"}
 
-# "http://desktop.arcgis.com/en/arcmap/latest/tools/analysis-toolbox/clip.htm"
+
 @base.results.result
 class ClipFeatureTool(base.base_tool.BaseTool):
 
@@ -21,7 +21,6 @@ class ClipFeatureTool(base.base_tool.BaseTool):
 
         return
 
-    # @parameter("clip_features", "Clip Features", "DEFeatureClass", "Required", False, "Input", ["Polygon"], None, None, None)
     @input_tableview("feature_table", "Table of Features", False, ["feature:geodata:"])
     @parameter("clip_features", "Clip Features", "GPFeatureLayer", "Required", False, "Input", ["Polygon"], None, None, None,)
     @parameter("xy_tolerance", "XY Tolerance", "GPLinearUnit", "Optional", False, "Input", None, None, None, None, "Options")
@@ -31,18 +30,21 @@ class ClipFeatureTool(base.base_tool.BaseTool):
         return base.base_tool.BaseTool.getParameterInfo(self)
 
     def initialise(self):
+
         self.clip_srs = base.utils.get_srs(self.clip_features, raise_unknown_error=True)
-
-    def iterate(self):
-
-        self.iterate_function_on_tableview(self.process, "feature_table", ["feature"])
 
         return
 
-    def process(self, data):
+    def iterate(self):
+
+        self.iterate_function_on_tableview(self.clip, "feature_table", ["feature"])
+
+        return
+
+    def clip(self, data):
 
         fc = data["feature"]
-        base.utils.validate_geodata(fc, vector=True)
+        base.utils.validate_geodata(fc, vector=True, srs_known=True)
         fc_srs = base.utils.get_srs(fc, raise_unknown_error=True)
         base.utils.compare_srs(fc_srs, self.clip_srs, raise_no_match_error=True)
 
@@ -53,7 +55,8 @@ class ClipFeatureTool(base.base_tool.BaseTool):
         self.log.info("Clipping {0} -->> {1} ...".format(fc, fc_out))
         arcpy.Clip_analysis(fc, self.clip_features, fc_out, self.xy_tolerance)
 
-        self.result.add({"geodata": fc_out, "source_geodata": fc})
+        self.log.info(self.result.add({"geodata": fc_out, "source_geodata": fc}))
 
         return
 
+# "http://desktop.arcgis.com/en/arcmap/latest/tools/analysis-toolbox/clip.htm"
