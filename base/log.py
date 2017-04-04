@@ -4,7 +4,6 @@ import functools
 import os
 import inspect
 import logging
-# from base.base_tool import BaseTool
 
 
 # basic settings
@@ -124,8 +123,6 @@ def configure_logging(arc_messages):
     return
 
 
-# @contextlib.contextmanager
-# def error_trap(identifier, context):
 @contextlib.contextmanager
 def error_trap(context):
 
@@ -157,14 +154,6 @@ def error_trap(context):
     except Exception as e:
         err(str(e))
         raise e
-        # if isinstance(context, BaseTool):
-        #     raise e
-        # say("error, context is " + idx)
-        # if context:
-        #     if hasattr(context, "result"):
-        #         context.result.fail(context.current_geodata, context.current_row)
-        #     else:
-        #         say("context has no result attribute")
 
     return
 

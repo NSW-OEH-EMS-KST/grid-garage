@@ -133,19 +133,56 @@ class BaseTool(object):
         Returns:
 
         """
-
-        # out_ws_par = self.get_parameter_by_name("output_workspace")  # None
-        # out_rasfmt_par = self.get_parameter_by_name("raster_format")  # None
+        # out_ws_par = None
+        # for p in parameters:
+        #     if p.name == "output_workspace":
+        #         out_ws_par = p
+        #         break
         #
-        # if out_ws_par and out_rasfmt_par:
+        # ras_fmt_par = None
+        # for p in parameters:
+        #     if p.name == "raster_format":
+        #         ras_fmt_par = p
+        #         break
+        #
+        # if out_ws_par and ras_fmt_par:
+        #
         #     out_ws_par.clearMessage()
-        #     out_rasfmt_par.clearMessage()
-        #     if out_ws_par.altered or out_rasfmt_par.altered:
+        #     ras_fmt_par.clearMessage()
+        #     # base.log.debug("messages cleared")
+        #
+        #     if out_ws_par.altered or ras_fmt_par.altered:
+        #         # base.log.debug("out_ws_par.altered or out_rasfmt_par.altered")
+        #
         #         ws = out_ws_par.value
-        #         fmt = out_rasfmt_par.value
-        #         self.log.debug("ws={} fmt={}".format(ws, fmt))
+        #         fmt = ras_fmt_par.value
+        #         # base.log.debug("ws={} fmt={}".format(ws, fmt))
         #         if base.utils.is_local_gdb(ws) and fmt != "Esri Grid":
-        #             out_rasfmt_par.setErrorMessage("Invalid raster format for workspace type")
+        #             ras_fmt_par.setErrorMessage("Invalid raster format for workspace type")
+        # try:
+        #     # base.log.debug("updateMessages")
+        #
+        #     out_ws_par = self.get_parameter_by_name("output_workspace")  # None
+        #     out_rasfmt_par = self.get_parameter_by_name("raster_format")  # None
+        #
+        #     if out_ws_par and out_rasfmt_par:
+        #         # base.log.debug("out_ws_par and out_rasfmt_par")
+        #
+        #         out_ws_par.clearMessage()
+        #         out_rasfmt_par.clearMessage()
+        #         # base.log.debug("messages cleared")
+        #
+        #         if out_ws_par.altered or out_rasfmt_par.altered:
+        #             # base.log.debug("out_ws_par.altered or out_rasfmt_par.altered")
+        #
+        #             ws = out_ws_par.value
+        #             fmt = out_rasfmt_par.value
+        #             # base.log.debug("ws={} fmt={}".format(ws, fmt))
+        #             if base.utils.is_local_gdb(ws) and fmt != "Esri Grid":
+        #                 out_rasfmt_par.setErrorMessage("Invalid raster format for workspace type")
+        # except Exception as e:
+        #     # base.log.debug("updateMessages error : {}".format(e))
+        #     print str(e)
 
         # BaseTool.updateMessages(self, parameters)
         # stretch = parameters[2].value == 'STRETCH'
@@ -174,7 +211,7 @@ class BaseTool(object):
         self.arc_messages = messages
         base.log.configure_logging(messages)
 
-        self.log.info("Debugging log file is located at '{}'".format(base.log.LOG_FILE))
+        base.log.info("Debugging log file is located at '{}'".format(base.log.LOG_FILE))
 
         self.parameter_objects = parameters
         self.parameter_strings = self.get_parameter_dict()
@@ -182,17 +219,17 @@ class BaseTool(object):
         [setattr(self, k, True) for k, v in self.parameter_strings.iteritems() if v in ['true', 'True']]  # ESRI string to bool
         [setattr(self, k, False) for k, v in self.parameter_strings.iteritems() if v in ['false', 'False']]  # ESRI string to bool
 
-        self.log.debug("Tool attributes set {}".format(self.__dict__))
+        base.log.debug("Tool attributes set {}".format(self.__dict__))
 
         if hasattr(self, "result"):
             init = self.result.initialise(self.get_parameter_by_name("result_table"),
                                           self.get_parameter_by_name("fail_table"),
                                           self.get_parameter_by_name("output_workspace").value,
                                           self.get_parameter_by_name("result_table_name").value)
-            [self.log.info(x) for x in init]
+            [base.log.info(x) for x in init]
 
         # run the functions
-        with self.log.error_trap(self):
+        with base.log.error_trap(self):
             for f in self.execution_list:
                 if isinstance(f, (list, tuple)):  # expecting to feed a function a function
                     f1, f2 = f  # for now just limit to 2 deep
@@ -204,7 +241,7 @@ class BaseTool(object):
                     f()
 
         if hasattr(self, "result"):
-            [self.log.info(w) for w in self.result.write()]
+            [base.log.info(w) for w in self.result.write()]
 
         return
 
@@ -284,7 +321,7 @@ class BaseTool(object):
 
         # iterate
         total_items, count = len(rows), 0
-        self.log.info("{0} items to process".format(total_items))
+        base.log.info("{0} items to process".format(total_items))
         for r in rows:
             try:
                 count += 1
@@ -293,12 +330,12 @@ class BaseTool(object):
                 data = {k: v for k, v in zip(key_names, r)}
                 g = data.get(key_names[0], None)  # convention: first key is geodata
                 self.current_geodata = g
-                self.log.debug("Executing {} with data= {}".format(fname, data))
-                # func = base.log.log(func, self)
+
+                base.log.debug("Executing {} with data= {}".format(fname, data))
                 func(data)
-                self.log.debug("Execution OK")
+                base.log.debug("Execution OK")
             except:
-                self.log.error("error executing " + fname)
+                base.log.error("error executing " + fname)
                 if hasattr(self, "result"):
                     self.result.fail(self.current_geodata, self.current_row)
 
@@ -331,7 +368,7 @@ class BaseTool(object):
 
         # iterate
         total_items, count = len(rows), 0
-        self.log.info("{0} items to process".format(total_items))
+        base.log.info("{0} items to process".format(total_items))
         for r in rows:
             try:
                 count += 1
@@ -340,12 +377,12 @@ class BaseTool(object):
                 data = {k: v for k, v in zip(key_names, r)}
                 g = data.get("geodata", None)
                 self.current_geodata = g
-                self.log.debug("Executing {} with data= {}".format(fname, data))
-                # func = base.log.log(func, self)
+
+                base.log.debug("Executing {} with data= {}".format(fname, data))
                 func(data)
-                self.log.debug("Execution complete")
+                base.log.debug("Execution complete")
             except:
-                self.log.error("error executing " + fname)
+                base.log.error("error executing " + fname)
                 if hasattr(self, "result"):
                     self.result.fail(self.current_geodata, self.current_row)
 
@@ -364,7 +401,7 @@ class BaseTool(object):
 
         """
 
-        self.arc_messages.addMessage("!! self.send_info() is deprecated... use self.log.info() !!")
+        self.arc_messages.addMessage("!! self.send_info() is deprecated... use base.log.info() !!")
         if not isinstance(message, list):
             message = [message]
 
@@ -385,7 +422,7 @@ class BaseTool(object):
 
         """
 
-        self.arc_messages.addMessage("!! self.send_warning() is deprecated... use self.log.warn() !!")
+        self.arc_messages.addMessage("!! self.send_warning() is deprecated... use base.log.warn() !!")
         if not isinstance(message, list):
             message = [message]
 
