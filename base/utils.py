@@ -37,6 +37,11 @@ class NotVectorError(ValueError):
         super(NotVectorError, self).__init__(self, "{0} is not a vector dataset".format(geodata))
 
 
+class NotTableError(ValueError):
+    def __init__(self, geodata):
+        super(NotTableError, self).__init__(self, "{0} is not a table dataset".format(geodata))
+
+
 class UnknownSrsError(ValueError):
     def __init__(self, geodata):
         super(UnknownSrsError, self).__init__(self, "Dataset '{0}' has an unknown spatial reference system".format(geodata))
@@ -45,6 +50,15 @@ class UnknownSrsError(ValueError):
 class UnmatchedSrsError(ValueError):
     def __init__(self, srs1, srs2):
         super(UnmatchedSrsError, self).__init__(self, "Spatial references do not match '{0}' != '{1}'".format(srs1, srs2))
+
+
+@base.log.log
+def get_field_list(dataset, wild_card=None, field_type=None):
+
+    if not geodata_exists(dataset):
+        raise DoesNotExistError(dataset)
+
+    return ap.ListFields(dataset, wild_card, field_type)
 
 
 @base.log.log
@@ -125,7 +139,7 @@ def get_search_cursor_rows(in_table, field_names, where_clause=None):
 
     # get a search cursor, listify it, release it
     sc = _get_search_cursor(in_table, field_names, where_clause_sc=where_clause)
-    rows = [row for row in sc]
+    rows = [row.append("") for row in sc]
     del sc
 
     base.log.debug("Returning rows = {}".format(rows))
@@ -299,6 +313,18 @@ def make_vector_name(like_name, out_wspace, ext='', prefix='', suffix=''):
     vector_name = ap.CreateUniqueName(vector_name, out_wspace)
 
     return os.path.join(out_wspace, vector_name + ext)
+
+
+@base.log.log
+def is_table(item):
+    if not geodata_exists(item):
+        raise DoesNotExistError(item)
+
+    d = ap.Describe(item)
+    try:
+        return d.dataType in ["Table"]
+    except:
+        return False
 
 
 @base.log.log
@@ -489,20 +515,28 @@ def get_srs(geodata, raise_unknown_error=False, as_object=False):
 
 
 @base.log.log
-def validate_geodata(geodata, raster=False, vector=False, srs_known=False):
+def validate_geodata(geodata, raster=False, vector=False, table=False, srs_known=False):
 
     if not geodata_exists(geodata):
         e = DoesNotExistError(geodata)
         base.log.debug("Raising {}".format(e))
         raise e
+
     if raster and not is_raster(geodata):
         e = NotRasterError(geodata)
         base.log.debug("Raising {}".format(e))
         raise e
+
     if vector and not is_vector(geodata):
         e = NotVectorError(geodata)
         base.log.debug("Raising {}".format(e))
         raise e
+
+    if table and not is_table(geodata):
+        e = NotTableError(geodata)
+        base.log.debug("Raising {}".format(e))
+        raise e
+
     if srs_known:
         get_srs(geodata, raise_unknown_error=True)
 

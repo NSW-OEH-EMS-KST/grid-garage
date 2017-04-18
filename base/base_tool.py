@@ -42,9 +42,6 @@ class BaseTool(object):
         self.execution_list = []
         self.metadata = {}
 
-        # state
-        self.current_geodata = self.current_row = "Not set"
-
         return
 
     @staticmethod
@@ -298,7 +295,6 @@ class BaseTool(object):
         Returns:
 
         """
-        fname = func.__name__
         base.log.debug("locals = {}".format(locals()))
         param = self.get_parameter_by_name(parameter_name)
         if param.datatype != "Table View":
@@ -308,36 +304,26 @@ class BaseTool(object):
         if multi_val:
             raise ValueError("Multi value tableview iteration is not yet implemented")
 
-        v = param.valueAsText
+        # validate the input table
+        tview = param.valueAsText
+        utils.validate_geodata(tview, table=True)
+        tview_fields = utils.get_field_list(tview)
+        proc_hist_field = "proc_hist"
+        base.log.info(["Input table fields are {}".format(tview_fields), "Fields requested by tool are {}".format(key_names)])
 
         # map fields
         num_fields = len(key_names)  # [rf1, rf2, ...]
         f_names = ["{0}_field_{1}".format(parameter_name, i) for i in range(0, num_fields)]  # [f_0, f_1, ...]
         f_vals = [self.get_parameter_by_name(f_name).valueAsText for f_name in f_names]
 
-        rows = base.utils.get_search_cursor_rows(v, f_vals)
-        if not rows:
-            raise ValueError("No records to process.")
+        if proc_hist_field in tview_fields:
+            rows = base.utils.get_search_cursor_rows(tview, f_vals.append(proc_hist_field))
+        else:
+            rows = base.utils.get_search_cursor_rows(tview, f_vals)
+            rows = [row.append("") for row in rows]
 
         # iterate
-        total_items, count = len(rows), 0
-        base.log.info("{0} items to process".format(total_items))
-        for r in rows:
-            try:
-                count += 1
-                r = utils.make_tuple(r)
-                self.current_row = r
-                data = {k: v for k, v in zip(key_names, r)}
-                g = data.get(key_names[0], None)  # convention: first key is geodata
-                self.current_geodata = g
-
-                base.log.debug("Executing {} with data= {}".format(fname, data))
-                func(data)
-                base.log.debug("Execution OK")
-            except:
-                base.log.error("error executing " + fname)
-                if hasattr(self, "result"):
-                    self.result.fail(self.current_geodata, self.current_row)
+        self.do_iteration(func, rows, key_names.append(proc_hist_field))
 
         return
 
@@ -356,35 +342,56 @@ class BaseTool(object):
 
         param = self.get_parameter_by_name(parameter_name)
         multi_val = getattr(param, "multivalue", False)
-        fname = func.__name__
 
         if param.datatype == "Table View":
             raise ValueError("Function deprecation, use 'iterate_function_on_tableview'")
 
-        rows = param.valueAsText.split(";") if multi_val else [param.valueAsText]
+        rows = [param.valueAsText.split(";")] if multi_val else [[param.valueAsText]]
 
-        if not rows:
-            raise ValueError("No values to process.")
+        # proc_hist field
+        for row in rows:
+            row.append("")
+        # rows = [[row.append("")] for row in rows]
+        base.log.debug("Processing rows will be {}".format(rows))
+        key_names.append("proc_hist")
 
         # iterate
-        total_items, count = len(rows), 0
+        self.do_iteration(func, rows, key_names)
+
+        return
+
+    @base.log.log
+    def do_iteration(self, func, rows, key_names):
+
+        if not rows:
+            raise ValueError("No values or records to process.")
+
+        fname = func.__name__
+        base.log.log(func)
+
+        # rows = [utils.make_tuple(row) for row in rows]
+        rows = [{k: v for k, v in zip(key_names, utils.make_tuple(row))} for row in rows]
+        total_items = len(rows)
         base.log.info("{0} items to process".format(total_items))
-        for r in rows:
+
+        count = 0
+        for row in rows:
             try:
                 count += 1
-                r = utils.make_tuple(r)
-                self.current_row = r
-                data = {k: v for k, v in zip(key_names, r)}
-                g = data.get("geodata", None)
-                self.current_geodata = g
-
-                base.log.debug("Executing {} with data= {}".format(fname, data))
-                func(data)
-                base.log.debug("Execution complete")
-            except:
-                base.log.error("error executing " + fname)
+                # data = {k: v for k, v in zip(key_names, row)}
+                geodata = row.get("geodata", None)
+                try:
+                    old_proc_hist = row.get("proc_hist", "")
+                    new_proc_hist = "Tool='{}' Parameters={} Row={}".format(self.label, self.get_parameter_dict(), row)
+                    self.result.new_proc_hist = " || ".join([old_proc_hist, new_proc_hist])
+                except:
+                    pass
+                base.log.debug("Running {} with data={}".format(fname, row))
+                func(row)
+            except Exception as e:
+                base.log.error("error executing {}: {}".format(fname, str(e)))
                 if hasattr(self, "result"):
-                    self.result.fail(self.current_geodata, self.current_row)
+                    self.result.fail(geodata, row)
 
         return
 

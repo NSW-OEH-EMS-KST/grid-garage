@@ -34,6 +34,8 @@ class ResultsUtils(object):
         self.output_workspace_type = ""
         self.output_workspace_parent = ""
 
+        return
+
     @base.log.log
     def initialise(self, result_table_param, fail_table_param, out_workspace, result_table_name):
         """ Initialise the results for the instance
@@ -109,6 +111,8 @@ class ResultsUtils(object):
 
         """
 
+        base.log.debug("ResultsUtils.add result={}".format(result))
+
         if not result:  # in case a caller passes in None or []
             return "Result was empty"
 
@@ -122,7 +126,9 @@ class ResultsUtils(object):
         # re-using these will force an error for any inconsistency
         # write the header on first call
         if not os.path.isfile(self.result_csv):
-            setattr(self, "result_fieldnames", result[0].keys() if is_tuple else result.keys())
+            result_fieldnames = result[0].keys() if is_tuple else result.keys()
+            result_fieldnames.append("proc_hist")
+            setattr(self, "result_fieldnames", result_fieldnames)
             with open(self.result_csv, "wb") as csv_file:
                 writer = csv.DictWriter(csv_file, delimiter=',', lineterminator='\n', fieldnames=self.result_fieldnames)
                 writer.writeheader()
@@ -131,6 +137,13 @@ class ResultsUtils(object):
         with open(self.result_csv, "ab") as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames=self.result_fieldnames)
             if is_tuple:
+
+                for r in result:  # add proc_hist data
+                    geodata = r.get("geodata", "geodata not set")
+                    source_geodata = r.get("source_geodata", "source not set")
+                    proc_hist = getattr(self, "new_proc_hist", "proc_hist not set")
+                    r["proc_hist"] = "{} << {} << {}".format(geodata, proc_hist, source_geodata)
+
                 writer.writerows(result)
                 self.result_count += len(result)
             else:
@@ -170,7 +183,7 @@ class ResultsUtils(object):
         tbinfo = traceback.format_tb(tb)[0]
         # Concatenate information together concerning the error into a message string
         msg = tbinfo + str(sys.exc_info()[1])
-        msg = msg.strip().replace('\n', ', ').replace('\r', '')
+        msg = msg.strip().replace('\n', ', ').replace('\r', '').replace(' ', '')
 
         # write the failure record
         with open(self.fail_csv, "ab") as csv_file:
