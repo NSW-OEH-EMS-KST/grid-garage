@@ -100,7 +100,7 @@ class TransformRasterTool(base.base_tool.BaseTool):
             ras = ap.sa.Ln(r_in)
 
         elif self.method == "SQUAREROOT":
-            ras = ap.sa. SquareRoot(r_in)
+            ras = ap.sa.SquareRoot(r_in)
 
         elif self.method == "INVERT":
             ras = (ras - (raster_max - raster_min)) * -1
