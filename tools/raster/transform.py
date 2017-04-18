@@ -85,7 +85,7 @@ class TransformRasterTool(base.base_tool.BaseTool):
 
         elif self.method == "STRETCH":  # (INVAL - INLO) * ((OUTUP-OUTLO)/(INUP-INLO)) + OUTLO
             if raster_min == raster_max:
-                raise ValueError("Minimum value = Maximum value, normalising is not applicable")
+                raise ValueError("Minimum value = Maximum value, stretching is not applicable")
             else:
                 scale = (self.max_stretch - self.min_stretch) / (raster_max - raster_min)
                 ras = (ras - raster_min) * scale + self.min_stretch
