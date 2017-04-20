@@ -9,6 +9,7 @@ import os
 import ast
 import base.log
 import base.utils
+import arcpy
 
 
 class BaseTool(object):
@@ -296,6 +297,7 @@ class BaseTool(object):
 
         """
         base.log.debug("locals = {}".format(locals()))
+
         param = self.get_parameter_by_name(parameter_name)
         if param.datatype != "Table View":
             raise ValueError("That parameter is not a table or table view ({0})".format(param.name))
@@ -304,26 +306,26 @@ class BaseTool(object):
         if multi_val:
             raise ValueError("Multi value tableview iteration is not yet implemented")
 
-        # validate the input table
-        tview = param.valueAsText
-        utils.validate_geodata(tview, table=True)
-        tview_fields = utils.get_field_list(tview)
-        proc_hist_field = "proc_hist"
-        base.log.info(["Input table fields are {}".format(tview_fields), "Fields requested by tool are {}".format(key_names)])
+        gg_in_table_text = param.valueAsText
+
+        gg_in_table = "gg_in_table"
+        arcpy. MakeTableView_management(gg_in_table_text, gg_in_table)
+
+        gg_in_table_fields = [f.name for f in arcpy.ListFields(gg_in_table)]
+        proc_hist_fieldname = "proc_hist"
+        if proc_hist_fieldname not in gg_in_table_fields:
+            arcpy.AddField_management(gg_in_table, proc_hist_fieldname, "TEXT", None, None, 500000)
 
         # map fields
         num_fields = len(key_names)  # [rf1, rf2, ...]
         f_names = ["{0}_field_{1}".format(parameter_name, i) for i in range(0, num_fields)]  # [f_0, f_1, ...]
         f_vals = [self.get_parameter_by_name(f_name).valueAsText for f_name in f_names]
-
-        if proc_hist_field in tview_fields:
-            rows = base.utils.get_search_cursor_rows(tview, f_vals.append(proc_hist_field))
-        else:
-            rows = base.utils.get_search_cursor_rows(tview, f_vals)
-            rows = [row.append("") for row in rows]
+        f_vals.append(proc_hist_fieldname)
+        rows = [r for r in arcpy.da.SearchCursor(gg_in_table, f_vals)]
 
         # iterate
-        self.do_iteration(func, rows, key_names.append(proc_hist_field))
+        key_names.append(proc_hist_fieldname)
+        self.do_iteration(func, rows, key_names)
 
         return
 
@@ -348,14 +350,13 @@ class BaseTool(object):
 
         rows = [param.valueAsText.split(";")] if multi_val else [[param.valueAsText]]
 
-        # proc_hist field
-        for row in rows:
+        for row in rows:  # add proc_hist field
             row.append("")
-        # rows = [[row.append("")] for row in rows]
+
         base.log.debug("Processing rows will be {}".format(rows))
-        key_names.append("proc_hist")
 
         # iterate
+        key_names.append("proc_hist")
         self.do_iteration(func, rows, key_names)
 
         return
@@ -381,9 +382,9 @@ class BaseTool(object):
                 # data = {k: v for k, v in zip(key_names, row)}
                 geodata = row.get("geodata", None)
                 try:
-                    old_proc_hist = row.get("proc_hist", "")
-                    new_proc_hist = "Tool='{}' Parameters={} Row={}".format(self.label, self.get_parameter_dict(), row)
-                    self.result.new_proc_hist = " || ".join([old_proc_hist, new_proc_hist])
+                    old_proc_hist = row.get("proc_hist", "<History Unknown>")
+                    # new_proc_hist = "Tool='{}' Parameters={} Row={}".format(self.label, self.get_parameter_dict(), row)
+                    self.result.new_proc_hist = "Tool='{}' Parameters={} Row={}".format(self.label, self.get_parameter_dict(), row)
                 except:
                     pass
                 base.log.debug("Running {} with data={}".format(fname, row))

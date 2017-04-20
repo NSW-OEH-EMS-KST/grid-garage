@@ -9,7 +9,6 @@ import logging
 # basic settings
 APPDATA_PATH = os.path.join(os.environ["USERPROFILE"], "AppData", "Local", "GridGarage")
 LOG_FILE = os.path.join(APPDATA_PATH, "gg3.log")
-
 LOGGER = None
 
 
@@ -59,8 +58,8 @@ _ARC_MESSAGES = None
 
 
 class ArcStreamHandler(logging.StreamHandler):
-    """ Logging handler to log messages to ArcGIS
-    """
+    """ Logging handler to log messages to ArcGIS """
+
     def emit(self, record):
         """ Emit the record to the ArcGIS messages object
 
@@ -95,6 +94,12 @@ def configure_logging(arc_messages):
     _ARC_MESSAGES = arc_messages
 
     if not os.path.exists(LOG_FILE):
+
+        if not os.path.exists(APPDATA_PATH):
+            arc_messages.AddMessage("Creating app data path {}".format(APPDATA_PATH))
+            os.makedirs(APPDATA_PATH)
+
+        arc_messages.AddMessage("Creating log file {}".format(LOG_FILE))
         open(LOG_FILE, 'a').close()
 
     global LOGGER

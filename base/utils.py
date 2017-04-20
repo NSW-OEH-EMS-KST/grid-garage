@@ -24,41 +24,46 @@ transform_methods = ["STANDARDISE", "STRETCH", "NORMALISE", "LOG", "SQUAREROOT",
 
 class DoesNotExistError(ValueError):
     def __init__(self, geodata):
-        super(DoesNotExistError, self).__init__(self, "{0} does not exist".format(geodata))
+        super(DoesNotExistError, self).__init__(self, "{} does not exist".format(geodata))
 
 
 class NotRasterError(ValueError):
-    def __init__(self, geodata):
-        super(NotRasterError, self).__init__(self, "{0} is not a raster dataset".format(geodata))
+    def __init__(self, geodata, datatype):
+        super(NotRasterError, self).__init__(self, "{} is not a raster dataset. Its data type is '{}'".format(geodata, datatype))
 
 
 class NotVectorError(ValueError):
-    def __init__(self, geodata):
-        super(NotVectorError, self).__init__(self, "{0} is not a vector dataset".format(geodata))
+    def __init__(self, geodata, datatype):
+        super(NotVectorError, self).__init__(self, "{} is not a vector dataset. Its data type is '{}'".format(geodata, datatype))
 
 
 class NotTableError(ValueError):
-    def __init__(self, geodata):
-        super(NotTableError, self).__init__(self, "{0} is not a table dataset".format(geodata))
+    def __init__(self, geodata, datatype):
+        super(NotTableError, self).__init__(self, "{} is not a table dataset. Its data type is '{}'".format(geodata, datatype))
 
 
 class UnknownSrsError(ValueError):
     def __init__(self, geodata):
-        super(UnknownSrsError, self).__init__(self, "Dataset '{0}' has an unknown spatial reference system".format(geodata))
+        super(UnknownSrsError, self).__init__(self, "Dataset '{}' has an unknown spatial reference system".format(geodata))
+
+
+class UnknownDataTypeError(ValueError):
+    def __init__(self, geodata, datatype):
+        super(UnknownDataTypeError, self).__init__(self, "Dataset '{}' has an unknown data type".format(geodata, datatype))
 
 
 class UnmatchedSrsError(ValueError):
     def __init__(self, srs1, srs2):
-        super(UnmatchedSrsError, self).__init__(self, "Spatial references do not match '{0}' != '{1}'".format(srs1, srs2))
+        super(UnmatchedSrsError, self).__init__(self, "Spatial references do not match '{}' != '{}'".format(srs1, srs2))
 
 
-@base.log.log
-def get_field_list(dataset, wild_card=None, field_type=None):
-
-    if not geodata_exists(dataset):
-        raise DoesNotExistError(dataset)
-
-    return ap.ListFields(dataset, wild_card, field_type)
+# @base.log.log
+# def get_field_list(dataset, wild_card=None, field_type=None):
+#
+#     if not geodata_exists(dataset):
+#         raise DoesNotExistError(dataset)
+#
+#     return ap.ListFields(dataset, wild_card, field_type)
 
 
 @base.log.log
@@ -128,7 +133,7 @@ def is_file_system(workspace):
 
 
 @base.log.log
-def get_search_cursor_rows(in_table, field_names, where_clause=None):
+def get_search_cursor_rows(in_table, field_names, where_clause=None, add_fields=[]):
 
     @base.log.log
     def _get_search_cursor(in_table_sc, field_names_sc, where_clause_sc=where_clause, spatial_reference=None, explode_to_points=None, sql_clause=None):
@@ -139,7 +144,8 @@ def get_search_cursor_rows(in_table, field_names, where_clause=None):
 
     # get a search cursor, listify it, release it
     sc = _get_search_cursor(in_table, field_names, where_clause_sc=where_clause)
-    rows = [row.append("") for row in sc]
+    # rows = [row.append("") for row in sc]
+    rows = [row for row in sc]
     del sc
 
     base.log.debug("Returning rows = {}".format(rows))
@@ -169,9 +175,9 @@ def split_up_filename(filename):
     Output:
         returns 4 strings: path, base (=name+ext), name, ext for the filename
     """
-    pth, base = os.path.split(filename)
-    name, ext = os.path.splitext(base)
-    return pth, base, name, ext
+    the_path, basename = os.path.split(filename)
+    name, ext = os.path.splitext(basename)
+    return the_path, basename, name, ext
 
 
 @base.log.log
@@ -522,18 +528,26 @@ def validate_geodata(geodata, raster=False, vector=False, table=False, srs_known
         base.log.debug("Raising {}".format(e))
         raise e
 
-    if raster and not is_raster(geodata):
-        e = NotRasterError(geodata)
+    d = ap.Describe(geodata)
+    try:
+        dt = d.dataType
+    except:
+        e = UnknownDataTypeError(geodata, "No datatype property")
         base.log.debug("Raising {}".format(e))
         raise e
 
-    if vector and not is_vector(geodata):
-        e = NotVectorError(geodata)
+    if raster and dt not in ["RasterDataset"]:
+        e = NotRasterError(geodata, dt)
         base.log.debug("Raising {}".format(e))
         raise e
 
-    if table and not is_table(geodata):
-        e = NotTableError(geodata)
+    if vector and dt not in ["FeatureClass", "ShapeFile"]:
+        e = NotVectorError(geodata, dt)
+        base.log.debug("Raising {}".format(e))
+        raise e
+
+    if table and dt not in ["Table", "TableView"]:
+        e = NotTableError(geodata, dt)
         base.log.debug("Raising {}".format(e))
         raise e
 
@@ -573,4 +587,5 @@ def get_band_nodata_value(raster, bandindex=1):
     base.log.debug("ndv={}".format(ndv))
 
     return ndv
+
 

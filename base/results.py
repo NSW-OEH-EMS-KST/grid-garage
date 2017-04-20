@@ -147,6 +147,11 @@ class ResultsUtils(object):
                 writer.writerows(result)
                 self.result_count += len(result)
             else:
+                geodata = result.get("geodata", "geodata not set")
+                source_geodata = result.get("source_geodata", "source not set")
+                proc_hist = getattr(self, "new_proc_hist", "proc_hist not set")
+                result["proc_hist"] = "{} << {} << {}".format(geodata, proc_hist, source_geodata)
+
                 writer.writerow(result)
                 self.result_count += 1
 
