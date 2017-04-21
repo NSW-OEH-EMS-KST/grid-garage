@@ -43,14 +43,14 @@ class LookupByTableRasterTool(base.base_tool.BaseTool):
         for f in lookup_fields:
             try:
                 ras_out = base.utils.make_raster_name(ras, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix + "_" + f)
-                self.send_info("Lookup field {0} in {1}".format(f, ras))
+                self.log.info("Lookup field {0} in {1}".format(f, ras))
                 out = Lookup(ras, f)
-                self.send_info(out)
-                self.send_info("Saving to {0}".format(ras_out))
+                self.log.info(out)
+                self.log.info("Saving to {0}".format(ras_out))
                 out.save(ras_out)
                 self.result.add({"geodata": ras_out, "source_geodata": ras})
-            except Exception as e:
-                self.result.fail(ras, e, data, self)
+            except:
+                self.result.fail(ras, data)
 
         return
 
