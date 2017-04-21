@@ -17,6 +17,9 @@ class ReclassByTableRasterTool(base.base_tool.BaseTool):
 
         base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
+        self.from_value_field = None
+        self.to_value_field = None
+        self.output_value_field = None
 
         return
 
@@ -31,12 +34,9 @@ class ReclassByTableRasterTool(base.base_tool.BaseTool):
 
     def initialise(self):
         p = self.get_parameter_dict()
-        # self.in_remap_table = p["in_remap_table"]
         self.from_value_field = p["in_remap_table_field_2"]
         self.to_value_field = p["in_remap_table_field_1"]
         self.output_value_field = p["in_remap_table_field_0"]
-        # self.missing_values = p["missing_values"] if p["missing_values"] else "#"
-        # self.raster_format = "" if p["raster_format"].lower() == "esri grid" else '.' + p["raster_format"]
 
         return
 
@@ -48,15 +48,16 @@ class ReclassByTableRasterTool(base.base_tool.BaseTool):
 
     def reclass(self, data):
 
-        # self.send_info(data)
         ras = data["raster"]
         base.utils.validate_geodata(ras, raster=True)
 
-        ras_out = base.utils.make_raster_name(ras, self.result.output_workspace, self.raster_format)
-        self.send_info("Reclassifying {0} -->> {1}...".format(ras, ras_out))
+        ras_out = base.utils.make_raster_name(ras, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self. output_filename_suffix)
+
+        self.log.info("Reclassifying {0} -->> {1}...".format(ras, ras_out))
         arcpy.ReclassByTable_3d(ras, self.in_remap_table, self.from_value_field, self.to_value_field, self.output_value_field, ras_out, self.missing_values)
 
         self.result.add({"geodata": ras_out, "source_geodata": ras})
+
         return
 
 "http://desktop.arcgis.com/en/arcmap/latest/tools/3d-analyst-toolbox/reclass-by-table.htm"
