@@ -188,7 +188,12 @@ class ResultsUtils(object):
         tbinfo = traceback.format_tb(tb)[0]
         # Concatenate information together concerning the error into a message string
         msg = tbinfo + str(sys.exc_info()[1])
-        msg = msg.strip().replace('\n', ', ').replace('\r', '').replace(' ', '')
+        msg = msg.strip().replace('\n', ', ').replace('\r', ' ').replace('  ', ' ')
+
+        geodata = row.get("geodata", "geodata not set")
+        source_geodata = row.get("source_geodata", "source not set")
+        proc_hist = getattr(self, "new_proc_hist", "proc_hist not set")
+        row["proc_hist"] = "{} << {} << {}".format(geodata, proc_hist, source_geodata)
 
         # write the failure record
         with open(self.fail_csv, "ab") as csv_file:

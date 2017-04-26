@@ -53,11 +53,11 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
         base.utils.validate_geodata(r_in, raster=True)
 
         r_out = base.utils.make_raster_name(r_in, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
-        self.log.info("Tweaking raster {}".format(r_in))
+        ndv = base.utils.get_band_nodata_value(r_in)
+        self.log.info("Tweaking raster {} (Nodata Value is {})".format(r_in, ndv))
 
         ras = arcpy.Raster(r_in)
         tweaks = []
-        ndv = base.utils.get_band_nodata_value(r_in)
 
         if self.scalar != "#":
             self.log.info('\tScaling by {}'.format(self.scalar))

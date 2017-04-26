@@ -69,7 +69,7 @@ class TransformRasterTool(base.base_tool.BaseTool):
         base.utils.validate_geodata(r_in, raster=True)
 
         r_out = base.utils.make_raster_name(r_in, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
-        self.log.info("Transforming raster {} using method {}".format(r_in, self.method))
+
         self.log.info("\tCalculating statistics")
         ap.CalculateStatistics_management(r_in)
 
@@ -77,7 +77,9 @@ class TransformRasterTool(base.base_tool.BaseTool):
         raster_std = self.get_property(r_in, "STD")
         raster_min = self.get_property(r_in, "MINIMUM")
         raster_max = self.get_property(r_in, "MAXIMUM")
+        self.log.info("\tStatistics Mean/Std/Min/Max: {}/{}/{}/{}".format(raster_mean, raster_std, raster_min, raster_max))
 
+        self.log.info("Transforming raster {} using method {}".format(r_in, self.method))
         ras = ap.Raster(r_in)
 
         if self.method == "STANDARDISE":

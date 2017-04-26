@@ -212,11 +212,8 @@ class BaseTool(object):
         base.log.info("Debugging log file is located at '{}'".format(base.log.LOG_FILE))
 
         self.parameter_objects = parameters
-        self.parameter_strings = self.get_parameter_dict()
-        [setattr(self, k, v) for k, v in self.parameter_strings.iteritems()]
-        [setattr(self, k, True) for k, v in self.parameter_strings.iteritems() if v in ['true', 'True']]  # ESRI string to bool
-        [setattr(self, k, False) for k, v in self.parameter_strings.iteritems() if v in ['false', 'False']]  # ESRI string to bool
 
+        [setattr(self, k, v) for k, v in self.get_parameter_dict().iteritems()]
         base.log.debug("Tool attributes set {}".format(self.__dict__))
 
         if hasattr(self, "result"):
@@ -255,7 +252,21 @@ class BaseTool(object):
         """
 
         # create the dict
-        pd = {p.name: p if p.name in leave_as_object else (p.valueAsText or "#") for p in self.parameter_objects}
+        pd = {}
+        for p in self.parameter_objects:
+            name = p.name
+            if name in leave_as_object:
+                pd[name] = p
+            elif p.dataType == "Boolean":
+                pd[name] = [False, True][p.valueAsText == "true"]
+            elif p.dataType == "Double":
+                pd[name] = float(p.valueAsText)
+            elif p.dataType == "Long":
+                pd[name] = int(float(p.valueAsText))
+            else:
+                pd[name] = (p.valueAsText or "#")
+
+        # pd = {p.name: p if p.name in leave_as_object else (p.valueAsText or "#") for p in self.parameter_objects}
 
         # now fix some specific parameters
         x = pd.get("raster_format", None)
