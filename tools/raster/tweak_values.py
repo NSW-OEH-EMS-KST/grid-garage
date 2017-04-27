@@ -36,8 +36,6 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
 
     def initialise(self):
 
-        # if set([self.min_val, self.max_val, self.constant, self.scalar]) == ["#"] and not self.integerise:
-        #     raise ValueError("No tweaks specified")
         if not (self.min_val or self.max_val or self.constant or self.scalar or self.integerise):
             raise ValueError("No tweaks specified")
 
