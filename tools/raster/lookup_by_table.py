@@ -50,6 +50,7 @@ class LookupByTableRasterTool(base.base_tool.BaseTool):
                 out.save(ras_out)
                 self.result.add({"geodata": ras_out, "source_geodata": ras})
             except:
+                self.log.warn("Failed on field '{}'".format(f))
                 self.result.fail(ras, data)
 
         return
