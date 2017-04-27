@@ -53,7 +53,7 @@ class LookupByTableRasterTool(base.base_tool.BaseTool):
                 self.log.warn("Failed on field '{}'".format(f))
                 data["geodata"] = ras
                 data["failure_field"] = f
-                self.result.fail(ras, data)
+                self.result.fail(data)
 
         return
 

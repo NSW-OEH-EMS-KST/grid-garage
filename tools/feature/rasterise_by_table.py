@@ -59,5 +59,5 @@ class RasteriseByTableTool(BaseTool):
                 self.result.add({"geodata": r_out, "source_geodata": feat_ds, "source_field": field})
             except Exception as e:
                 self.log.error("FAILED rasterising {0} on {1}: {2}".format(feat_ds, field, str(e)))
-                self.result.fail(r_out, data)
+                self.result.fail(data)
 

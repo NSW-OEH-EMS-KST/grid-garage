@@ -387,24 +387,18 @@ class BaseTool(object):
         total_items = len(rows)
         base.log.info("{0} items to process".format(total_items))
 
-        count = 0
         for row in rows:
             try:
-                count += 1
-                # data = {k: v for k, v in zip(key_names, row)}
-                geodata = row.get("geodata", None)
                 try:
-                    old_proc_hist = row.get("proc_hist", "<History Unknown>")
-                    # new_proc_hist = "Tool='{}' Parameters={} Row={}".format(self.label, self.get_parameter_dict(), row)
                     self.result.new_proc_hist = "Tool='{}' Parameters={} Row={}".format(self.label, self.get_parameter_dict(), row)
-                except:
+                except AttributeError:
                     pass
                 base.log.debug("Running {} with data={}".format(fname, row))
                 func(row)
             except Exception as e:
                 base.log.error("error executing {}: {}".format(fname, str(e)))
                 if hasattr(self, "result"):
-                    self.result.fail(geodata, row)
+                    self.result.fail(row)
 
         return
 

@@ -150,7 +150,7 @@ class ResultsUtils(object):
         return results
 
     @base.log.log
-    def fail(self, geodata, row):
+    def fail(self, row):
         """ Write failure record to CSV
 
         Writes a failure to the temp CSV immediately, trade off between
@@ -184,9 +184,12 @@ class ResultsUtils(object):
             geodata = row["raster"]
         except KeyError:
             try:
-                geodata = row["geodata"]
+                geodata = row["feature"]
             except KeyError:
-                geodata = "geodata not set for row"
+                try:
+                    geodata = row["geodata"]
+                except KeyError:
+                    geodata = "geodata not set for row"
         source_geodata = row.get("source_geodata", "source not set for row")
         proc_hist = getattr(self, "new_proc_hist", "proc_hist not set for row")
         row["proc_hist"] = "{} << {} << {}".format(geodata, proc_hist, source_geodata)
