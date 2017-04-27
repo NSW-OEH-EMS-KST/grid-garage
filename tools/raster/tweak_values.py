@@ -36,6 +36,8 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
 
     def initialise(self):
 
+        # if set([self.min_val, self.max_val, self.constant, self.scalar]) == ["#"] and not self.integerise:
+        #     raise ValueError("No tweaks specified")
         if set([self.min_val, self.max_val, self.constant, self.scalar]) == ["#"] and not self.integerise:
             raise ValueError("No tweaks specified")
 
@@ -53,23 +55,24 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
         base.utils.validate_geodata(r_in, raster=True)
 
         r_out = base.utils.make_raster_name(r_in, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
-        ndv = base.utils.get_band_nodata_value(r_in)
-        self.log.info("Tweaking raster {} (Nodata Value is {})".format(r_in, ndv))
 
         ras = arcpy.Raster(r_in)
+        ndv = ras.noDataValue
+        self.log.info("Tweaking raster {}\nNoData Value is {}".format(r_in, ndv))
+
         tweaks = []
 
-        if self.scalar != "#":
+        if self.scalar:
             self.log.info('\tScaling by {}'.format(self.scalar))
             ras *= float(self.scalar)
             tweaks.append('scaled by {}'.format(self.scalar))
 
-        if self.constant != "#":
+        if self.constant:
             self.log.info('\tTranslating by {}'.format(self.constant))
             ras += float(self.constant)
             tweaks.append('translated by {}'.format(self.constant))
 
-        if self.min_val != "#":
+        if self.min_val:
             self.log.info('\tSetting minimum to {} values under will go to {}'.format(self.min_val, self.under_min))
             under = self.min_val if self.under_min == 'Minimum' else ndv
             if under == "#":
@@ -77,7 +80,7 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
             ras = arcpy.sa.Con(ras >= float(self.min_val), ras, float(under))
             tweaks.append('Minimum set to {} under set to {}'.format(self.min_val, under))
 
-        if self.max_val != "#":
+        if self.max_val:
             self.log.info('\tSetting maximum to {} values over will go to {}'.format(self.max_val, self.over_max))
             over = self.max_val if self.over_max == 'Maximum' else ndv
             if over == "#":
@@ -85,7 +88,7 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
             ras = arcpy.sa.Con(ras <= float(self.max_val), ras, float(over))
             tweaks.append('Maximum set to {} over set to {}'.format(self.max_val, over))
 
-        if self.integerise != "#":
+        if self.integerise:
             self.log.info('\tIntegerising...')
             ras = arcpy.sa.Int(ras)
             tweaks.append('integerised (truncation)')

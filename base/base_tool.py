@@ -89,11 +89,13 @@ class BaseTool(object):
     @base.log.log
     def getParameterInfo(self):
         """Define parameter definitions"""
+
         return []
 
     @base.log.log
     def isLicensed(self):
         """Set whether tool is licensed to execute."""
+
         return True
 
     @base.log.log
@@ -260,40 +262,39 @@ class BaseTool(object):
             elif p.dataType == "Boolean":
                 pd[name] = [False, True][p.valueAsText == "true"]
             elif p.dataType == "Double":
-                pd[name] = float(p.valueAsText)
+                pd[name] = float(p.valueAsText) if p.valueAsText else None
             elif p.dataType == "Long":
-                pd[name] = int(float(p.valueAsText))
+                pd[name] = int(float(p.valueAsText)) if p.valueAsText else None
             else:
-                pd[name] = (p.valueAsText or "#")
-
-        # pd = {p.name: p if p.name in leave_as_object else (p.valueAsText or "#") for p in self.parameter_objects}
+                pd[name] = p.valueAsText or "#"
 
         # now fix some specific parameters
         x = pd.get("raster_format", None)
         if x:
             pd["raster_format"] = "" if x.lower() == "esri grid" else '.' + x
 
-        x = pd.get("output_filename_prefix", None)
-        if x:
-            pd["output_filename_prefix"] = "" if x == "#" else x
+        def set_hash_to_empty(p):
+            v = pd.get(p, None)
+            if v:
+                pd[p] = "" if v == "#" else x
+            return
 
-        x = pd.get("output_filename_suffix", None)
-        if x:
-            pd["output_filename_suffix"] = "" if x == "#" else x
+        set_hash_to_empty("output_filename_prefix")
+        set_hash_to_empty("output_filename_suffix")
 
         return pd
 
-    @base.log.log
-    def get_parameter_names(self):
-        """ Create a dictionary of parameter names
-
-        Returns: A dictionary of parameter names
-
-        """
-
-        pn = [p.name for p in self.parameter_objects]
-
-        return pn
+    # @base.log.log
+    # def get_parameter_names(self):
+    #     """ Create a dictionary of parameter names
+    #
+    #     Returns: A dictionary of parameter names
+    #
+    #     """
+    #
+    #     pn = [p.name for p in self.parameter_objects]
+    #
+    #     return pn
 
     @base.log.log
     def iterate_function_on_tableview(self, func, parameter_name, key_names):
