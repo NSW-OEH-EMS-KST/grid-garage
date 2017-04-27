@@ -98,66 +98,56 @@ class ResultsUtils(object):
         return ret
 
     @base.log.log
-    def add(self, result):
+    def add(self, results):
         """ Write result record to CSV
 
         Writes a result to the temp CSV immediately, trade off between
         runtime performance, RAM usage and FAILURE (i.e. recovery of results)
 
         Args:
-            result ():
+            results ():
 
         Returns:
 
         """
 
-        base.log.debug("ResultsUtils.add result={}".format(result))
+        base.log.debug("ResultsUtils.add result={}".format(results))
 
-        if not result:  # in case a caller passes in None or []
+        if not results:  # in case a caller passes in None or []
             return "Result was empty"
 
         if not self.result_csv:
             raise ValueError("Result CSV is not set")
 
-        # work out if we have a single or multiple results
-        is_tuple = isinstance(result, (tuple, list))
+        results = base.utils.make_tuple(results)
 
-        # here we will just store the keys from the first result,
-        # re-using these will force an error for any inconsistency
-        # write the header on first call
+        # here we will just store the keys from the first result, re-using these will force an error for any inconsistency
         if not os.path.isfile(self.result_csv):
-            result_fieldnames = result[0].keys() if is_tuple else result.keys()
+            result_fieldnames = results[0].keys()
             result_fieldnames.append("proc_hist")
             setattr(self, "result_fieldnames", result_fieldnames)
             with open(self.result_csv, "wb") as csv_file:
                 writer = csv.DictWriter(csv_file, delimiter=',', lineterminator='\n', fieldnames=self.result_fieldnames)
-                writer.writeheader()
+                writer.writeheader()  # write the header on first call
+
+        def get_geodata_source_history(dict):
+            geodata = dict.get("geodata", "geodata not set for result")
+            source_geodata = dict.get("source_geodata", "source not set for result")
+            proc_hist = getattr(self, "new_proc_hist", "proc_hist not set for result")
+            return "{} << {} << {}".format(geodata, proc_hist, source_geodata)
 
         # write the data
         with open(self.result_csv, "ab") as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames=self.result_fieldnames)
-            if is_tuple:
+            for r in results:  # add proc_hist data
+                r["proc_hist"] = get_geodata_source_history(r)
 
-                for r in result:  # add proc_hist data
-                    geodata = r.get("geodata", "geodata not set")
-                    source_geodata = r.get("source_geodata", "source not set")
-                    proc_hist = getattr(self, "new_proc_hist", "proc_hist not set")
-                    r["proc_hist"] = "{} << {} << {}".format(geodata, proc_hist, source_geodata)
+            writer.writerows(results)
+            self.result_count += len(results)
 
-                writer.writerows(result)
-                self.result_count += len(result)
-            else:
-                geodata = result.get("geodata", "geodata not set")
-                source_geodata = result.get("source_geodata", "source not set")
-                proc_hist = getattr(self, "new_proc_hist", "proc_hist not set")
-                result["proc_hist"] = "{} << {} << {}".format(geodata, proc_hist, source_geodata)
+        results = "Result written: {}".format(results)
 
-                writer.writerow(result)
-                self.result_count += 1
-
-        result = "Result written: {}".format(result)
-
-        return result
+        return results
 
     @base.log.log
     def fail(self, geodata, row):
@@ -190,9 +180,15 @@ class ResultsUtils(object):
         msg = tbinfo + str(sys.exc_info()[1])
         msg = msg.strip().replace('\n', ', ').replace('\r', ' ').replace('  ', ' ')
 
-        geodata = row.get("geodata", "geodata not set")
-        source_geodata = row.get("source_geodata", "source not set")
-        proc_hist = getattr(self, "new_proc_hist", "proc_hist not set")
+        try:
+            geodata = row["raster"]
+        except KeyError:
+            try:
+                geodata = row["geodata"]
+            except KeyError:
+                geodata = "geodata not set for row"
+        source_geodata = row.get("source_geodata", "source not set for row")
+        proc_hist = getattr(self, "new_proc_hist", "proc_hist not set for row")
         row["proc_hist"] = "{} << {} << {}".format(geodata, proc_hist, source_geodata)
 
         # write the failure record
