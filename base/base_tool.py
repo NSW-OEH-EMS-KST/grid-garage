@@ -276,7 +276,7 @@ class BaseTool(object):
         def set_hash_to_empty(p):
             v = pd.get(p, None)
             if v:
-                pd[p] = "" if v == "#" else x
+                pd[p] = "" if v == "#" else v
             return
 
         set_hash_to_empty("output_filename_prefix")
