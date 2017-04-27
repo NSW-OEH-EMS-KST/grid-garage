@@ -16,7 +16,7 @@ class SetNodataValueRasterTool(base.base_tool.BaseTool):
     def __init__(self):
 
         base.base_tool.BaseTool.__init__(self, tool_settings)
-        self.execution_list = [self.initialise, self.iterate]
+        self.execution_list = [self.iterate]
 
         return
 
@@ -27,11 +27,6 @@ class SetNodataValueRasterTool(base.base_tool.BaseTool):
     def getParameterInfo(self):
 
         return base.base_tool.BaseTool.getParameterInfo(self)
-
-    def initialise(self):
-        self.ndv = float(self.ndv) if "." in self.ndv else int(self.ndv)
-
-        return
 
     def iterate(self):
 

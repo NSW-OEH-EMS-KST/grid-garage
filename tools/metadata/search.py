@@ -25,7 +25,7 @@ class SearchMetadataTool(BaseTool):
         return
 
     def process(self, data):
-        self.send_info(data)
+        self.log.info(data)
         # TODO
         return
 

@@ -50,7 +50,7 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
 
         # look for an early exit as all parameters are optional
         if not (self.replacements or self.output_filename_prefix or self.output_filename_suffix):
-            self.send_warning('All optional parameters are empty. Nothing to do.')
+            self.log.warn('All optional parameters are empty. Nothing to do.')
             exit(1)
 
         if self.replacements:                                                                        # s_,; p_,prefix_
