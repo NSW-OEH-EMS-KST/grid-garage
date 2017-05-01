@@ -91,7 +91,7 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
             under = self.min_val if self.under_min == 'Minimum' else ndv
             if under == "#":
                 raise ValueError("Raster '{}' does not have a nodata value".format(r_in))
-            ras = arcpy.sa.Con(ras >= float(self.min_val), ras, under)
+            ras = arcpy.sa.Con(ras >= self.min_val, ras, under)
             tweaks.append('Minimum set to {} under set to {}'.format(self.min_val, under))
 
         if self.max_val:
@@ -99,7 +99,7 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
             over = self.max_val if self.over_max == 'Maximum' else ndv
             if over == "#":
                 raise ValueError("Raster '{}' does not have a nodata value".format(r_in))
-            ras = arcpy.sa.Con(ras <= float(self.max_val), ras, over)
+            ras = arcpy.sa.Con(ras <= self.max_val, ras, over)
             tweaks.append('Maximum set to {} over set to {}'.format(self.max_val, over))
 
         if self.integerise:
