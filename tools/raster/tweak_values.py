@@ -55,7 +55,23 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
         r_out = base.utils.make_raster_name(r_in, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
 
         ras = arcpy.Raster(r_in)
-        ndv = int(ras.noDataValue)
+        ndv = ras.noDataValue
+        pix_type = ras.pixelType
+        if any(x in pix_type for x in ["S", "U"]):
+            self.log.info("Raster pixel type is '{}' (integer)".format(pix_type))
+            try:
+                ndv = int(ndv)
+            except:
+                pass
+            try:
+                self.min_val = int(self.min_val)
+            except:
+                pass
+            try:
+                self.max_val = int(self.max_val)
+            except:
+                pass
+
         self.log.info(["Tweaking raster {}".format(r_in), "\tNoData Value is {}".format(ndv)])
 
         tweaks = []
@@ -75,7 +91,7 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
             under = self.min_val if self.under_min == 'Minimum' else ndv
             if under == "#":
                 raise ValueError("Raster '{}' does not have a nodata value".format(r_in))
-            ras = arcpy.sa.Con(ras >= float(self.min_val), ras, float(under))
+            ras = arcpy.sa.Con(ras >= float(self.min_val), ras, under)
             tweaks.append('Minimum set to {} under set to {}'.format(self.min_val, under))
 
         if self.max_val:
@@ -83,7 +99,7 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
             over = self.max_val if self.over_max == 'Maximum' else ndv
             if over == "#":
                 raise ValueError("Raster '{}' does not have a nodata value".format(r_in))
-            ras = arcpy.sa.Con(ras <= float(self.max_val), ras, float(over))
+            ras = arcpy.sa.Con(ras <= float(self.max_val), ras, over)
             tweaks.append('Maximum set to {} over set to {}'.format(self.max_val, over))
 
         if self.integerise:
