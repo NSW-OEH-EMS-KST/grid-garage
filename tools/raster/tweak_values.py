@@ -55,7 +55,7 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
         r_out = base.utils.make_raster_name(r_in, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
 
         ras = arcpy.Raster(r_in)
-        ndv = ras.noDataValue
+        ndv = int(ras.noDataValue)
         self.log.info(["Tweaking raster {}".format(r_in), "\tNoData Value is {}".format(ndv)])
 
         tweaks = []
