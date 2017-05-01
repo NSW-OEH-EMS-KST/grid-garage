@@ -321,6 +321,8 @@ class BaseTool(object):
         gg_in_table_text = param.valueAsText
 
         gg_in_table = "gg_in_table"
+        if arcpy.Exists(gg_in_table):
+            arcpy.Delete_management(gg_in_table)
         arcpy. MakeTableView_management(gg_in_table_text, gg_in_table)
 
         gg_in_table_fields = [f.name for f in arcpy.ListFields(gg_in_table)]
