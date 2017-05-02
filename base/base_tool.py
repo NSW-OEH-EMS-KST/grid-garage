@@ -314,9 +314,9 @@ class BaseTool(object):
         if param.datatype != "Table View":
             raise ValueError("That parameter is not a table or table view ({0})".format(param.name))
 
-        multi_val = getattr(param, "multivalue", False)
+        multi_val = getattr(param, "multiValue", False)
         if multi_val:
-            raise ValueError("Multi value tableview iteration is not yet implemented")
+            raise ValueError("Multi-value tableview iteration is not yet implemented")
 
         gg_in_table_text = param.valueAsText
 
@@ -357,15 +357,21 @@ class BaseTool(object):
         """
 
         param = self.get_parameter_by_name(parameter_name)
-        multi_val = getattr(param, "multivalue", False)
+        multi_val = getattr(param, "multiValue", False)
+        base.log.debug("multiValue attribute is {}".format(multi_val))
 
         if param.datatype == "Table View":
-            raise ValueError("Function deprecation, use 'iterate_function_on_tableview'")
+            raise ValueError("No, use 'iterate_function_on_tableview'")
 
-        rows = [param.valueAsText.split(";")] if multi_val else [[param.valueAsText]]
+        base.log.debug("param.valueAsText =  {}".format(param.valueAsText))
+        base.log.debug("param.valueAsText.split(';' =  {}".format(param.valueAsText.split(";")))
+        rows = param.valueAsText.split(";") if multi_val else [param.valueAsText]
 
         for row in rows:  # add proc_hist field
-            row.append("")
+            # base.log.debug("row =  {}".format(row))
+            row = base.utils.make_tuple(row).append("")
+            # base.log.debug("row =  {}".format(row))
+            # row.append("")
 
         base.log.debug("Processing rows will be {}".format(rows))
 
