@@ -64,11 +64,11 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
             except:
                 pass
             try:
-                self.min_val = int(self.min_val)
+                min_val = int(self.min_val)
             except:
                 pass
             try:
-                self.max_val = int(self.max_val)
+                max_val = int(self.max_val)
             except:
                 pass
 
@@ -87,20 +87,20 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
             tweaks.append('translated by {}'.format(self.constant))
 
         if self.min_val:
-            self.log.info('\tSetting minimum to {} values under will go to {}'.format(self.min_val, self.under_min))
-            under = self.min_val if self.under_min == 'Minimum' else ndv
+            self.log.info('\tSetting minimum to {} values under will go to {}'.format(min_val, self.under_min))
+            under = min_val if self.under_min == 'Minimum' else ndv
             if under == "#":
                 raise ValueError("Raster '{}' does not have a nodata value".format(r_in))
-            ras = arcpy.sa.Con(ras >= self.min_val, ras, under)
-            tweaks.append('Minimum set to {} under set to {}'.format(self.min_val, under))
+            ras = arcpy.sa.Con(ras >= min_val, ras, under)
+            tweaks.append('Minimum set to {} under set to {}'.format(min_val, under))
 
         if self.max_val:
-            self.log.info('\tSetting maximum to {} values over will go to {}'.format(self.max_val, self.over_max))
-            over = self.max_val if self.over_max == 'Maximum' else ndv
+            self.log.info('\tSetting maximum to {} values over will go to {}'.format(max_val, self.over_max))
+            over = max_val if self.over_max == 'Maximum' else ndv
             if over == "#":
                 raise ValueError("Raster '{}' does not have a nodata value".format(r_in))
-            ras = arcpy.sa.Con(ras <= self.max_val, ras, over)
-            tweaks.append('Maximum set to {} over set to {}'.format(self.max_val, over))
+            ras = arcpy.sa.Con(ras <= max_val, ras, over)
+            tweaks.append('Maximum set to {} over set to {}'.format(max_val, over))
 
         if self.integerise:
             self.log.info('\tIntegerising...')
