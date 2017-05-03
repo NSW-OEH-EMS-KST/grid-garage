@@ -73,14 +73,13 @@ class TransformRasterTool(base.base_tool.BaseTool):
         self.log.info("\tCalculating statistics")
         ap.CalculateStatistics_management(r_in)
 
-        raster_mean = self.get_property(r_in, "MEAN")
-        raster_std = self.get_property(r_in, "STD")
-        raster_min = self.get_property(r_in, "MINIMUM")
-        raster_max = self.get_property(r_in, "MAXIMUM")
-        self.log.info("\tStatistics Mean/Std/Min/Max: {}/{}/{}/{}".format(raster_mean, raster_std, raster_min, raster_max))
-
         self.log.info("Transforming raster {} using method {}".format(r_in, self.method))
         ras = ap.Raster(r_in)
+        raster_mean = ras.mean
+        raster_std = ras.standardDeviation
+        raster_min = ras.minimum
+        raster_max = ras.maximum
+        self.log.info("\tStatistics Mean/Std/Min/Max: {}/{}/{}/{}".format(raster_mean, raster_std, raster_min, raster_max))
 
         if self.method == "STANDARDISE":
             ras = (ras - raster_mean) / raster_std
