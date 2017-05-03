@@ -22,13 +22,14 @@ class ClipRasterTool(base.base_tool.BaseTool):
         base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
         self.polygon_srs = None
+        self.clipping_geometry = None
 
         return
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("rectangle", "Rectangle", "GPExtent", "Required", False, "Input", None, "extent", None, None)
     @parameter("polygons", "Polygon feature(s) to clip by", "GPFeatureLayer", "Optional", False, "Input", ["Polygon"], None, None, None, "Options")
-    @parameter("clipping_geometry", "Use features for clipping", "GPBoolean", "Optional", False, "Input", None, None, None, None, "Options")
+    # @parameter("clipping_geometry", "Use features for clipping", "GPBoolean", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("no_data_val", "Value for 'NoData'", "GPString", "Optional", False, "Input", None, "nodata", None, None, "Options")
     @parameter("maintain_extent", "Maintain clipping extent", "GPString", "Optional", False, "Input", ["MAINTAIN_EXTENT", "NO_MAINTAIN_EXTENT"], None, None, None, "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
@@ -39,12 +40,17 @@ class ClipRasterTool(base.base_tool.BaseTool):
 
     def initialise(self):
 
-        if self.clipping_geometry:
+        self.log.info(self.get_parameter_dict())
+        if self.polygons:
             self.clipping_geometry = "ClippingGeometry"
             self.polygon_srs = get_srs(self.polygons, raise_unknown_error=True) if self.polygons != "#" else None
         else:
             self.clipping_geometry = "NONE"
             self.polygons = "#"
+
+        # self.log.info(self.__dict__)
+        # self.log.info(self.get_parameter_dict())
+        # raise ValueError("Early return for debug")
 
         return
 
