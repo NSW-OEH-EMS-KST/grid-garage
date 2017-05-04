@@ -41,7 +41,7 @@ class ClipRasterTool(base.base_tool.BaseTool):
     def initialise(self):
 
         self.log.info(self.get_parameter_dict())
-        if self.polygons:
+        if self.polygons and self.polgons != "#":
             self.clipping_geometry = "ClippingGeometry"
             self.polygon_srs = get_srs(self.polygons, raise_unknown_error=True) if self.polygons != "#" else None
         else:

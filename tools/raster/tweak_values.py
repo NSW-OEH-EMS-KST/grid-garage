@@ -57,20 +57,26 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
         ras = arcpy.Raster(r_in)
         ndv = ras.noDataValue
         pix_type = ras.pixelType
+        min_val = self.min_val
+        max_val = self.max_val
         if any(x in pix_type for x in ["S", "U"]):
+
             self.log.info("Raster pixel type is '{}' (integer)".format(pix_type))
+
             try:
                 ndv = int(ndv)
             except:
-                pass
+                ndv = None
+
             try:
-                min_val = int(self.min_val)
+                min_val = int(min_val)
             except:
-                pass
+                min_val = None
+
             try:
                 max_val = int(self.max_val)
             except:
-                pass
+                max_val = None
 
         self.log.info(["Tweaking raster {}".format(r_in), "\tNoData Value is {}".format(ndv)])
 
@@ -86,7 +92,7 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
             ras += float(self.constant)
             tweaks.append('translated by {}'.format(self.constant))
 
-        if self.min_val:
+        if min_val:
             self.log.info('\tSetting minimum to {} values under will go to {}'.format(min_val, self.under_min))
             under = min_val if self.under_min == 'Minimum' else ndv
             if under == "#":
@@ -94,7 +100,7 @@ class TweakValuesRasterTool(base.base_tool.BaseTool):
             ras = arcpy.sa.Con(ras >= min_val, ras, under)
             tweaks.append('Minimum set to {} under set to {}'.format(min_val, under))
 
-        if self.max_val:
+        if max_val:
             self.log.info('\tSetting maximum to {} values over will go to {}'.format(max_val, self.over_max))
             over = max_val if self.over_max == 'Maximum' else ndv
             if over == "#":
