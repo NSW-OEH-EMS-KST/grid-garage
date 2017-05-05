@@ -42,7 +42,7 @@ from tools.raster.tweak_values import TweakValuesRasterTool
 class Toolbox(object):
     def __init__(self):
         """Define the toolbox (the name of the toolbox is the name of the .pyt file)."""
-        self.label = "Grid Garage v3"
+        self.label = "Grid Garage"
         self.alias = "GridGarage"
 
         geodata_tools = {SearchGeodataTool,
