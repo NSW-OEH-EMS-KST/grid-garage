@@ -53,7 +53,7 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
             self.log.warn('All optional parameters are empty. Nothing to do.')
             exit(1)
 
-        if self.replacements:                                                                        # s_,; p_,prefix_
+        if self.replacements and self.replacements != "#":                                           # s_,; p_,prefix_
             try:
                 replace = self.replacements
                 replace = replace.split(';')                                                         # ["s_,", "p_,prefix_"]
