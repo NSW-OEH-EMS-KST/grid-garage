@@ -49,24 +49,27 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
     def initialise(self):
 
         # look for an early exit as all parameters are optional
-        if not (self.replacements or self.output_filename_prefix or self.output_filename_suffix):
+        if not (self.output_filename_prefix or self.output_filename_suffix) and self.replacements == "#":
             self.log.warn('All optional parameters are empty. Nothing to do.')
             exit(1)
 
-        if self.replacements and self.replacements != "#":                                           # s_,; p_,prefix_
+        if self.replacements == "#":
+
+            self.log.info('No text replacements to be made')
+            self.replacements = None
+        else:
+
             try:
-                replace = self.replacements
+                replace = self.replacements                                                          # s_,; p_,prefix_
                 replace = replace.split(';')                                                         # ["s_,", "p_,prefix_"]
                 replace = [v.replace("'", "").replace('"', "").replace(" ", "") for v in replace]
                 replace = [v.split(",") for v in replace]                                            # [["s_", ""], ["p_", "prefix"]]
                 # get rid of blanks and quotes - don't want them in geodata names
                 replace = [[v1.replace("'", "").replace(" ", "_"), v2.replace("'", "").replace(" ", "_")] for v1, v2 in replace]
                 self.replacements = replace
+                self.log.info('Replacements to be made are: {0}'.format(self.replacements))
             except:
                 raise ValueError('Could not parse replacements string! It should be like "old", "new"; "next_old", "next_new"')
-
-            # reflect the changes
-            self.log.info('Replacements to be made are: {0}'.format(replace))
 
         return
 
