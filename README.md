@@ -1,5 +1,5 @@
-!https://github.com/NSW-OEH-EMS-KST/asdst/blob/master/img/oehlogo.png)
-# grid-garage-3
+![oeh logo](https://github.com/NSW-OEH-EMS-KST/grid-garage/blob/master/img/oehlogo.png)
+
 ArcGIS python toolbox supporting table-based processing.
 
 The toolbox is being developed under ArcGIS 10.4. It appears to load Ok in 10.1 (10.2, 10.3 untested at this time).
