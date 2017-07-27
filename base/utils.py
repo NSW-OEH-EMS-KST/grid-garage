@@ -57,6 +57,11 @@ class UnmatchedSrsError(ValueError):
         super(UnmatchedSrsError, self).__init__(self, "Spatial references do not match '{}' != '{}'".format(srs1, srs2))
 
 
+class NotPolygonError(ValueError):
+    def __init__(self, geodata, shapetype):
+        super(NotPolygonError, self).__init__(self, "Dataset '{}' contains {} features, not polygons".format(geodata, shapetype))
+
+
 # @base.log.log
 # def get_field_list(dataset, wild_card=None, field_type=None):
 #
@@ -521,38 +526,43 @@ def get_srs(geodata, raise_unknown_error=False, as_object=False):
 
 
 @base.log.log
-def validate_geodata(geodata, raster=False, vector=False, table=False, srs_known=False):
+def validate_geodata(geodata, raster=False, vector=False, table=False, srs_known=False, polygon=False):
 
     if not geodata_exists(geodata):
-        e = DoesNotExistError(geodata)
-        base.log.debug("Raising {}".format(e))
-        raise e
+        # e = DoesNotExistError(geodata)
+        # base.log.debug("Raising {}".format(e))
+        raise DoesNotExistError(geodata)
 
     d = ap.Describe(geodata)
     try:
         dt = d.dataType
     except:
-        e = UnknownDataTypeError(geodata, "No datatype property")
-        base.log.debug("Raising {}".format(e))
-        raise e
+        # e = UnknownDataTypeError(geodata, "No datatype property")
+        # base.log.debug("Raising {}".format(e))
+        raise UnknownDataTypeError(geodata, "No datatype property")
 
     if raster and dt not in ["RasterDataset"]:
-        e = NotRasterError(geodata, dt)
-        base.log.debug("Raising {}".format(e))
-        raise e
+        # e = NotRasterError(geodata, dt)
+        # base.log.debug("Raising {}".format(e))
+        raise NotRasterError(geodata, dt)
 
     if vector and dt not in ["FeatureClass", "ShapeFile"]:
         e = NotVectorError(geodata, dt)
-        base.log.debug("Raising {}".format(e))
-        raise e
+        # base.log.debug("Raising {}".format(e))
+        raise NotVectorError(geodata, dt)
 
     if table and dt not in ["Table", "TableView"]:
-        e = NotTableError(geodata, dt)
-        base.log.debug("Raising {}".format(e))
-        raise e
+        # e = NotTableError(geodata, dt)
+        # base.log.debug("Raising {}".format(e))
+        raise NotTableError(geodata, dt)
 
     if srs_known:
         get_srs(geodata, raise_unknown_error=True)
+
+    if polygon and d.shapeType != "Polygon":
+        # e = NotPolygonError(geodata, d.shapeType)
+        # base.log.debug("Raising {}".format(e))
+        raise NotPolygonError(geodata, d.shapeType)
 
     return
 

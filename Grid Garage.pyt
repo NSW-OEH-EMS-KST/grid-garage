@@ -11,7 +11,8 @@ from tools.geodata.select import SelectGeodataTool
 from tools.geodata.describe import DescribeGeodataTool
 from tools.geodata.list_workspace_tables import ListWorkspaceTablesGeodataTool
 # feature tools
-from tools.feature.rasterise_by_table import RasteriseByTableTool
+from tools.feature.feature_to_raster import FeatureToRasterTool
+from tools.feature.polygon_to_raster import PolygonToRasterTool
 from tools.feature.copy import CopyFeatureTool
 from tools.feature.clip import ClipFeatureTool
 # raster tools
@@ -56,7 +57,8 @@ class Toolbox(object):
                          RenameGeodataTool,
                          ListWorkspaceTablesGeodataTool}
 
-        feature_tools = {RasteriseByTableTool,
+        feature_tools = {FeatureToRasterTool,
+                         PolygonToRasterTool,
                          CopyFeatureTool,
                          ClipFeatureTool}
 
