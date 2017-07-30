@@ -1,9 +1,11 @@
-import base.base_tool
-import base.results
+from base.base_tool import BaseTool
+from base.results import result
+from base import utils
 from base.method_decorators import input_tableview, input_output_table, parameter
-from arcpy import GetCellValue_management
+from arcpy import GetCellValue_management, GetCount_management
+import arcpy.sa
 from collections import OrderedDict
-import base.utils
+
 
 tool_settings = {"label": "Values at Points",
                  "description": "Retrieves the values of rasters at specified points...",
@@ -11,12 +13,12 @@ tool_settings = {"label": "Values at Points",
                  "category": "Raster"}
 
 
-@base.results.result
-class ValuesAtPointsRasterTool(base.base_tool.BaseTool):
+@result
+class ValuesAtPointsRasterTool(BaseTool):
     def __init__(self):
 
-        base.base_tool.BaseTool.__init__(self, tool_settings)
-        self.execution_list = [self.initialise, self.iterating, self.finish]
+        BaseTool.__init__(self, tool_settings)
+        self.execution_list = [self.initialise, self.iterate, self.finish]
         self.point_rows = None
         self.points_srs = None
         self.result_dict = {}
@@ -28,53 +30,57 @@ class ValuesAtPointsRasterTool(base.base_tool.BaseTool):
     @input_output_table
     def getParameterInfo(self):
 
-        return base.base_tool.BaseTool.getParameterInfo(self)
+        return BaseTool.getParameterInfo(self)
 
     def initialise(self):
 
-        d = base.utils.describe(self.points)
+        d = utils.describe(self.points)
         self.points_srs = d.get("dataset_spatialReference", "Unknown")
         source = d.get("general_catalogPath", None)
 
         if "unknown" in self.points_srs.lower():
             raise ValueError("Point dataset '{0}'has unknown spatial reference system ({1})".format(source, self.points_srs))
 
-        self.point_rows = base.utils.get_search_cursor_rows(self.points, ("SHAPE@XY", "OID@"))
-        self.log.info("{0} points found in '{1}'".format(len(self.point_rows), self.points))
+        c = GetCount_management(self.points).getOutput(0)
+        # self.point_rows = utils.get_search_cursor_rows(self.points, ("SHAPE@XY", "OID@"))
+        self.point_rows = arcpy.sa.SearchCursor(self.points, ("SHAPE@XY", "OID@"))
+        self.info("{0} points found in '{1}'".format(c, self.points))
 
         return
 
-    def iterating(self):
+    def iterate(self):
 
-        self.iterate_function_on_tableview(self.process, "raster_table", ["raster"])
+        self.iterate_function_on_tableview(self.process, "raster_table", ["geodata"])
 
         return
 
     def process(self, data):
 
-        ras = data["raster"]
-        base.utils.validate_geodata(ras, raster=True, srs_known=True)
+        ras = data["geodata"]
+        utils.validate_geodata(ras, raster=True, srs_known=True)
 
-        d = base.utils.describe(ras)
+        d = utils.describe(ras)
         r_base = d.get("general_baseName", "None")
         ras_srs = d.get("dataset_spatialReference", "Unknown")
 
         if ras_srs != self.points_srs:  # hack!! needs doing properly
             raise ValueError("Spatial reference systems do not match ({0} != {1})".format(ras_srs, self.points_srs))
 
-        self.log.info("Extracting point values from {0}...".format(ras))
+        self.info("Extracting point values from {0}...".format(ras))
 
         for row in self.point_rows:
             oid = row[1]
             # calc
             xy = "{0} {1}".format(row[0][0], row[0][1])
-            result = GetCellValue_management(ras, xy)
-            val = result.getOutput(0)
+            res = GetCellValue_management(ras, xy)
+            val = res.getOutput(0)
+
             # get the storage
             id_res = self.result_dict.get(oid, None)
             if not id_res:  # init needed
                 id_res = {}
                 self.result_dict[oid] = id_res
+
             # store it
             id_res[r_base] = val
 
@@ -91,13 +97,14 @@ class ValuesAtPointsRasterTool(base.base_tool.BaseTool):
         result_list = []
 
         for oid, val_dict in self.result_dict.iteritems():
-            # row_dict = {"source_pt_id": oid}
+
             row_dict = OrderedDict()
             row_dict["source_pt_id"] = oid
             for k, v in val_dict.iteritems():
                 row_dict[k] = v
+
             result_list.append(row_dict)
 
-        self.result.add(result_list)
+        self.result.add_pass(result_list)
 
         return

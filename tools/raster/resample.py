@@ -1,8 +1,8 @@
-import base.base_tool
-import base.results
+from base.base_tool import BaseTool
+from base.results import result
+from base import utils
 from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, resample_methods, raster_formats
 import arcpy
-import base.utils
 
 tool_settings = {"label": "Resample",
                  "description": "Resample rasters...",
@@ -10,11 +10,13 @@ tool_settings = {"label": "Resample",
                  "category": "Raster"}
 
 
-@base.results.result
-class ResampleRasterTool(base.base_tool.BaseTool):
+@result
+class ResampleRasterTool(BaseTool):
 
     def __init__(self):
-        base.base_tool.BaseTool.__init__(self, tool_settings)
+
+        BaseTool.__init__(self, tool_settings)
+
         self.execution_list = [self.iterate]
 
         return
@@ -26,26 +28,27 @@ class ResampleRasterTool(base.base_tool.BaseTool):
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
 
-        return base.base_tool.BaseTool.getParameterInfo(self)
+        return BaseTool.getParameterInfo(self)
 
     def iterate(self):
 
-        self.iterate_function_on_tableview(self.resample, "raster_table", ["raster"])
+        self.iterate_function_on_tableview(self.resample, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def resample(self, data):
 
-        ras = data["raster"]
-        base.utils.validate_geodata(ras, raster=True)
-        ras_out = base.utils.make_raster_name(ras, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+        ras = data["geodata"]
 
-        self.log.info("Resampling {0} -->> {1} ...".format(ras, ras_out))
+        utils.validate_geodata(ras, raster=True)
+
+        ras_out = utils.make_raster_name(ras, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+
+        self.info("Resampling {0} -->> {1} ...".format(ras, ras_out))
+
         arcpy.Resample_management(ras, ras_out, self.cell_size, self.resample_type)
 
-        self.log.info(self.result.add({"geodata": ras_out, "source_geodata": ras}))
-
-        return
+        return {"geodata": ras_out, "source_geodata": ras}
 
 # "http://desktop.arcgis.com/en/arcmap/latest/tools/data-management-toolbox/resample.htm"
 

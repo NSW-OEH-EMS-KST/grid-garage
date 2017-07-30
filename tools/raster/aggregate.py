@@ -1,8 +1,8 @@
-import base.base_tool
-import base.results
+from base.base_tool import BaseTool
+from base.results import result
+from base import utils
 from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats, aggregation_methods, data_nodata, expand_trunc
 from arcpy.sa import Aggregate
-import base.utils
 
 
 tool_settings = {"label": "Aggregate",
@@ -11,12 +11,13 @@ tool_settings = {"label": "Aggregate",
                  "category": "Raster"}
 
 
-@base.results.result
-class AggregateRasterTool(base.base_tool.BaseTool):
+@result
+class AggregateRasterTool(BaseTool):
 
     def __init__(self):
 
-        base.base_tool.BaseTool.__init__(self, tool_settings)
+        BaseTool.__init__(self, tool_settings)
+
         self.execution_list = [self.iterate]
 
         return
@@ -30,26 +31,30 @@ class AggregateRasterTool(base.base_tool.BaseTool):
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
 
-        return base.base_tool.BaseTool.getParameterInfo(self)
+        return BaseTool.getParameterInfo(self)
 
     def iterate(self):
 
-        self.iterate_function_on_tableview(self.aggregate, "raster_table", ["raster"])
+        self.iterate_function_on_tableview(self.aggregate, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def aggregate(self, data):
 
-        ras = data["raster"]
-        base.utils.validate_geodata(ras, raster=True)
+        ras = data["geodata"]
 
-        ras_out = base.utils.make_raster_name(ras, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
-        self.log.info("Aggregating {0} -->> {1} ...".format(ras, ras_out))
+        utils.validate_geodata(ras, raster=True)
+
+        ras_out = utils.make_raster_name(ras, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+
+        self.info("Aggregating {} -->> {} ...".format(ras, ras_out))
+
         out = Aggregate(ras, self.cell_factor, self.aggregation_type, self.extent_handling, self.ignore_nodata)
+
         out.save(ras_out)
 
-        self.result.add({"geodata": ras_out, "source_geodata": ras})
+        return {"geodata": ras_out, "source_geodata": ras}
 
-        return
 
 # "http://desktop.arcgis.com/en/arcmap/latest/tools/spatial-analyst-toolbox/aggregate.htm"
+#  Aggregate (in_raster, cell_factor, {aggregation_type}, {extent_handling}, {ignore_nodata})

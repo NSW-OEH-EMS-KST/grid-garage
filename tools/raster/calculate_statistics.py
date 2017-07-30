@@ -1,8 +1,8 @@
-import base.base_tool
-import base.results
+from base.base_tool import BaseTool
+from base.results import result
+from base import utils
 from base.method_decorators import input_tableview, input_output_table, parameter
 from arcpy import CalculateStatistics_management
-import base.utils
 
 
 tool_settings = {"label": "Calculate Statistics",
@@ -11,12 +11,12 @@ tool_settings = {"label": "Calculate Statistics",
                  "category": "Raster"}
 
 
-@base.results.result
-class CalculateStatisticsRasterTool(base.base_tool.BaseTool):
+@result
+class CalculateStatisticsRasterTool(BaseTool):
 
     def __init__(self):
 
-        base.base_tool.BaseTool.__init__(self, tool_settings)
+        BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
         return
@@ -30,22 +30,22 @@ class CalculateStatisticsRasterTool(base.base_tool.BaseTool):
     @input_output_table
     def getParameterInfo(self):
 
-        return base.base_tool.BaseTool.getParameterInfo(self)
+        return BaseTool.getParameterInfo(self)
 
     def iterate(self):
 
-        self.iterate_function_on_tableview(self.calculate, "raster_table", ["raster"])
+        self.iterate_function_on_tableview(self.calculate, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def calculate(self, data):
 
-        ras = data["raster"]
-        base.utils.validate_geodata(ras, raster=True)
+        ras = data["geodata"]
+
+        utils.validate_geodata(ras, raster=True)
+
         CalculateStatistics_management(ras, self.x_skip_factor, self.y_skip_factor, self.ignore_values, self.skip_existing, self.area_of_interest)
 
-        self.result.add({"geodata": ras, "statistics": "built"})
+        return {"geodata": ras, "statistics": "built"}
 
-        return
-
-"http://desktop.arcgis.com/en/arcmap/latest/tools/data-management-toolbox/calculate-statistics.htm"
+# "http://desktop.arcgis.com/en/arcmap/latest/tools/data-management-toolbox/calculate-statistics.htm"

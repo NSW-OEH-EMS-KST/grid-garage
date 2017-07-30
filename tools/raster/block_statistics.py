@@ -1,5 +1,5 @@
-import base.base_tool
-import base.results
+from base.base_tool import BaseTool
+from base.results import result
 from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, stats_type, data_nodata, raster_formats
 from arcpy.sa import BlockStatistics
 from base.utils import validate_geodata, make_raster_name
@@ -10,12 +10,13 @@ tool_settings = {"label": "Block Statistics",
                  "category": "Raster"}
 
 
-@base.results.result
-class BlockStatisticsRasterTool(base.base_tool.BaseTool):
+@result
+class BlockStatisticsRasterTool(BaseTool):
 
     def __init__(self):
 
-        base.base_tool.BaseTool.__init__(self, tool_settings)
+        BaseTool.__init__(self, tool_settings)
+
         self.execution_list = [self.iterate]
 
         return
@@ -28,31 +29,31 @@ class BlockStatisticsRasterTool(base.base_tool.BaseTool):
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
 
-        return base.base_tool.BaseTool.getParameterInfo(self)
+        return BaseTool.getParameterInfo(self)
 
     def iterate(self):
 
-        self.iterate_function_on_tableview(self.block_statistics, "raster_table", ["raster"])
+        self.iterate_function_on_tableview(self.block_statistics, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def block_statistics(self, data):
 
-        ras = data["raster"]
+        ras = data["geodata"]
+
         validate_geodata(ras, raster=True)
 
         ras_out = make_raster_name(ras, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
-        self.log.info("Calculating block statistics on {0}...".format(ras))
+
+        self.info("Calculating block statistics on {0}...".format(ras))
 
         out = BlockStatistics(ras, self.neighbourhood, self.statistics_type, self.ignore_nodata)
 
-        self.log.info("Saving to {0}...".format(ras_out))
+        self.info("Saving to {0}...".format(ras_out))
+
         out.save(ras_out)
 
-        r = self.result.add({"geodata": ras_out, "source_geodata": ras})
-        self.log.info(r)
-
-        return
+        return {"geodata": ras_out, "source_geodata": ras}
 
 
 # "http://desktop.arcgis.com/en/arcmap/latest/tools/spatial-analyst-toolbox/block-statistics.htm"

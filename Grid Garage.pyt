@@ -31,13 +31,17 @@ from tools.raster.set_no_data_value import SetNodataValueRasterTool
 from tools.raster.set_value_to_null import SetValueToNullRasterTool
 from tools.raster.transform import TransformRasterTool
 from tools.raster.tweak_values import TweakValuesRasterTool
-# from tools.raster.zonal_counts import ZonalCountsRasterTool
-# # metadata tools
-# from tools.metadata.search import SearchMetadataTool
-# from tools.metadata.tips_from_template import TipsFromTemplateMetadataTool
-# from tools.metadata.tips_from_tip_files import TipsFromTipFilesMetadataTool
-# from tools.metadata.export_tips import ExportTipsMetadataTool
-# from tools.metadata.export_xml import ExportXmlMetadataTool
+from tools.raster.reclass_by_threshold import ReclassByThresholdRasterTool
+from tools.raster. import ReclassByThresholdRasterTool
+BandPropetiesRasterTool
+# metadata tools
+from tools.metadata.audit import AuditMetadataTool
+from tools.metadata.create_tips import CreateTipsTableMetadataTool
+from tools.metadata.import_tips import ImportTipFilesToTableMetadataTool
+from tools.metadata.export_tips import ExportTipsToFileMetadataTool
+from tools.metadata.export_xml import ExportXmlMetadataTool
+from tools.metadata.id_from_xml import GetIARIDFromXmlTool
+from tools.metadata.import_metadata import ImportMetadataTool
 
 
 class Toolbox(object):
@@ -72,24 +76,23 @@ class Toolbox(object):
                         ValuesAtPointsRasterTool,
                         ReprojectRasterTool,
                         ReclassByTableRasterTool,
+                        ReclassByThresholdRasterTool,
                         ResampleRasterTool,
                         SetNodataValueRasterTool,
                         SetValueToNullRasterTool,
                         TransformRasterTool,
-                        TweakValuesRasterTool}  # ,
-                        # ZonalCountsRasterTool}
+                        TweakValuesRasterTool,
+                        BandPropetiesRasterTool,
+                        ValuesToPointsRasterTool,
+                        SliceRasterTool,
+                        ZonalStatisticsAsTableTool}
 
-        # metadata_tools = {SearchMetadataTool,
-        #                   TipsFromTemplateMetadataTool,
-        #                   TipsFromTipFilesMetadataTool,
-        #                   ExportTipsMetadataTool,
-        #                   ExportXmlMetadataTool}
+        metadata_tools = {AuditMetadataTool,
+                          CreateTipsTableMetadataTool,
+                          ImportTipFilesToTableMetadataTool,
+                          ExportTipsToFileMetadataTool,
+                          ExportXmlMetadataTool,
+                          GetIARIDFromXmlTool,
+                          ImportMetadataTool}
 
-        self.tools = list(geodata_tools | feature_tools | raster_tools)  # | metadata_tools)
-
-
-def main():
-    pass
-
-if __name__ == "__main__":
-    main()
+        self.tools = list(geodata_tools | feature_tools | raster_tools | metadata_tools)

@@ -1,5 +1,5 @@
-import base.base_tool
-import base.results
+from base.base_tool import BaseTool
+from base.results import result
 from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats
 import arcpy
 from base.utils import get_srs, validate_geodata, compare_srs, make_raster_name
@@ -14,65 +14,58 @@ tool_settings = {"label": "Clip",
 #     NO_MAINTAIN_EXTENT - Maintain the cell alignment as the input raster and adjust the output extent accordingly."""
 
 
-@base.results.result
-class ClipRasterTool(base.base_tool.BaseTool):
+@result
+class ClipRasterTool(BaseTool):
 
     def __init__(self):
 
-        base.base_tool.BaseTool.__init__(self, tool_settings)
-        self.execution_list = [self.initialise, self.iterate]
+        BaseTool.__init__(self, tool_settings)
+        self.execution_list = [self.iterate]
         self.polygon_srs = None
-        self.clipping_geometry = None
 
         return
 
     @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("rectangle", "Rectangle", "GPExtent", "Required", False, "Input", None, "extent", None, None)
     @parameter("polygons", "Polygon feature(s) to clip by", "GPFeatureLayer", "Optional", False, "Input", ["Polygon"], None, None, None, "Options")
-    # @parameter("clipping_geometry", "Use features for clipping", "GPBoolean", "Optional", False, "Input", None, None, None, None, "Options")
+    @parameter("clipping_geometry", "Use features for clipping", "GPBoolean", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("no_data_val", "Value for 'NoData'", "GPString", "Optional", False, "Input", None, "nodata", None, None, "Options")
     @parameter("maintain_extent", "Maintain clipping extent", "GPString", "Optional", False, "Input", ["MAINTAIN_EXTENT", "NO_MAINTAIN_EXTENT"], None, None, None, "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
 
-        return base.base_tool.BaseTool.getParameterInfo(self)
-
-    def initialise(self):
-
-        self.log.info(self.get_parameter_dict())
-        if self.polygons == "#":
-            self.clipping_geometry = "NONE"
-        else:
-            self.clipping_geometry = "ClippingGeometry"
-            self.polygon_srs = get_srs(self.polygons, raise_unknown_error=True) if self.polygons != "#" else None
-
-        return
+        return BaseTool.getParameterInfo(self)
 
     def iterate(self):
 
-        self.iterate_function_on_tableview(self.clip, "raster_table", ["raster"])
+        if self.clipping_geometry:
+            self.clipping_geometry = "ClippingGeometry"
+            self.polygon_srs = get_srs(self.polygons, raise_unknown_error=True) if self.polygons != "#" else None
+        else:
+            self.clipping_geometry = "NONE"
+            self.polygons = "#"
+
+        self.iterate_function_on_tableview(self.clip, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def clip(self, data):
 
-        ras = data["raster"]
+        ras = data["geodata"]
         validate_geodata(ras, raster=True, srs_known=True)
         ras_srs = get_srs(ras, raise_unknown_error=True)
-        self.log.debug("raster srs = {}".format(ras_srs))
+        self.debug("raster srs = {}".format(ras_srs))
 
         if self.polygons != "#":
             compare_srs(ras_srs, self.polygon_srs, raise_no_match_error=True, other_condition=(self.clipping_geometry != "NONE"))
 
         ras_out = make_raster_name(ras, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self. output_filename_suffix)
 
-        self.log.info("Clipping {0} -->> {1} ...".format(ras, ras_out))
+        self.info("Clipping {0} -->> {1} ...".format(ras, ras_out))
         arcpy.Clip_management(ras, self.rectangle, ras_out, self.polygons, self.no_data_val, self.clipping_geometry, self.maintain_extent)
 
-        self.log.info(self.result.add({"geodata": ras_out, "source_geodata": ras}))
-
-        return
+        return {"geodata": ras_out, "source_geodata": ras}
 
 # import arcpy
 # arcpy.Clip_management(
