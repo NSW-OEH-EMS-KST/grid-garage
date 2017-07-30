@@ -99,3 +99,18 @@ class Toolbox(object):
 
         self.tools = list(geodata_tools | feature_tools | raster_tools | metadata_tools)
 
+
+def test_tools():
+
+    tb = Toolbox()
+    for t in tb.tools:
+        try:
+            tool = t()
+            print "Dummy run  - {}".format(tool.label)
+            tool.execute(tool.getParameterInfo(), None)
+        except Exception as e:
+            print e
+
+
+if __name__ == "__main__":
+    test_tools()

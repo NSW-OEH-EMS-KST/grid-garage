@@ -4,7 +4,7 @@ import functools
 from base.utils import raster_formats, resample_methods, aggregation_methods, data_nodata, expand_trunc, stats_type, pixel_type, raster_formats2, transform_methods
 
 
-def parameter(name, display_name, data_type, parameter_type, multi_value, direction, value_list, default_environment, dependancy_list, default_value, category=None, enabled=True):
+def parameter(name, display_name, data_type, parameter_type, multi_value, direction, value_list, default_environment, dependancy_list, default_value, category=None):
     """ Wrap a function with a function that generates a generic parameter
 
     Args:
@@ -25,7 +25,7 @@ def parameter(name, display_name, data_type, parameter_type, multi_value, direct
 
     validate_parameter(name, display_name, data_type, parameter_type, multi_value, direction, value_list, default_environment, dependancy_list, default_value)
 
-    par = arcpy.Parameter(name=name, displayName=display_name, datatype=data_type, parameterType=parameter_type, enabled=enabled, multiValue=multi_value, direction=direction, category=category)
+    par = arcpy.Parameter(name=name, displayName=display_name, datatype=data_type, parameterType=parameter_type, multiValue=multi_value, direction=direction, category=category)
 
     if value_list:  # and data_type == "GPString":
         if value_list[0] == "Range" and len(value_list) == 3:  # a range, probably need to extend this usage a bit in hindsight
@@ -148,24 +148,25 @@ def input_tableview(name, display_name, multi_value, required_fields):
     pars = [par]
 
     # create dependencies
-    i = 0
+    # i = 0
     for rf in required_fields:
         if ":" not in rf:  # more info is included
             raise ValueError("Bad 'required_fields' string")  # def-time
 
         f_alias, f_name, f_default = rf.split(":")
+        f_default = "Required" if not f_default else f_default
 
-        p = arcpy.Parameter(name="{0}_field_{1}".format(name, i),
+        p = arcpy.Parameter(name="{0}_field_{1}".format(name, f_name),
                             displayName="Field for {0}".format(f_alias),
                             datatype="Field",
-                            parameterType="Required",
+                            parameterType=f_default,
                             multiValue=False,
                             direction="Input")
         if f_name:
             p.value = f_name
         p.parameterDependencies = [name]  # should be constant
         pars.append(p)
-        i += 1
+        # i += 1
 
     def decorator(f):
         @functools.wraps(f)
