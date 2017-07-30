@@ -32,8 +32,10 @@ from tools.raster.set_value_to_null import SetValueToNullRasterTool
 from tools.raster.transform import TransformRasterTool
 from tools.raster.tweak_values import TweakValuesRasterTool
 from tools.raster.reclass_by_threshold import ReclassByThresholdRasterTool
-from tools.raster. import ReclassByThresholdRasterTool
-BandPropetiesRasterTool
+from tools.raster.values_to_points import ValuesToPointsRasterTool
+from tools.raster.slice import SliceRasterTool
+from tools.raster.zonal_stats_as_table import ZonalStatisticsAsTableTool
+# BandPropetiesRasterTool
 # metadata tools
 from tools.metadata.audit import AuditMetadataTool
 from tools.metadata.create_tips import CreateTipsTableMetadataTool
@@ -82,7 +84,7 @@ class Toolbox(object):
                         SetValueToNullRasterTool,
                         TransformRasterTool,
                         TweakValuesRasterTool,
-                        BandPropetiesRasterTool,
+                        # BandPropetiesRasterTool,
                         ValuesToPointsRasterTool,
                         SliceRasterTool,
                         ZonalStatisticsAsTableTool}
@@ -96,3 +98,19 @@ class Toolbox(object):
                           ImportMetadataTool}
 
         self.tools = list(geodata_tools | feature_tools | raster_tools | metadata_tools)
+
+
+def test():
+
+    tb = Toolbox()
+    for t in tb.tools:
+        try:
+            tool = t()
+            print "Dummy run  - {}".format(tool.label)
+            tool.execute(tool.getParameterInfo(), None)
+        except Exception as e:
+            print e
+
+
+if __name__ == "__main__":
+    test()
