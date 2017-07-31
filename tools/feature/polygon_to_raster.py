@@ -34,7 +34,7 @@ class PolygonToRasterTool(BaseTool):
 
     def iterating(self):
 
-        self.iterate_function_on_tableview(self.rasterise, "features_table", ["feature", "fields", "priority field"])
+        self.iterate_function_on_tableview(self.rasterise, "features_table", ["feature", "fields", "priority_field"])
 
         return
 

@@ -43,7 +43,7 @@ class ValuesAtPointsRasterTool(BaseTool):
 
         c = GetCount_management(self.points).getOutput(0)
         # self.point_rows = utils.get_search_cursor_rows(self.points, ("SHAPE@XY", "OID@"))
-        self.point_rows = arcpy.sa.SearchCursor(self.points, ("SHAPE@XY", "OID@"))
+        self.point_rows = arcpy.da.SearchCursor(self.points, ("SHAPE@XY", "OID@"))
         self.info("{0} points found in '{1}'".format(c, self.points))
 
         return
