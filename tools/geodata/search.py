@@ -42,12 +42,12 @@ class SearchGeodataTool(base.base_tool.BaseTool):
         ws = data["workspace"]
 
         for dt in self.geodata_types:
-            self.log.info("Searching for {0} geodata types in {1}".format(dt, ws))
+            self.info("Searching for {0} geodata types in {1}".format(dt, ws))
             found = [{"geodata": v} for v in walk(ws.strip("'"), data_types=dt)]
             if not found:
-                self.log.info("Nothing found")
+                self.info("Nothing found")
             else:
-                self.log.info(self.result.add(found))
+                self.info(self.result.add(found))
 
 
         return
