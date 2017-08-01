@@ -33,7 +33,7 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
 
         """
         self.info('Testing new names for duplication...')
-        table = self.result.result_csv  # self.get_parameter_by_name("result_table").valueAsText()  # tool.get_parameter_as_text(0)
+        table = self.result.pass_csv  # self.get_parameter_by_name("result_table").valueAsText()  # tool.get_parameter_as_text(0)
         self.debug(table)
         rows = get_search_cursor_rows(table, ['candidate_name'])
         self.debug(rows)
