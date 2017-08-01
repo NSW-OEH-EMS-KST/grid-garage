@@ -39,7 +39,7 @@ class CopyFeatureTool(base.base_tool.BaseTool):
 
     def process(self, data):
 
-        fc = data["feature"]
+        fc = data["geodata"]
         base.utils.validate_geodata(fc, vector=True)
 
         ws = self.result.output_workspace
