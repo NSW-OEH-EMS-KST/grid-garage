@@ -26,14 +26,14 @@ class RenameGeodataTool(base.base_tool.BaseTool):
 
     def iterate(self):
 
-        self.iterate_function_on_tableview(self.rename, "geodata_table", ["geodata", "new name"], return_to_results=True)
+        self.iterate_function_on_tableview(self.rename, "geodata_table", ["geodata", "candidate_name"], return_to_results=True)
 
         return
 
     def rename(self, data):
 
-        gd = data["new name"]
-        ngd = data["geodata"]
+        gd = data["geodata"]
+        ngd = data["candidate_name"]
 
         self.info('Renaming {0} --> {1}'.format(gd, ngd))
         Rename_management(gd, ngd)
