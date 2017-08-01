@@ -33,6 +33,7 @@ class SearchGeodataTool(base.base_tool.BaseTool):
         return
 
     def iterate(self):
+
         self.iterate_function_on_parameter(self.search, "workspaces", ["workspace"])
 
         return
@@ -47,6 +48,6 @@ class SearchGeodataTool(base.base_tool.BaseTool):
             if not found:
                 self.info("Nothing found")
             else:
-                self.info(self.result.add(found))
+                self.info(self.result.add_pass(found))
 
         return
