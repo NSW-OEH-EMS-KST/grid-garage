@@ -38,7 +38,7 @@ class ClipFeatureTool(base.base_tool.BaseTool):
 
     def clip(self, data):
 
-        fc = data["feature"]
+        fc = data["geodata"]
         base.utils.validate_geodata(fc, vector=True, srs_known=True)
         fc_srs = base.utils.get_srs(fc, raise_unknown_error=True)
         base.utils.compare_srs(fc_srs, self.clip_srs, raise_no_match_error=True)
