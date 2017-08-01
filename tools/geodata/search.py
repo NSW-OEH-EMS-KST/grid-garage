@@ -49,5 +49,4 @@ class SearchGeodataTool(base.base_tool.BaseTool):
             else:
                 self.info(self.result.add(found))
 
-
         return
