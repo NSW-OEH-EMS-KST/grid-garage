@@ -38,10 +38,10 @@ class FeatureToRasterTool(BaseTool):
 
     def rasterise(self, data):
 
-        feat_ds = data["feature"]
+        feat_ds = data["geodata"]
         base.utils.validate_geodata(feat_ds, vector=True)
 
-        fields_string = data["fields"]
+        fields_string = data["table_fields"]
         try:
             target_fields = [field.strip() for field in fields_string.split(",")]
         except:
