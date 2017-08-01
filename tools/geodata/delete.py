@@ -25,7 +25,7 @@ class DeleteGeodataTool(base.base_tool.BaseTool):
 
     def __init__(self):
         base.base_tool.BaseTool.__init__(self, tool_settings)
-        self.execution_list = [self.start_iteration]
+        self.execution_list = [self.iterate]
 
         return
 
@@ -35,20 +35,17 @@ class DeleteGeodataTool(base.base_tool.BaseTool):
 
         return base.base_tool.BaseTool.getParameterInfo(self)
 
-    def start_iteration(self):
+    def iterate(self):
 
-        self.iterate_function_on_tableview(self.delete, "geodata_table", ["geodata"])
+        self.iterate_function_on_tableview(self.delete, "geodata_table", ["geodata"], return_to_results=True)
 
         return
 
     def delete(self, data):
 
         gd = data["geodata"]
-        self.log.info('Deleting {0}'.format(gd))
+        self.info('Deleting {0}'.format(gd))
         Delete_management(gd)
 
-        r = self.result.add({'deleted_geodata': gd, 'time-deleted': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]})
-        self.log.info(r)
-
-        return
+        return {'deleted_geodata': gd, 'time-deleted': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}
 

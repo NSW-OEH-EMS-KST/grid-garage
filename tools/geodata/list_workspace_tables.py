@@ -28,16 +28,16 @@ class ListWorkspaceTablesGeodataTool(base.base_tool.BaseTool):
 
     def iterate(self):
 
-        self.iterate_function_on_parameter(self.list, "workspaces", ["workspace"])
+        self.iterate_function_on_parameter(self.list, "workspaces", ["workspace"], return_to_results=True)
 
     def list(self, data):
 
         ws = data["workspace"]
-        self.log.info("Searching for tables in {0}".format(ws))
+        self.info("Searching for tables in {0}".format(ws))
         found = walk(ws.strip("'"), data_types="Table")
-        [self.log.info("Found: {}".format(f)) for f in found]
+        [self.info("Found: {}".format(f)) for f in found]
         if not found:
-            self.log.info("No tables were found")
+            self.info("No tables were found")
             return
 
         dic_list = []
@@ -48,6 +48,4 @@ class ListWorkspaceTablesGeodataTool(base.base_tool.BaseTool):
             d["date_time_ex_name"] = match.group(0) if match else None
             dic_list.append(d)
 
-        self.log.info(self.result.add(dic_list))
-
-        return
+        return dic_list

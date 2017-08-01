@@ -48,6 +48,6 @@ class SearchGeodataTool(base.base_tool.BaseTool):
             if not found:
                 self.info("Nothing found")
             else:
-                self.info(self.result.add_pass(found))
+                self.result.add_pass(found)
 
         return

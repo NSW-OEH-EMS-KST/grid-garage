@@ -33,7 +33,7 @@ class CopyFeatureTool(base.base_tool.BaseTool):
 
     def iterate(self):
 
-        self.iterate_function_on_tableview(self.process, "features_table", ["feature"])
+        self.iterate_function_on_tableview(self.process, "features_table", ["feature"], return_to_results=True)
 
         return
 
@@ -47,12 +47,10 @@ class CopyFeatureTool(base.base_tool.BaseTool):
 
         nfc = base.utils.make_vector_name(fc, ws, ex, self.output_filename_prefix, self. output_filename_suffix)
 
-        self.log.info('copying {0} --> {1}'.format(fc, nfc))
+        self.info('copying {0} --> {1}'.format(fc, nfc))
         arcpy.CopyFeatures_management(fc, nfc, self.config_kw, self.sg_1, self.sg_2, self.sg_3)
 
-        self.result.add({'geodata': nfc, 'copied_from': fc})
-
-        return
+        return {'geodata': nfc, 'copied_from': fc}
 
 # "http://desktop.arcgis.com/en/arcmap/latest/tools/data-management-toolbox/copy-features.htm"
 # "CopyFeatures_management (in_features, out_feature_class, {config_keyword}, {spatial_grid_1}, {spatial_grid_2}, {spatial_grid_3})"

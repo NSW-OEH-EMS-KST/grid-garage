@@ -18,7 +18,7 @@ class PolygonToRasterTool(BaseTool):
     def __init__(self):
 
         BaseTool.__init__(self, tool_settings)
-        self.execution_list = [self.iterating]
+        self.execution_list = [self.iterate]
         self.cell_assignment = None
 
         return
@@ -32,10 +32,7 @@ class PolygonToRasterTool(BaseTool):
 
         return BaseTool.getParameterInfo(self)
 
-    def iterating(self):
-
-        # if not self.priority_field:
-        #     self.priority_field = "NONE"
+    def iterate(self):
 
         if not self.cell_assignment:
             self.cell_assignment = "CELL_CENTER"
@@ -61,11 +58,11 @@ class PolygonToRasterTool(BaseTool):
         for field in target_fields:
             try:
                 r_out = base.utils.make_raster_name("{0}_{1}".format(splitext(feat_ds)[0], field), self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
-                self.log.info("Rasterising {0} on {1} -> {2}".format(feat_ds, field, r_out))
+                self.info("Rasterising {0} on {1} -> {2}".format(feat_ds, field, r_out))
                 PolygonToRaster_conversion(feat_ds, field, r_out, self.cell_assignment, self.priority_field, self.cell_size)
                 self.result.add_pass({"geodata": r_out, "source_geodata": feat_ds, "source_field": field})
             except Exception as e:
-                self.log.error("FAILED rasterising {0} on {1}: {2}".format(feat_ds, field, str(e)))
-                self.result.fail(data)
+                self.error("FAILED rasterising {0} on {1}: {2}".format(feat_ds, field, str(e)))
+                self.result.add_fail(data)
 
 #    PolygonToRaster_conversion (in_features, value_field, out_rasterdataset, {cell_assignment}, {priority_field}, {cellsize})

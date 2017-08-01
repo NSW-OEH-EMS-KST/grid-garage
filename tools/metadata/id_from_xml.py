@@ -25,7 +25,7 @@ class GetIARIDFromXmlTool(BaseTool):
 
     def iterate(self):
 
-        self.iterate_function_on_parameter(self.get_ids, "xml_table", ["xml"])
+        self.iterate_function_on_parameter(self.get_ids, "xml_table", ["xml"], return_to_results=True)
 
         return
 

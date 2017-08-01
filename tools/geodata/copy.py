@@ -29,7 +29,7 @@ class CopyGeodataTool(base.base_tool.BaseTool):
 
     def iterate(self):
 
-        self.iterate_function_on_tableview(self.copy, "geodata_table", ["geodata"])
+        self.iterate_function_on_tableview(self.copy, "geodata_table", ["geodata"], return_to_results=True)
 
         return
 
@@ -40,13 +40,13 @@ class CopyGeodataTool(base.base_tool.BaseTool):
         ext = splitext(gd)[1]
         ngd = make_table_name(gd, self.result.output_workspace, ext, self.output_filename_prefix, self.output_filename_suffix)
 
-        self.log.info('Copying {0} --> {1}'.format(gd, ngd))
+        self.info('Copying {0} --> {1}'.format(gd, ngd))
         Copy_management(gd, ngd)
 
-        r = self.result.add({'geodata': ngd, 'copied_from': gd})
-        self.log.info(r)
+        # r = self.result.add_pass({'geodata': ngd, 'copied_from': gd})
+        # self.info(r)
 
-        return
+        return {'geodata': ngd, 'copied_from': gd}
 
 # Copy_management(in_data, out_data, {data_type})
 # "http://desktop.arcgis.com/en/arcmap/latest/tools/data-management-toolbox/copy.htm"

@@ -1,6 +1,8 @@
 import base.base_tool
 import base.results
 from base.method_decorators import input_output_table, input_tableview
+from base.utils import describe
+
 
 tool_settings = {"label": "Extract Parent Datasource",
                  "description": "Extracts the parent datasource from geodata...",
@@ -32,7 +34,7 @@ class ExtractParentGeodataTool(base.base_tool.BaseTool):
 
     def process(self, data):
 
-        self.log.info(data)
+        self.info(data)
         # self.add_result("TODO")
 
         return

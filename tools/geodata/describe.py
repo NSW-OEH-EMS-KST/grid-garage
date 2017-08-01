@@ -15,7 +15,7 @@ class DescribeGeodataTool(base.base_tool.BaseTool):
     def __init__(self):
 
         base.base_tool.BaseTool.__init__(self, tool_settings)
-        self.execution_list = [self.iterating]
+        self.execution_list = [self.iterate]
 
         return
 
@@ -25,18 +25,16 @@ class DescribeGeodataTool(base.base_tool.BaseTool):
 
         return base.base_tool.BaseTool.getParameterInfo(self)
 
-    def iterating(self):
+    def iterate(self):
 
-        self.iterate_function_on_tableview(self.describe, "geodata_table", ["geodata"])
+        self.iterate_function_on_tableview(self.describe, "geodata_table", ["geodata"], return_to_results=True)
 
         return
 
     def describe(self, data):
 
         item = data["geodata"]
-        self.log.info("Describing {0}".format(item))
-        r = describe(item)
-        self.log.info(self.result.add(r))
+        self.info("Describing {0}".format(item))
 
-        return
+        return describe(item)
 

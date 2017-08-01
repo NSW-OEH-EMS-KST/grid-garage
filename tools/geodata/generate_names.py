@@ -32,30 +32,30 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
         Test for duplicate names.
 
         """
-        self.log.info('Testing new names for duplication...')
+        self.info('Testing new names for duplication...')
         table = self.result.result_csv  # self.get_parameter_by_name("result_table").valueAsText()  # tool.get_parameter_as_text(0)
-        self.log.debug(table)
+        self.debug(table)
         rows = get_search_cursor_rows(table, ['candidate_name'])
-        self.log.debug(rows)
+        self.debug(rows)
         values = [x for x, in rows]
         duplicates = set([x for x in values if values.count(x) > 1])
         duplicates = list(duplicates)  # nicer print
 
         if not duplicates:
-            self.log.info('New item names (full) appear to be unique. Das is gut mein freund...')
+            self.info('New item names (full) appear to be unique. Das is gut mein freund...')
         else:
-            self.log.warn(['!! There seems to be non-unique new names. DOH! Please check the following...'] + duplicates)
+            self.warn(['!! There seems to be non-unique new names. DOH! Please check the following...'] + duplicates)
 
     def initialise(self):
 
         # look for an early exit as all parameters are optional
         if not (self.output_filename_prefix or self.output_filename_suffix) and self.replacements == "#":
-            self.log.warn('All optional parameters are empty. Nothing to do.')
+            self.warn('All optional parameters are empty. Nothing to do.')
             exit(1)
 
         if self.replacements == "#":
 
-            self.log.info('No text replacements to be made')
+            self.info('No text replacements to be made')
             self.replacements = None
         else:
 
@@ -67,7 +67,7 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
                 # get rid of blanks and quotes - don't want them in geodata names
                 replace = [[v1.replace("'", "").replace(" ", "_"), v2.replace("'", "").replace(" ", "_")] for v1, v2 in replace]
                 self.replacements = replace
-                self.log.info('Replacements to be made are: {0}'.format(self.replacements))
+                self.info('Replacements to be made are: {0}'.format(self.replacements))
             except:
                 raise ValueError('Could not parse replacements string! It should be like "old", "new"; "next_old", "next_new"')
 
@@ -75,7 +75,7 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
 
     def iterate(self):
 
-        self.iterate_function_on_tableview(self.process, "geodata_table", ["geodata"])
+        self.iterate_function_on_tableview(self.process, "geodata_table", ["geodata"], return_to_results=True)
 
         return
 
@@ -103,7 +103,6 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
         else:
             new_full = make_table_name(new_name, old_ws, old_ext, self.output_filename_prefix, self.output_filename_suffix)
 
-        self.log.info("{0} -->> {1}".format(gd, new_full))
-        self.result.add({'geodata': gd, 'candidate_name': new_full, 'existing_base_name': old_base, 'candidate_base_name': new_base})
+        self.info("{0} -->> {1}".format(gd, new_full))
 
-        return
+        return {'geodata': gd, 'candidate_name': new_full, 'existing_base_name': old_base, 'candidate_base_name': new_base}

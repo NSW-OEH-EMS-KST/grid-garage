@@ -42,7 +42,7 @@ class CompareExtentsGeodataTool(base.base_tool.BaseTool):
 
     def iterate(self):
 
-        self.iterate_function_on_tableview(self.compare, "geodata_table", ["geodata"])
+        self.iterate_function_on_tableview(self.compare, "geodata_table", ["geodata"], return_to_results=True)
 
         return
 
@@ -80,6 +80,6 @@ class CompareExtentsGeodataTool(base.base_tool.BaseTool):
             ("disjoint_aoi", dis), ("overlaps_aoi", ovr),
             ("equals_aoi", equ), ("touches_aoi", tch)])
 
-        self.log.info(self.result.add(r))
+        # self.info(self.result.add_pass(r))
 
-        return
+        return r

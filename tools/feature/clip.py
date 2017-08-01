@@ -17,7 +17,7 @@ class ClipFeatureTool(base.base_tool.BaseTool):
 
         base.base_tool.BaseTool.__init__(self, tool_settings)
         self.clip_srs = None
-        self.execution_list = [self.initialise, self.iterate]
+        self.execution_list = [self.iterate]
 
         return
 
@@ -29,15 +29,10 @@ class ClipFeatureTool(base.base_tool.BaseTool):
 
         return base.base_tool.BaseTool.getParameterInfo(self)
 
-    def initialise(self):
-
-        self.clip_srs = base.utils.get_srs(self.clip_features, raise_unknown_error=True)
-
-        return
-
     def iterate(self):
 
-        self.iterate_function_on_tableview(self.clip, "feature_table", ["feature"])
+        self.clip_srs = base.utils.get_srs(self.clip_features, raise_unknown_error=True)
+        self.iterate_function_on_tableview(self.clip, "feature_table", ["feature"], return_to_results=True)
 
         return
 
@@ -52,11 +47,9 @@ class ClipFeatureTool(base.base_tool.BaseTool):
         fc_ws, fc_base, fc_name, fc_ext = base.utils.split_up_filename(fc)
         fc_out = base.utils.make_vector_name(fc, self.result.output_workspace, fc_ext, self.output_filename_prefix, self.output_filename_suffix)
 
-        self.log.info("Clipping {0} -->> {1} ...".format(fc, fc_out))
+        self.info("Clipping {0} -->> {1} ...".format(fc, fc_out))
         arcpy.Clip_analysis(fc, self.clip_features, fc_out, self.xy_tolerance)
 
-        self.log.info(self.result.add({"geodata": fc_out, "source_geodata": fc}))
-
-        return
+        return {"geodata": fc_out, "source_geodata": fc}
 
 # "http://desktop.arcgis.com/en/arcmap/latest/tools/analysis-toolbox/clip.htm"
