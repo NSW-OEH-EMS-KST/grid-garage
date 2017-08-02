@@ -32,7 +32,7 @@ class FeatureToRasterTool(BaseTool):
 
     def iterate(self):
 
-        self.iterate_function_on_tableview(self.rasterise, "features_table", ["feature", "fields"])
+        self.iterate_function_on_tableview(self.rasterise, "features_table", ["geodata", "table_fields"])
 
         return
 
