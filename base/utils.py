@@ -58,6 +58,11 @@ class UnmatchedSrsError(ValueError):
         super(UnmatchedSrsError, self).__init__(self, "Spatial references do not match '{}' != '{}'".format(srs1, srs2))
 
 
+class NotPolygonError(ValueError):
+    def __init__(self, geodata, shapetype):
+        super(NotPolygonError, self).__init__(self, "Dataset '{}' has a unknown data type of '{}', not 'polygon'".format(geodata, shapetype))
+
+
 def static_vars(**kwargs):
     def decorate(func):
         for k in kwargs:
@@ -507,7 +512,7 @@ def get_srs(geodata, raise_unknown_error=False, as_object=False):
         return srs.name
 
 
-def validate_geodata(geodata, raster=False, vector=False, table=False, srs_known=False, message_func=None):
+def validate_geodata(geodata, raster=False, vector=False, table=False, srs_known=False, polygon=False, message_func=None):
 
     if message_func:
         message_func("Validating '{}'".format(geodata))
@@ -516,10 +521,11 @@ def validate_geodata(geodata, raster=False, vector=False, table=False, srs_known
 
         raise DoesNotExistError(geodata)
 
+    desc = ap.Describe(geodata)
     try:
-        dt = ap.Describe(geodata).dataType
+        dt = desc.dataType
     except:
-        raise UnknownDataTypeError(geodata, "No datatype property")
+        raise UnknownDataTypeError(geodata, "No dataType property")
 
     if raster and dt not in ["RasterDataset"]:
 
@@ -532,6 +538,15 @@ def validate_geodata(geodata, raster=False, vector=False, table=False, srs_known
     if table and dt not in ["Table", "TableView"]:
 
         raise NotTableError(geodata, dt)
+
+    if polygon:
+        try:
+            st = desc.shapeType
+        except:
+            raise UnknownDataTypeError(geodata, "No shapeType property")
+
+        if st != "polygon":
+            raise NotPolygonError(geodata, st)
 
     if srs_known:
 
