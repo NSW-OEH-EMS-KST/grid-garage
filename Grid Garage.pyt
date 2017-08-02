@@ -83,7 +83,7 @@ class Toolbox(object):
                         ResampleRasterTool,
                         SetNodataValueRasterTool,
                         SetValueToNullRasterTool,
-                        ToAsciiRasterTool
+                        ToAsciiRasterTool,
                         TransformRasterTool,
                         TweakValuesRasterTool,
                         ValuesToPointsRasterTool,
