@@ -36,6 +36,7 @@ from tools.raster.values_to_points import ValuesToPointsRasterTool
 from tools.raster.slice import SliceRasterTool
 from tools.raster.zonal_stats_as_table import ZonalStatisticsAsTableTool
 from tools.raster.properties import BandPropetiesRasterTool
+from tools.raster.to_ascii import ToAsciiRasterTool
 # metadata tools
 from tools.metadata.audit import AuditMetadataTool
 from tools.metadata.create_tips import CreateTipsTableMetadataTool
@@ -69,24 +70,25 @@ class Toolbox(object):
                          ClipFeatureTool}
 
         raster_tools = {AggregateRasterTool,
+                        BandPropetiesRasterTool,
                         BlockStatisticsRasterTool,
                         BuildAttributeTableRasterTool,
                         CalculateStatisticsRasterTool,
                         ClipRasterTool,
                         CopyRasterTool,
                         LookupByTableRasterTool,
-                        ValuesAtPointsRasterTool,
                         ReprojectRasterTool,
                         ReclassByTableRasterTool,
                         ReclassByThresholdRasterTool,
                         ResampleRasterTool,
                         SetNodataValueRasterTool,
                         SetValueToNullRasterTool,
+                        ToAsciiRasterTool
                         TransformRasterTool,
                         TweakValuesRasterTool,
-                        BandPropetiesRasterTool,
                         ValuesToPointsRasterTool,
                         SliceRasterTool,
+                        ValuesAtPointsRasterTool,
                         ZonalStatisticsAsTableTool}
 
         metadata_tools = {AuditMetadataTool,
