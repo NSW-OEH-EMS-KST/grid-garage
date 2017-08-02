@@ -37,7 +37,7 @@ class PolygonToRasterTool(BaseTool):
         if not self.cell_assignment:
             self.cell_assignment = "CELL_CENTER"
 
-        self.iterate_function_on_tableview(self.rasterise, "features_table", ["feature", "fields", "priority_field"])
+        self.iterate_function_on_tableview(self.rasterise, "features_table", ["geodata", "table_fields", "priority_field"])
 
         return
 
