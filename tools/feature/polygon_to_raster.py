@@ -43,7 +43,7 @@ class PolygonToRasterTool(BaseTool):
 
     def rasterise(self, data):
 
-        feat_ds = data["feature"]
+        feat_ds = data["geodata"]
         base.utils.validate_geodata(feat_ds, vector=True, polygon=True)
 
         fields_string = data["fields"]
