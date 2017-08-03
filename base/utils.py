@@ -60,7 +60,7 @@ class UnmatchedSrsError(ValueError):
 
 class NotPolygonError(ValueError):
     def __init__(self, geodata, shapetype):
-        super(NotPolygonError, self).__init__(self, "Dataset '{}' has a unknown data type of '{}', not 'polygon'".format(geodata, shapetype))
+        super(NotPolygonError, self).__init__(self, "Dataset '{}' has a unknown data type of '{}', not 'Polygon'".format(geodata, shapetype))
 
 
 def static_vars(**kwargs):
@@ -545,7 +545,7 @@ def validate_geodata(geodata, raster=False, vector=False, table=False, srs_known
         except:
             raise UnknownDataTypeError(geodata, "No shapeType property")
 
-        if st != "polygon":
+        if st != "Polygon":
             raise NotPolygonError(geodata, st)
 
     if srs_known:
