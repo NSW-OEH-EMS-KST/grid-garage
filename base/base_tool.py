@@ -404,6 +404,12 @@ class BaseTool(object):
         except AttributeError:
             pass
 
+        try:
+            if self.output_file_workspace in [None, "", "#"]:
+                self.output_file_workspace = self.result.output_workspace
+        except Exception:
+            pass
+
         for f in self.execution_list:
             f = log_error(f)
             f()

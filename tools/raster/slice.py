@@ -49,7 +49,7 @@ class SliceRasterTool(BaseTool):
 
         utils.validate_geodata(ras, raster=True)
 
-        ras_out = utils.make_raster_name(ras, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self. output_filename_suffix)
+        ras_out = utils.make_raster_name(ras, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self. output_filename_suffix)
 
         self.info("Slicing {0} -->> {1}...".format(ras, ras_out))
 

@@ -83,7 +83,7 @@ class TransformRasterTool(BaseTool):
         r_in = data["geodata"]
         utils.validate_geodata(r_in, raster=True)
 
-        r_out = utils.make_raster_name(r_in, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+        r_out = utils.make_raster_name(r_in, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
 
         self.info("\tCalculating statistics")
         arcpy.CalculateStatistics_management(r_in)

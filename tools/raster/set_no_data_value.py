@@ -42,7 +42,7 @@ class SetNodataValueRasterTool(BaseTool):
 
         utils.validate_geodata(ras, raster=True)
 
-        r_out = utils.make_raster_name(ras, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+        r_out = utils.make_raster_name(ras, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
 
         self.info("Setting NDV {0} on {1} -> {2}".format(self.ndv, ras, r_out))
 

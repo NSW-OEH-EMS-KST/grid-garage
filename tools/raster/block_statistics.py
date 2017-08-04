@@ -43,7 +43,7 @@ class BlockStatisticsRasterTool(BaseTool):
 
         validate_geodata(ras, raster=True)
 
-        ras_out = make_raster_name(ras, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+        ras_out = make_raster_name(ras, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
 
         self.info("Calculating block statistics on {0}...".format(ras))
 

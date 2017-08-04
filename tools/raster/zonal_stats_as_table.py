@@ -44,7 +44,7 @@ class ZonalStatisticsAsTableTool(BaseTool):
         ras = data["geodata"]
         validate_geodata(ras, raster=True)
 
-        ras_out = make_table_name(ras, self.result.output_workspace, None, self.output_filename_prefix, self. output_filename_suffix)
+        ras_out = make_table_name(ras, self.output_file_workspace, None, self.output_file_workspace, self. output_filename_suffix)
 
         self.info("Extracting stats table {0} -->> {1} ...".format(ras, ras_out))
 
