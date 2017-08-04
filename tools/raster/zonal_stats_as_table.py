@@ -10,7 +10,6 @@ tool_settings = {"label": "Zonal Statistics As Table",
                  "can_run_background": "True",
                  "category": "Raster"}
 
-# ZonalStatisticsAsTable (in_zone_data, zone_field, in_value_raster, out_table, {ignore_nodata}, {statistics_type})
 
 @result
 class ZonalStatisticsAsTableTool(BaseTool):
