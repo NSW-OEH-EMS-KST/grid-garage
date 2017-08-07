@@ -22,9 +22,9 @@ class ZonalStatisticsAsTableTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
+    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:", "Zone Field:zone_field:"])
     @parameter("zones", "Zones", "GPFeatureLayer", "Required", False, "Input", ["Polygon"], None, None, None, "Options")
-    @parameter("zone_field", "Zone Field", "Field", "Required", False, "Input", None, None, ["zones"], None, None)
+    # @parameter("zone_field", "Zone Field", "Field", "Required", False, "Input", None, None, ["zones"], None, None)
     @parameter("ignore_no_data", "'NoData' treatment", "GPString", "Optional", False, "Input", ["DATA", "NODATA"], None, None, None, "Options")
     @parameter("statistics_type", "statistics_type", "GPString", "Optional", False, "Input", stats_type + ["ALL"], None, None, "ALL", "Options")
     @input_output_table_with_output_affixes
