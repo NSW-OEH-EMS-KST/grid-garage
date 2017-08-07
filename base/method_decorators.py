@@ -153,7 +153,10 @@ def input_tableview(name, display_name, multi_value, required_fields):
         if ":" not in rf:  # more info is included
             raise ValueError("Bad 'required_fields' string")  # def-time
 
+        # settings = rf.split(":")
         f_alias, f_name, f_default = rf.split(":")
+        # if len(settings) == 4:
+
         f_default = "Required" if not f_default else f_default
 
         p = arcpy.Parameter(name="{0}_field_{1}".format(name, f_name),
@@ -183,6 +186,77 @@ def input_tableview(name, display_name, multi_value, required_fields):
         return wrapper
 
     return decorator
+
+
+def input_output_table(f, add_data_workspace=False):
+    """ Wrap a function with a function that generates output table parameters
+
+    DEPRECATED. TOOLS SHOULD BE REFACTORED TO USE THE NEW FUNCTION BELOW
+
+    Args:
+        f ():
+
+    Returns:
+
+    """
+
+    # Result Table
+    par0 = arcpy.Parameter(displayName="Result Table",
+                           name="result_table",
+                           datatype=["GPTableView"],
+                           parameterType="Derived",
+                           direction="Output")
+
+    # Fail Table
+    par1 = arcpy.Parameter(displayName="Fail Table",
+                           name="fail_table",
+                           datatype=["GPTableView"],
+                           parameterType="Derived",
+                           direction="Output")
+
+    # Output Workspace
+    par2 = arcpy.Parameter(displayName="Output Workspace",
+                           name="output_workspace",
+                           datatype=["DEWorkspace"],
+                           parameterType="Required",
+                           direction="Input")
+    par2.defaultEnvironmentName = "workspace"
+
+    # Output Table Name
+    par3 = arcpy.Parameter(displayName="Result Table Name",
+                           name="result_table_name",
+                           datatype="GPString",
+                           parameterType="Required",
+                           direction="Input")
+
+    par3.value = "#run_id#"
+    # Output Workspace
+    par2 = arcpy.Parameter(displayName="Output Workspace",
+                           name="output_workspace",
+                           datatype=["DEWorkspace"],
+                           parameterType="Required",
+                           direction="Input")
+    par2.defaultEnvironmentName = "workspace"
+
+    # Output Table Name
+    par3 = arcpy.Parameter(displayName="Result Table Name",
+                           name="result_table_name",
+                           datatype="GPString",
+                           parameterType="Required",
+                           direction="Input")
+
+    par3.value = "#run_id#"
+
+    @functools.wraps(f)
+    def wrapped(*args, **kwargs):
+        params = f(*args, **kwargs)
+        pars = [par0, par1, par2, par3]
+        if params:
+            params.insert(0, pars)
+        else:
+            params = pars
+        return params
+    return wrapped
 
 
 def input_output_table(f):
@@ -288,6 +362,14 @@ def input_output_table_with_output_affixes(f):
                            direction="Input",
                            category="Output Filename Affixes")
 
+    # Output file workspace
+    par6 = arcpy.Parameter(displayName="Output File Workspace",
+                           name="output_file_workspace",
+                           datatype="DEWorkspace",
+                           parameterType="Optional",
+                           direction="Input",
+                           category="Output File (Dataset) Workspace")
+
     # Output Table Name
     par5 = arcpy.Parameter(displayName="Result Table Name",
                            name="result_table_name",
@@ -300,7 +382,7 @@ def input_output_table_with_output_affixes(f):
     @functools.wraps(f)
     def wrapped(*args, **kwargs):
         params = f(*args, **kwargs)
-        pars = [par0, par1, par2, par3, par4, par5]
+        pars = [par0, par1, par2, par3, par4, par5, par6]
         if params:
             params.insert(0, pars)
         else:
@@ -501,3 +583,4 @@ def arc_environment_list():
 
     """
     return arcpy.ListEnvironments()
+
