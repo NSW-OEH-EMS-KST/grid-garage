@@ -500,8 +500,12 @@ class BaseTool(object):
         num_fields = len(key_names)  # [rf1, rf2, ...]
         f_names = ["{0}_field_{1}".format(parameter_name, k) for k in key_names]  # [f_0, f_1, ...]
         f_vals = [self.get_parameter(f_name).valueAsText for f_name in f_names]
+        f_vals = [f for f in f_vals if f not in [None, "NONE"]]
         if nonkey_names:
             f_vals.extend(nonkey_names)
+
+        self.info(f_vals)
+
         rows = [r for r in arcpy.da.SearchCursor(gg_in_table, f_vals)]
 
         # iterate
@@ -559,18 +563,9 @@ class BaseTool(object):
         total_rows = len(rows)
         self.info("{} items to process".format(total_rows))
         row_num = 0
-        # try:
-        #     add = log_error(self.result.add_pass)
-        # except AttributeError:
-        #     pass
 
         for row in rows:
             try:
-                # try:
-                #     self.result.new_proc_hist = "To be deprecated"  # "Tool='{}' Parameters={} Row={}".format(self.label, self.get_parameter_dict(), row)
-                # except AttributeError:
-                #     pass
-
                 row_num += 1
                 self.info("{} > Processing row {} of {}".format(time_stamp("%H:%M:%S%f")[:-3], row_num, total_rows))
                 self.debug("Running {} with row={}".format(fname, row))

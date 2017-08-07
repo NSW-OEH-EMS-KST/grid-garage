@@ -153,7 +153,10 @@ def input_tableview(name, display_name, multi_value, required_fields):
         if ":" not in rf:  # more info is included
             raise ValueError("Bad 'required_fields' string")  # def-time
 
+        # settings = rf.split(":")
         f_alias, f_name, f_default = rf.split(":")
+        # if len(settings) == 4:
+
         f_default = "Required" if not f_default else f_default
 
         p = arcpy.Parameter(name="{0}_field_{1}".format(name, f_name),
@@ -580,3 +583,4 @@ def arc_environment_list():
 
     """
     return arcpy.ListEnvironments()
+
