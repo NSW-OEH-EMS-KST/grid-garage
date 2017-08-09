@@ -32,7 +32,7 @@ from tools.raster.set_value_to_null import SetValueToNullRasterTool
 from tools.raster.transform import TransformRasterTool
 from tools.raster.tweak_values import TweakValuesRasterTool
 # from tools.raster.reclass_by_threshold import ReclassByThresholdRasterTool
-from tools.raster.values_to_points import ValuesToPointsRasterTool
+from tools.raster.extract_values_to_points import ExtractValuesToPointsRasterTool
 # from tools.raster.slice import SliceRasterTool
 # from tools.raster.zonal_stats_as_table import ZonalStatisticsAsTableTool
 from tools.raster.properties import BandPropetiesRasterTool
@@ -86,7 +86,7 @@ class Toolbox(object):
                         ToAsciiRasterTool,
                         TransformRasterTool,
                         TweakValuesRasterTool,
-                        ValuesToPointsRasterTool,
+                        ExtractValuesToPointsRasterTool,
                         # SliceRasterTool,
                         ValuesAtPointsRasterTool,
                         # ZonalStatisticsAsTableTool
