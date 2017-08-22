@@ -41,7 +41,7 @@ from tools.metadata.audit import AuditMetadataTool
 from tools.metadata.create_tips import CreateTipsTableMetadataTool
 from tools.metadata.import_tips import ImportTipFilesToTableMetadataTool
 from tools.metadata.export_tips import ExportTipsToFileMetadataTool
-from tools.metadata.export_xml import ExportXmlMetadataTool
+from tools.metadata.export_metadata import ExportXmlMetadataTool
 from tools.metadata.id_from_xml import GetIARIDFromXmlTool
 from tools.metadata.import_metadata import ImportMetadataTool
 
