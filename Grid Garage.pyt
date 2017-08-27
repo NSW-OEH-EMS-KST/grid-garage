@@ -34,7 +34,7 @@ from tools.raster.tweak_values import TweakValuesRasterTool
 # from tools.raster.reclass_by_threshold import ReclassByThresholdRasterTool
 from tools.raster.extract_values_to_points import ExtractValuesToPointsRasterTool
 # from tools.raster.slice import SliceRasterTool
-# from tools.raster.zonal_stats_as_table import ZonalStatisticsAsTableTool
+from tools.raster.zonal_stats_as_table import ZonalStatisticsAsTableTool
 from tools.raster.properties import BandPropetiesRasterTool
 from tools.raster.to_ascii import ToAsciiRasterTool
 # metadata tools
@@ -89,7 +89,7 @@ class Toolbox(object):
                         ExtractValuesToPointsRasterTool,
                         # SliceRasterTool,
                         ValuesAtPointsRasterTool,
-                        # ZonalStatisticsAsTableTool
+                        ZonalStatisticsAsTableTool,
                         }
 
         metadata_tools = {
