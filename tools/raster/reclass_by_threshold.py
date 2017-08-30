@@ -32,39 +32,65 @@ class ReclassByThresholdRasterTool(BaseTool):
 
     def iterate(self):
 
-        try:
-            self.info(self.thresholds)
-        except:
-            pass
         self.iterate_function_on_tableview(self.reclass, "raster_table", ["geodata", "thresholds"], return_to_results=True)
 
         return
 
     def make_remap(self, value, minv, maxv):
-        self.info(locals())
+        self.info("remap: ", locals())
 
         if not value:
-            raise ValueError("No threshold string")
+            raise ValueError("Thresholds string is empty")
 
-        thresholds = value.split(",")
+        #  "0 5 1;5.01 7.5 2;7.5 10 3"
+
+        thresholds = value.split(";")  # always gonna give a tuple, at least the tuplised string
+
+        for threshold in thresholds:  # unpack, checking the format is ok
+            try:
+                a, b, c = threshold.split()
+            except ValueError as e:
+                self.warn("Threshold token '{}' is incorrectly formed '{}'. It should be like '1 10 0'".format(threshold, e.message))
 
         if not thresholds:
-            raise ValueError("\tNo thresholds set")
+            raise ValueError("\tNo thresholds found")
 
         thresholds = sorted([float(t.strip()) for t in thresholds])
+        # thresholds = sorted(thresholds + [minv, maxv])
         self.info("sorted thresholds are {}".format(thresholds))
+        # thresholds = [(t, t + 0.0001, i) for i, t in enumerate(thresholds, start=1)]
+        # # thresholds = [(t, t + 0.0001, i) for i, t in enumerate(thresholds, start=1)]
+        # self.info("endpoint thresholds are {}".format(thresholds))
+        # thresholds = sorted(thresholds + [minv, maxv])
+        # self.info("endpoint thresholds LIST are {}".format(thresholds))
 
         mint, maxt = min(thresholds), max(thresholds)
 
         if mint < minv:
             raise ValueError("\tMin threshold under min value {} < {}".format(mint, minv))
+
         if maxt > maxv:
             raise ValueError("\tMax threshold over max value {} > {}".format(maxt, maxv))
 
-        delta = 0.0001
-        thresholds2 = [(minv, thresholds[0], 1), (thresholds[len(thresholds)-1], maxv, thresholds[len(thresholds)-1])]
-        for i, t in enumerate(thresholds):
-            # thresholds2.append("{} {} {}".format(from_v, to_v, i + 1))
+        # thresholds = [(t, t + 0.0001, i) for i, t in enumerate(thresholds, start=1)]
+        # thresholds = [item for t in thresholds for item in t]
+
+        # v = [min] + thresholds + [max]
+        # thresholds = ["{} {} {}".format((t, t + 1)
+        # flat_list = [item for sublist in l for item in sublist]
+        # 93, 134
+        # 93, 94, 134, 135
+        # 0, 93 , 134, 1000
+        # thresholds2 = [(v, v + 0.0001) for v in thresholds]
+        # self.info(thresholds2)
+        #
+        # thresholds2 = [minv] + thresholds2 + [maxv]
+        # self.info(thresholds2)
+        # delta = 0.0001
+        # thresholds2 = [(minv, thresholds[0], 1), (thresholds[len(thresholds)-1], maxv, thresholds[len(thresholds)-1])]
+        # for t in thresholds:
+        # for i, t in enumerate(thresholds):
+        #     thresholds2.append("{} {} {}".format(from_v, to_v, i + 1))
             # if i == 0:
             #     from_v = minv
             # else:
@@ -75,14 +101,17 @@ class ReclassByThresholdRasterTool(BaseTool):
             # else:
             #     to_v = thresholds[i]
 
-            thresholds2.append("{} {} {}".format(from_v, to_v, i + 1))
+            # thresholds2.append("{} {} {}".format(from_v, to_v, i + 1))
         # thresholds2 = []
         # for t in thresholds:
         #     thresholds2.append(t)
         #     thresholds2.append(t+1)
-        self.info(thresholds2)
-        remap = ";".join(thresholds2)
-        self.info(remap)
+        self.info(thresholds)
+
+        remap = ";".join(thresholds)
+
+        self.info("remap: ", locals())
+
         return thresholds
 
     def reclass(self, data):
@@ -96,7 +125,7 @@ class ReclassByThresholdRasterTool(BaseTool):
 
         utils.validate_geodata(ras, raster=True)
 
-        ras_out = utils.make_raster_name(ras, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self. output_filename_suffix)
+        ras_out = utils.make_raster_name(ras, self.result.output_workspace, self.raster_format, self.output_filename_prefix, self. output_filename_suffix)
 
         self.info("Reclassifying {} -->> {}...".format(ras, ras_out))
 
