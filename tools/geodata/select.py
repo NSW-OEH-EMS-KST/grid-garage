@@ -1,6 +1,9 @@
-import base.base_tool
-import base.results
+from base.base_tool import BaseTool
+from base.results import result
 from base.method_decorators import input_output_table, parameter
+from os.path import isfile
+from arcpy import Describe
+
 
 tool_settings = {"label": "Select",
                  "description": "Feed selected geodata into a table",
@@ -8,12 +11,12 @@ tool_settings = {"label": "Select",
                  "category": "Geodata"}
 
 
-@base.results.result
-class SelectGeodataTool(base.base_tool.BaseTool):
+@result
+class SelectGeodataTool(BaseTool):
 
     def __init__(self):
 
-        base.base_tool.BaseTool.__init__(self, tool_settings)
+        BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
         return
@@ -22,17 +25,21 @@ class SelectGeodataTool(base.base_tool.BaseTool):
     @input_output_table
     def getParameterInfo(self):
 
-        return base.base_tool.BaseTool.getParameterInfo(self)
+        return BaseTool.getParameterInfo(self)
 
     def iterate(self):
 
-        self.iterate_function_on_parameter(self.process, "geodata", ["geodata"])
+        self.iterate_function_on_parameter(self.process, "geodata", ["geodata"], return_to_results=True)
 
         return
 
     def process(self, data):
 
-        self.result.add_pass(data)
+        geodata = data["geodata"]
 
-        return
+        if not isfile(geodata):  # then we are probably fed a layer from a ToC D&D
+            geodata = Describe(geodata).catalogPath
+
+        return {"geodata": geodata}
+
 
