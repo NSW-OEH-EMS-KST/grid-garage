@@ -16,8 +16,6 @@ import arcpy
 import logging
 from collections import OrderedDict
 
-LOGGER = None
-
 
 def time_stamp(fmt='%Y%m%d_%H%M%S'):
     from datetime import datetime
@@ -25,68 +23,74 @@ def time_stamp(fmt='%Y%m%d_%H%M%S'):
     return datetime.now().strftime(fmt)
 
 
+@static_vars(logger=None)
 def get_logger():
+    if not get_logger.logger:
+        get_logger.logger = logging.getLogger("gridgarage")
 
-    global LOGGER
-
-    if not LOGGER:
-        LOGGER = logging.getLogger("gridgarage")
-
-    return LOGGER
+    return get_logger.logger
 
 
-def debug(*msgs):
+def debug(message):
+    message = make_tuple(message)
+
+    try:
+        logger = get_logger()
+        debug_func = logger.debug
+    except:
+        debug_func = print
+        message = ["DEBUG: " + str(msg) for msg in message]
+
+    for msg in message:
+        debug_func(msg)
+
+    return
+
+
+def info(message):
+    message = make_tuple(message)
 
     try:
         logger = get_logger()
         info_func = logger.info
     except:
         info_func = print
+        message = ["INFO: " + str(msg) for msg in message]
 
-    for msg in msgs:
-        info_func("DEBUG: " + str(msg))
+    for msg in message:
+        info_func(msg)
 
     return
 
 
-def info(*msgs):
+def warn(message):
+    message = make_tuple(message)
 
     try:
         logger = get_logger()
-        info_func = logger.info
+        warn_func = logger.warn
     except:
-        info_func = print
+        warn_func = print
+        message = ["WARN: " + str(msg) for msg in message]
 
-    for msg in msgs:
-        info_func("INFO: " + str(msg))
-
-    return
-
-
-def warn(*msgs):
-
-    try:
-        logger = get_logger()
-        info_func = logger.info
-    except Exception as e:
-        info_func = print
-
-    for msg in msgs:
-        info_func("WARNING: " + str(msg))
+    for msg in message:
+        warn_func(msg)
 
     return
 
 
-def error(*msgs):
+def error(message):
+    message = make_tuple(message)
 
     try:
         logger = get_logger()
-        info_func = logger.info
+        error_func = logger.error
     except:
-        info_func = print
+        error_func = print
+        message = ["ERROR: " + str(msg) for msg in message]
 
-    for msg in msgs:
-        info_func("ERROR: " + str(msg))
+    for msg in message:
+        error_func(msg)
 
     return
 
@@ -567,11 +571,10 @@ class BaseTool(object):
                 self.debug("Running {} with row={}".format(fname, row))
                 res = func(row)
                 if return_to_results:
-                    self.result.add_pass(res)
-                    # try:
-                    #     self.result.add_pass(res)
-                    # except AttributeError:
-                    #     raise ValueError("No result attribute for result record")
+                    try:
+                        self.result.add_pass(res)
+                    except AttributeError:
+                        raise ValueError("No result attribute for result record")
 
             except Exception as e:
 
