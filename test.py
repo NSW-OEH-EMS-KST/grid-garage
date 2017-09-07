@@ -33,16 +33,15 @@ from tools.raster.transform import TransformRasterTool
 from tools.raster.tweak_values import TweakValuesRasterTool
 from tools.raster.reclass_by_threshold import ReclassByThresholdRasterTool
 from tools.raster.extract_values_to_points import ExtractValuesToPointsRasterTool
-# from tools.raster.slice import SliceRasterTool
-# from tools.raster.zonal_stats_as_table import ZonalStatisticsAsTableTool
+from tools.raster.slice import SliceRasterTool
+from tools.raster.zonal_stats_as_table import ZonalStatisticsAsTableTool
 from tools.raster.properties import BandPropetiesRasterTool
-from tools.raster.to_ascii import ToAsciiRasterTool
 # metadata tools
-# from tools.metadata.audit import AuditMetadataTool
+from tools.metadata.audit import AuditMetadataTool
 from tools.metadata.create_tips import CreateTipsTableMetadataTool
 from tools.metadata.import_tips import ImportTipFilesToTableMetadataTool
 from tools.metadata.export_tips import ExportTipsToFileMetadataTool
-from tools.metadata.export_metadata import ExportXmlMetadataTool
+from tools.metadata.export_xml import ExportXmlMetadataTool
 from tools.metadata.id_from_xml import GetIARIDFromXmlTool
 from tools.metadata.import_metadata import ImportMetadataTool
 
@@ -70,37 +69,33 @@ class Toolbox(object):
                          ClipFeatureTool}
 
         raster_tools = {AggregateRasterTool,
-                        BandPropetiesRasterTool,
                         BlockStatisticsRasterTool,
                         BuildAttributeTableRasterTool,
                         CalculateStatisticsRasterTool,
                         ClipRasterTool,
                         CopyRasterTool,
                         LookupByTableRasterTool,
+                        ValuesAtPointsRasterTool,
                         ReprojectRasterTool,
                         ReclassByTableRasterTool,
                         ReclassByThresholdRasterTool,
                         ResampleRasterTool,
                         SetNodataValueRasterTool,
                         SetValueToNullRasterTool,
-                        ToAsciiRasterTool,
                         TransformRasterTool,
                         TweakValuesRasterTool,
+                        BandPropetiesRasterTool,
                         ExtractValuesToPointsRasterTool,
-                        # SliceRasterTool,
-                        ValuesAtPointsRasterTool,
-                        # ZonalStatisticsAsTableTool
-                        }
+                        SliceRasterTool,
+                        ZonalStatisticsAsTableTool}
 
-        metadata_tools = {
-                          # AuditMetadataTool,
+        metadata_tools = {AuditMetadataTool,
                           CreateTipsTableMetadataTool,
                           ImportTipFilesToTableMetadataTool,
                           ExportTipsToFileMetadataTool,
                           ExportXmlMetadataTool,
-                          # GetIARIDFromXmlTool,
-                          # ImportMetadataTool
-                          }
+                          GetIARIDFromXmlTool,
+                          ImportMetadataTool}
 
         self.tools = list(geodata_tools | feature_tools | raster_tools | metadata_tools)
 
