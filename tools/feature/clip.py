@@ -1,6 +1,5 @@
 import base.base_tool
-import base.results
-from base.method_decorators import input_output_table_with_output_affixes, input_tableview, parameter
+from base.decorators import input_output_table_with_output_affixes, input_tableview, parameter
 import arcpy
 import base.utils
 
@@ -10,7 +9,6 @@ tool_settings = {"label": "Clip",
                  "category": "Feature"}
 
 
-@base.results.result
 class ClipFeatureTool(base.base_tool.BaseTool):
 
     def __init__(self):
@@ -21,7 +19,7 @@ class ClipFeatureTool(base.base_tool.BaseTool):
 
         return
 
-    @input_tableview("feature_table", "Table of Features", False, ["feature:geodata:"])
+    @input_tableview("feature_table", "Table for Features", features=True)
     @parameter("clip_features", "Clip Features", "GPFeatureLayer", "Required", False, "Input", ["Polygon"], None, None, None,)
     @parameter("xy_tolerance", "XY Tolerance", "GPLinearUnit", "Optional", False, "Input", None, None, None, None, "Options")
     @input_output_table_with_output_affixes

@@ -1,13 +1,13 @@
 import base.base_tool
-import base.results
-from base.method_decorators import input_output_table, parameter
+
+from base.decorators import input_output_table, parameter
 from base.utils import datatype_list, walk
 tool_settings = {"label": "Search",
                  "description": "Search for identifiable geodata",
                  "can_run_background": "True",
                  "category": "Geodata"}
 
-@base.results.result
+
 class SearchGeodataTool(base.base_tool.BaseTool):
 
     def __init__(self):

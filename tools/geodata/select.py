@@ -1,6 +1,6 @@
 import base.base_tool
-import base.results
-from base.method_decorators import input_output_table, parameter
+
+from base.decorators import input_output_table, parameter
 
 tool_settings = {"label": "Select",
                  "description": "Feed selected geodata into a table",
@@ -8,7 +8,6 @@ tool_settings = {"label": "Select",
                  "category": "Geodata"}
 
 
-@base.results.result
 class SelectGeodataTool(base.base_tool.BaseTool):
 
     def __init__(self):

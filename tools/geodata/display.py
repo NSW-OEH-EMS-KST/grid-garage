@@ -1,6 +1,6 @@
 import base.base_tool
 import base.arcmap
-from base.method_decorators import input_tableview
+from base.decorators import input_tableview
 
 
 tool_settings = {"label": "Display",
@@ -18,7 +18,7 @@ class DisplayGeodataTool(base.base_tool.BaseTool):
 
         return
 
-    @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
+    @input_tableview("geodata_table", "Table of Geodata")
     def getParameterInfo(self):
         """Define parameter definitions"""
         return base.base_tool.BaseTool.getParameterInfo(self)

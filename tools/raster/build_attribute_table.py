@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-from base.results import result
+
 from base import utils
-from base.method_decorators import input_tableview, input_output_table, parameter
+from base.decorators import input_tableview, input_output_table, parameter
 import arcpy
 
 
@@ -11,7 +11,6 @@ tool_settings = {"label": "Build Attribute Table",
                  "category": "Raster"}
 
 
-@result
 class BuildAttributeTableRasterTool(BaseTool):
 
     def __init__(self):
@@ -22,7 +21,7 @@ class BuildAttributeTableRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
+    @input_tableview("raster_table", "Table for Rasters", rasters=True)
     @parameter("overwrite", "Overwrite existing table", "GPBoolean", "Required", False, "Input", None, None, None, None)
     @input_output_table
     def getParameterInfo(self):

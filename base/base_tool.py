@@ -15,6 +15,7 @@ from functools import wraps
 import arcpy
 import logging
 from collections import OrderedDict
+from base.results import GgResult
 
 
 def time_stamp(fmt='%Y%m%d_%H%M%S'):
@@ -201,6 +202,8 @@ class BaseTool(object):
         self.parameters = None
         self.messages = None
         self.execution_list = []
+
+        self.result = GgResult()
 
         return
 

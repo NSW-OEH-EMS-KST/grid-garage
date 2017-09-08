@@ -1,10 +1,8 @@
 import base.base_tool
-import base.results
 import collections
 import arcpy
 import base.utils
-from base.method_decorators import input_output_table, input_tableview, parameter
-
+from base.decorators import input_output_table, input_tableview, parameter
 
 tool_settings = {"label": "Compare Extents",
                  "description": "Compare Extents...",
@@ -12,7 +10,6 @@ tool_settings = {"label": "Compare Extents",
                  "category": "Geodata"}
 
 
-@base.results.result
 class CompareExtentsGeodataTool(base.base_tool.BaseTool):
 
     def __init__(self):
@@ -25,7 +22,7 @@ class CompareExtentsGeodataTool(base.base_tool.BaseTool):
 
         return
 
-    @input_tableview("geodata_table", "Table for Geodata", False, ["geodata:geodata:"])
+    @input_tableview("geodata_table", "Table for Geodata")
     @parameter("aoi_dataset", "Dataset (Area of Interest) to compare with", ["DEFeatureClass", "DERasterDataset"], "Required", False, "Input", None, None, None, None)
     @input_output_table
     def getParameterInfo(self):

@@ -1,6 +1,6 @@
 import base.base_tool
-import base.results
-from base.method_decorators import input_output_table, parameter
+
+from base.decorators import input_output_table, parameter
 from base.utils import split_up_filename, walk
 import re
 
@@ -11,7 +11,6 @@ tool_settings = {"label": "List Workspace Tables",
                  "category": "Geodata"}
 
 
-@base.results.result
 class ListWorkspaceTablesGeodataTool(base.base_tool.BaseTool):
 
     def __init__(self):

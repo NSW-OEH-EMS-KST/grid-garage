@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-from base.results import result
+
 from base import utils
-from base.method_decorators import input_tableview, input_output_table, parameter
+from base.decorators import input_tableview, input_output_table, parameter
 from arcpy import CalculateStatistics_management
 
 
@@ -11,7 +11,6 @@ tool_settings = {"label": "Calculate Statistics",
                  "category": "Raster"}
 
 
-@result
 class CalculateStatisticsRasterTool(BaseTool):
 
     def __init__(self):
@@ -21,7 +20,7 @@ class CalculateStatisticsRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
+    @input_tableview("raster_table", "Table for Rasters", rasters=True)
     @parameter("x_skip_factor", "X Skip Factor", "GPLong", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("y_skip_factor", "Y Skip Factor", "GPLong", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("ignore_values", "Ignore Values", "GPLong", "Optional", True, "Input", None, None, None, None, "Options")

@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-from base.results import result
+
 from base.utils import raster_formats, resample_methods, validate_geodata, make_raster_name, get_transformation
-from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter
+from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter
 import arcpy
 
 tool_settings = {"label": "Reproject",
@@ -10,7 +10,6 @@ tool_settings = {"label": "Reproject",
                  "category": "Raster"}
 
 
-@result
 class ReprojectRasterTool(BaseTool):
 
     def __init__(self):
@@ -19,7 +18,7 @@ class ReprojectRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
+    @input_tableview("raster_table", "Table for Rasters", rasters=True)
     @parameter("output_cs", "Output Spatial Reference", "Spatial Reference", "Required", False, "Input", None, "outputCoordinateSystem", None, None)
     @parameter("cell_size", "Cell Size", "GPSACellSize", "Required", False, "Input", None, "cellSize", None, None)
     @parameter("resample_type", "Resampling Method", "GPString", "Required", False, "Input", resample_methods, "resamplingMethod", None, None)

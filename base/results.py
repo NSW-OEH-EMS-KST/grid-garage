@@ -1,39 +1,30 @@
 from base.utils import make_tuple
-from arcpy import Describe, TableToTable_conversion, FieldMappings, FieldMap, Field
-# from shutil import copyfile
+from arcpy import Describe, TableToTable_conversion, FieldMappings, Field
 from sys import exc_info
 from traceback import format_exception
 import os
 import csv
 
 
-def result(cls):
-    setattr(cls, "result", ResultsUtils())
-    return cls
+# def result(cls):
+#     setattr(cls, "result", GgResult())
+#     return cls
 
 
-class ResultsUtils(object):
+class GgResult(object):
 
     def __init__(self):
         """ Add class members """
+        table_tokens = "table table_name count table_output_parameter csv".split()
 
-        self.fail_table = ""
-        self.fail_table_name = ""
-        self.fail_count = 0
-        self.fail_table_output_parameter = None
-        self.fail_csv = ""
+        for att in ["fail_{}".format(t) for t in table_tokens]:
+            setattr(self, att, None)
 
-        self.pass_table = ""
-        self.pass_table_name = ""
-        self.pass_count = 0
-        self.pass_table_output_parameter = None
-        self.pass_csv = ""
+        for att in ["pass_{}".format(t) for t in table_tokens]:
+            setattr(self, att, None)
 
-        self.output_workspace = ""
-        self.output_workspace_type = ""
-        self.output_workspace_parent = ""
-
-        self.logger = None
+        for att in "output_workspace output_workspace_type output_workspace_parent logger".split():
+            setattr(self, att, None)
 
         return
 

@@ -1,9 +1,10 @@
 import base.base_tool
-import base.results
-from base.method_decorators import input_output_table_with_output_affixes, input_tableview
+
+from base.decorators import input_output_table_with_output_affixes, input_tableview
 from os.path import splitext
 from base.utils import make_table_name
 from arcpy import Copy_management
+
 
 tool_settings = {"label": "Copy",
                  "description": "Make a simple copy of geodata",
@@ -11,7 +12,6 @@ tool_settings = {"label": "Copy",
                  "category": "Geodata"}
 
 
-@base.results.result
 class CopyGeodataTool(base.base_tool.BaseTool):
 
     def __init__(self):
@@ -21,7 +21,7 @@ class CopyGeodataTool(base.base_tool.BaseTool):
 
         return
 
-    @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
+    @input_tableview("geodata_table", "Table of Geodata")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
 

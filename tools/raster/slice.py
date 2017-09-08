@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-from base.results import result
+
 from base import utils
-from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, data_nodata, raster_formats
+from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter, data_nodata, raster_formats
 import arcpy
 
 tool_settings = {"label": "Slice",
@@ -10,7 +10,6 @@ tool_settings = {"label": "Slice",
                  "category": "Raster"}
 
 
-@result
 class SliceRasterTool(BaseTool):
 
     def __init__(self):
@@ -21,7 +20,7 @@ class SliceRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
+    @input_tableview("raster_table", "Table for Rasters", rasters=True)
     @parameter("raster_format", "Output Raster Format", "GPString", "Optional", False, "Input", raster_formats, None, None, "Esri Grid")
     @parameter("num_zones", "Number of Zones", "GPLong", "Required", False, "Input", None, None, None, 10, "Options")
     @parameter("slice_type", "Type of Slice", "GPString", "Required", False, "Input", ["EQUAL_INTERVAL", "EQUAL_AREA", "NATURAL_BREAKS"], None, None, None)

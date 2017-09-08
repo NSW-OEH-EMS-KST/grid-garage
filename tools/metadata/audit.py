@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-from base.results import result
+
 from base.utils import split_up_filename, validate_geodata
-from base.method_decorators import input_tableview, input_output_table
+from base.decorators import input_tableview, input_output_table
 import arcpy
 from os.path import exists, join
 from hermes import Paperwork
@@ -14,7 +14,6 @@ tool_settings = {"label": "Audit",
                  "category": "Metadata"}
 
 
-@result
 class AuditMetadataTool(BaseTool):
     def __init__(self):
         BaseTool.__init__(self, tool_settings)

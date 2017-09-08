@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-from base.results import result
+
 from base import utils
-from base.method_decorators import input_tableview, input_output_table, parameter
+from base.decorators import input_tableview, input_output_table, parameter
 from collections import OrderedDict
 
 
@@ -11,7 +11,7 @@ tool_settings = {"label": "Export tips",
                  "category": "Metadata"}
 
 
-@result
+
 class ExportTipsToFileMetadataTool(BaseTool):
     def __init__(self):
 
