@@ -123,7 +123,7 @@ def validate_parameter(name, display_name, data_type, parameter_type, multi_valu
     return
 
 
-def input_tableview(object_name, display_name, multi_value=False, other_fields=None, features=False, rasters=False):
+def input_tableview(object_name, display_name, multi_value=False, other_fields=None, features=False, rasters=False, xml=True):
     """ Wrap a function with a function that generates an input tableview parameter
 
     Args:
@@ -160,6 +160,8 @@ def input_tableview(object_name, display_name, multi_value=False, other_fields=N
         required_fields = "geodata feature Required geodata"
     elif rasters:
         required_fields = "geodata raster Required geodata"
+    elif xml:
+        required_fields = "geodata xml Required xml"
 
     required_fields = [parse_other_fields(required_fields)]
     print required_fields

@@ -12,14 +12,13 @@ tool_settings = {"label": "Import Tip Files to Table",
                  "category": "Metadata"}
 
 
-
 class ImportTipFilesToTableMetadataTool(BaseTool):
     def __init__(self):
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
-    @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
+    @input_tableview("geodata_table", "Table of Geodata")
     @input_output_table
     def getParameterInfo(self):
 

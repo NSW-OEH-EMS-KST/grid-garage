@@ -10,7 +10,6 @@ tool_settings = {"label": "Get IAR ID From XML",
                  "category": "Metadata"}
 
 
-
 class GetIARIDFromXmlTool(BaseTool):
     def __init__(self):
 

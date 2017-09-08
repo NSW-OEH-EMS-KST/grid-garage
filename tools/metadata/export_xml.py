@@ -26,7 +26,7 @@ class ExportXmlMetadataTool(BaseTool):
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
-    @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
+    @input_tableview("geodata_table", "Table of Geodata")
     @parameter("xml_folder", "Output Folder", "DEFolder", "Required", False, "Input", None, None, None, None)
     # @parameter("translator", "Translator", "DEFile", "Required", False, "Input", None, None, None, default_translator, None)
     @parameter("stylesheet", "Style Sheet", "DEFile", "Required", False, "Input", None, None, None, default_stylesheet, None)

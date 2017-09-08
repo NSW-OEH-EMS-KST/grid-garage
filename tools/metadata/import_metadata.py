@@ -12,7 +12,6 @@ tool_settings = {"label": "Import Metadata",
                  "category": "Metadata"}
 
 
-
 class ImportMetadataTool(BaseTool):
 
     def __init__(self):
@@ -23,7 +22,7 @@ class ImportMetadataTool(BaseTool):
 
         return
 
-    @input_tableview("geodata_table", "Table of Geodata", False, ["source:source:", "geodata:geodata:"])
+    @input_tableview("geodata_table", "Table of Geodata", other_fields="source Source Required geodata")
     @input_output_table
     def getParameterInfo(self):
 

@@ -21,7 +21,7 @@ class CreateTipsTableMetadataTool(BaseTool):
         self.tip_order = []
         self.extractions = None
 
-    @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
+    @input_tableview("geodata_table", "Table of Geodata")
     @parameter("tip_template", "Tip Template", "GPTableView", "Required", False, "Input", None, None, None, None, None)
     @parameter("include_fields", "Include Fields", "Field", "Required", True, "Input", None, None, ["tip_template"], None, None)
     @input_output_table
