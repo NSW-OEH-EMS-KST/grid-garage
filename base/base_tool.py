@@ -23,80 +23,84 @@ def time_stamp(fmt='%Y%m%d_%H%M%S'):
 
     return datetime.now().strftime(fmt)
 
+debug = print  # updated to logger.debug after logging set up
+
+# @static_vars(logger=None)
+# def get_logger():
+#     if not get_logger.logger:
+#         get_logger.logger = logging.getLogger("gridgarage")
+#
+#     return get_logger.logger
+
+
+# def debug(message):
+#     message = make_tuple(message)
+#
+#     try:
+#         logger = get_logger()
+#         debug_func = logger.debug
+#     except:
+#         debug_func = print
+#         message = ["DEBUG: " + str(msg) for msg in message]
+#
+#     for msg in message:
+#         debug_func(msg)
+#
+#     return
+
+
+# def info(message):
+#     message = make_tuple(message)
+#
+#     try:
+#         logger = get_logger()
+#         info_func = logger.info
+#     except:
+#         info_func = print
+#         message = ["INFO: " + str(msg) for msg in message]
+#
+#     for msg in message:
+#         info_func(msg)
+#
+#     return
+
+
+# def warn(message):
+#     message = make_tuple(message)
+#
+#     try:
+#         logger = get_logger()
+#         warn_func = logger.warn
+#     except:
+#         warn_func = print
+#         message = ["WARN: " + str(msg) for msg in message]
+#
+#     for msg in message:
+#         warn_func(msg)
+#
+#     return
+
+
+# def error(message):
+#     message = make_tuple(message)
+#
+#     try:
+#         logger = get_logger()
+#         error_func = logger.error
+#     except:
+#         error_func = print
+#         message = ["ERROR: " + str(msg) for msg in message]
+#
+#     for msg in message:
+#         error_func(msg)
+#
+#     return
 
 @static_vars(logger=None)
 def get_logger(logger_name):
     if not get_logger.logger:
         get_logger.logger = logging.getLogger(logger_name)
 
-    return get_logger.logger
-
-
-def debug(message):
-    message = make_tuple(message)
-
-    try:
-        logger = get_logger()
-        debug_func = logger.debug
-    except:
-        debug_func = print
-        message = ["DEBUG: " + str(msg) for msg in message]
-
-    for msg in message:
-        debug_func(msg)
-
-    return
-
-
-def info(message):
-    message = make_tuple(message)
-
-    try:
-        logger = get_logger()
-        info_func = logger.info
-    except:
-        info_func = print
-        message = ["INFO: " + str(msg) for msg in message]
-
-    for msg in message:
-        info_func(msg)
-
-    return
-
-
-def warn(message):
-    message = make_tuple(message)
-
-    try:
-        logger = get_logger()
-        warn_func = logger.warn
-    except:
-        warn_func = print
-        message = ["WARN: " + str(msg) for msg in message]
-
-    for msg in message:
-        warn_func(msg)
-
-    return
-
-
-def error(message):
-    message = make_tuple(message)
-
-    try:
-        logger = get_logger()
-        error_func = logger.error
-    except:
-        error_func = print
-        message = ["ERROR: " + str(msg) for msg in message]
-
-    for msg in message:
-        error_func(msg)
-
-    return
-
-
-# LOG_FILE = join(APPDATA_PATH, "gridgarage.log")
 @contextmanager
 def error_trap(context):
     """ A context manager that traps and logs exception in its block.
@@ -115,15 +119,15 @@ def error_trap(context):
 
     try:
 
-        debug("IN context= " + idx)
+        debug("IN: " + idx)
 
         yield
 
-        debug("OUT context= " + idx)
+        debug("OUT: " + idx)
 
     except Exception as e:
 
-        error(repr(format_exception(*exc_info())))
+        debug(repr(format_exception(*exc_info())))
 
         raise e
 
@@ -191,10 +195,10 @@ class BaseTool(object):
 
         self.log_file = join(self.appdata_path, self.tool_name + ".log")
         self.logger = None
-        self.debug = debug
-        self.info = info
-        self.warn = warn
-        self.error = error
+        self.debug = None
+        self.info = None
+        self.warn = None
+        self.error = None
 
         self.label = settings.get("label", "label not set")
         self.description = settings.get("description", "description not set")
@@ -210,7 +214,8 @@ class BaseTool(object):
         return
 
     def configure_logging(self):
-        print("BaseTool.configure_logging")
+
+       print("BaseTool.configure_logging")
 
         if not self.messages:
             return
@@ -219,10 +224,14 @@ class BaseTool(object):
             self.messages.addMessage("Initialising logging...")
 
         logger = get_logger(self.tool_name)
+
         self.debug = logger.debug
         self.info = logger.info
         self.warn = logger.warn
         self.error = logger.error
+
+        global debug
+        debug = self.debug
 
         logger.handlers = []  # be rid of ones from other tools
         logger.setLevel(logging.DEBUG)
@@ -255,18 +264,20 @@ class BaseTool(object):
         return
 
     @log_error
-    def get_parameter(self, param_name, raise_not_found_error=False):
+    def get_parameter(self, param_name, raise_not_found_error=False, parameters=None):
 
-        if self.parameters:
+        if not parameters:
+            parameters = self.parameters
 
-            for param in self.parameters:
-                if param.name == param_name:
-                    return param
+        try:
+            param = self.get_parameter_dict(leave_as_object=param_name, parameters=parameters)[param_name]
+        except KeyError:
+            if raise_not_found_error:
+                raise ValueError("Parameter '{}' not found".format(param_name))
+            else:
+                return None
 
-        if raise_not_found_error:
-            raise ValueError("Parameter {0} not found".format(param_name))
-
-        return
+        return param
 
     def getParameterInfo(self):
 
@@ -280,8 +291,8 @@ class BaseTool(object):
     def updateParameters(self, parameters):
 
         try:
-            ps = [(i, p.name) for i, p in enumerate(parameters)]
-            self.debug("BaseTool.updateParameters {}".format(ps))
+            # ps = [(i, p.name) for i, p in enumerate(parameters)]
+            # self.debug("BaseTool.updateParameters {}".format(ps))
 
             # set default result table name
 
@@ -296,17 +307,8 @@ class BaseTool(object):
 
             # validate workspace and raster format
 
-            out_ws_par = None
-            for p in parameters:
-                if p.name == "output_workspace":
-                    out_ws_par = p
-                    break
-
-            ras_fmt_par = None
-            for p in parameters:
-                if p.name == "raster_format":
-                    ras_fmt_par = p
-                    break
+            out_ws_par = self.get_parameter("output_workspace", raise_not_found_error=False)
+            ras_fmt_par = self.get_parameter("raster_format", raise_not_found_error=False)
 
             if out_ws_par and ras_fmt_par:
 
@@ -328,7 +330,7 @@ class BaseTool(object):
     @log_error
     def updateMessages(self, parameters):
 
-        self.debug("Well, in here anyway...")
+        debug("updateMessages exposure code")
         # out_ws_par = None
         # for p in parameters:
         #     if p.name == "output_workspace":
@@ -435,7 +437,7 @@ class BaseTool(object):
         return
 
     @log_error
-    def get_parameter_dict(self, leave_as_object=()):
+    def get_parameter_dict(self, leave_as_object=(), parameters=()):
         """ Create a dictionary of parameters
 
         Args:
@@ -448,6 +450,9 @@ class BaseTool(object):
         # create the dict
         # TODO make multivalue parameters a list
         # TODO see what binning the bloody '#' does to tools
+        if not parameters:
+            parameters = self.parameters
+
         pd = {}
         for p in self.parameters:
             name = p.name
@@ -598,8 +603,9 @@ class BaseTool(object):
                 self.error("error executing {}: {}".format(fname, str(e)))
 
                 try:
-                    fail = log_error(self.result.add_fail)
-                    fail(row)
+                    # fail = log_error(self.result.add_fail)
+                    # fail(row)
+                    self.result.add_fail(row)
                 except AttributeError:
                     pass
 

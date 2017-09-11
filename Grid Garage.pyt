@@ -31,14 +31,14 @@ from tools.raster.set_no_data_value import SetNodataValueRasterTool
 from tools.raster.set_value_to_null import SetValueToNullRasterTool
 from tools.raster.transform import TransformRasterTool
 from tools.raster.tweak_values import TweakValuesRasterTool
-# from tools.raster.reclass_by_threshold import ReclassByThresholdRasterTool
+from tools.raster.reclass_by_threshold import ReclassByThresholdRasterTool
 from tools.raster.extract_values_to_points import ExtractValuesToPointsRasterTool
 # from tools.raster.slice import SliceRasterTool
-# from tools.raster.zonal_stats_as_table import ZonalStatisticsAsTableTool
+from tools.raster.zonal_stats_as_table import ZonalStatisticsAsTableTool
 from tools.raster.properties import BandPropetiesRasterTool
 from tools.raster.to_ascii import ToAsciiRasterTool
 # metadata tools
-# from tools.metadata.audit import AuditMetadataTool
+from tools.metadata.audit import AuditMetadataTool
 from tools.metadata.create_tips import CreateTipsTableMetadataTool
 from tools.metadata.import_tips import ImportTipFilesToTableMetadataTool
 from tools.metadata.export_tips import ExportTipsToFileMetadataTool
@@ -79,7 +79,7 @@ class Toolbox(object):
                         LookupByTableRasterTool,
                         ReprojectRasterTool,
                         ReclassByTableRasterTool,
-                        # ReclassByThresholdRasterTool,
+                        ReclassByThresholdRasterTool,
                         ResampleRasterTool,
                         SetNodataValueRasterTool,
                         SetValueToNullRasterTool,
@@ -89,11 +89,11 @@ class Toolbox(object):
                         ExtractValuesToPointsRasterTool,
                         # SliceRasterTool,
                         ValuesAtPointsRasterTool,
-                        # ZonalStatisticsAsTableTool
+                        ZonalStatisticsAsTableTool,
                         }
 
         metadata_tools = {
-                          # AuditMetadataTool,
+                          AuditMetadataTool,
                           CreateTipsTableMetadataTool,
                           ImportTipFilesToTableMetadataTool,
                           ExportTipsToFileMetadataTool,
