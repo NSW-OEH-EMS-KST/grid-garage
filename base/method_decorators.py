@@ -153,9 +153,7 @@ def input_tableview(name, display_name, multi_value, required_fields):
         if ":" not in rf:  # more info is included
             raise ValueError("Bad 'required_fields' string")  # def-time
 
-        # settings = rf.split(":")
         f_alias, f_name, f_default = rf.split(":")
-        # if len(settings) == 4:
 
         f_default = "Required" if not f_default else f_default
 
@@ -169,7 +167,6 @@ def input_tableview(name, display_name, multi_value, required_fields):
             p.value = f_name
         p.parameterDependencies = [name]  # should be constant
         pars.append(p)
-        # i += 1
 
     def decorator(f):
         @functools.wraps(f)
