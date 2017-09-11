@@ -12,7 +12,6 @@ tool_settings = {"label": "Reclass by Threshold",
                  "category": "Raster"}
 
 
-
 class ReclassByThresholdRasterTool(BaseTool):
 
     def __init__(self):
@@ -23,7 +22,7 @@ class ReclassByThresholdRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", rasters=True, other_fields="thresholds Thresholds Required thresholds")
+    @input_tableview(rasters=True, other_fields="thresholds Thresholds Required thresholds")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, "Esri Grid")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):

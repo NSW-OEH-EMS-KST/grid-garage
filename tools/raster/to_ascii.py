@@ -21,7 +21,7 @@ class ToAsciiRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", rasters=True)
+    @input_tableview(rasters=True)
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
 

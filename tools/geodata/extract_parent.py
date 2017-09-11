@@ -18,7 +18,7 @@ class ExtractParentGeodataTool(base.base_tool.BaseTool):
 
         return
 
-    @input_tableview("geodata_table", "Table of Geodata")
+@input_tableview()
     @input_output_table
     def getParameterInfo(self):
 

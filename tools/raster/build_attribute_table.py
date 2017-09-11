@@ -21,7 +21,7 @@ class BuildAttributeTableRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", rasters=True)
+    @input_tableview(rasters=True)
     @parameter("overwrite", "Overwrite existing table", "GPBoolean", "Required", False, "Input", None, None, None, None)
     @input_output_table
     def getParameterInfo(self):

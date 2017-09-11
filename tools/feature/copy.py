@@ -19,7 +19,7 @@ class CopyFeatureTool(base.base_tool.BaseTool):
 
         return
 
-    @input_tableview("feature_table", "Table for Features", features=True)
+    @input_tableview(features=True)
     @parameter("config_kw", "Config Keyword", "GPString", "Optional", False, "Input", None, "configKeyword", None, None)
     @parameter("sg_1", "Spatial Grid 1", "GPLong", "Optional", False, "Input", None, None, None, 0, "Options")
     @parameter("sg_2", "Spatial Grid 2", "GPLong", "Optional", False, "Input", None, None, None, 0, "Options")

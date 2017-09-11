@@ -1,4 +1,4 @@
-import base.base_tool
+from base.base_tool import BaseTool
 import collections
 import arcpy
 import base.utils
@@ -10,11 +10,11 @@ tool_settings = {"label": "Compare Extents",
                  "category": "Geodata"}
 
 
-class CompareExtentsGeodataTool(base.base_tool.BaseTool):
+class CompareExtentsGeodataTool(BaseTool):
 
     def __init__(self):
 
-        base.base_tool.BaseTool.__init__(self, tool_settings)
+        BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
         self.aoi_extent = None
         self.aoi_srs_name = None
@@ -22,12 +22,12 @@ class CompareExtentsGeodataTool(base.base_tool.BaseTool):
 
         return
 
-    @input_tableview("geodata_table", "Table for Geodata")
+    @input_tableview()
     @parameter("aoi_dataset", "Dataset (Area of Interest) to compare with", ["DEFeatureClass", "DERasterDataset"], "Required", False, "Input", None, None, None, None)
     @input_output_table
     def getParameterInfo(self):
 
-        return base.base_tool.BaseTool.getParameterInfo(self)
+        return BaseTool.getParameterInfo(self)
 
     def initialise(self):
 

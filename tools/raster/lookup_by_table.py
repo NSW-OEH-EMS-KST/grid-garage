@@ -21,7 +21,7 @@ class LookupByTableRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", rasters=True, other_fields=["table_fields", "Lookup Fields", "Required", "table_fields"])
+    @input_tableview(rasters=True, other_fields="table_fields Lookup_Fields Required table_fields")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, "Esri Grid")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):

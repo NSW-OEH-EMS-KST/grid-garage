@@ -23,7 +23,7 @@ class ExtractValuesToPointsRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", rasters=True, other_fields="query query Optional query")
+    @input_tableview(rasters=True, other_fields="query query Optional query")
     @parameter("points", "Point Features", "GPFeatureLayer", "Required", False, "Input", ["Point"], None, None, None)
     @parameter("interpolate", "Interpolate Values", "GPString", "Optional", False, "Input", ["NONE", "INTERPOLATE"], None, None, None, "Options")
     @parameter("add_attributes", "Add Raster Attributes", "GPString", "Optional", False, "Input", ["VALUE_ONLY", "ALL"], None, None, None, "Options")

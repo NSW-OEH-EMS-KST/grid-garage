@@ -19,7 +19,7 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
 
         return
 
-    @input_tableview("geodata_table", "Table of Geodata")
+    @input_tableview()
     @parameter("replacements", "Replacements", "GPString", "Optional", False, "Input", None, None, None, None)
     @input_output_table_with_output_affixes
     def getParameterInfo(self):

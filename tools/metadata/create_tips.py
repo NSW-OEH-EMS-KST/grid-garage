@@ -1,5 +1,4 @@
 from base.base_tool import BaseTool
-
 from base.utils import validate_geodata, describe
 from base.decorators import input_tableview, input_output_table, parameter
 from collections import OrderedDict
@@ -11,7 +10,6 @@ tool_settings = {"label": "Create Tips Table",
                  "category": "Metadata"}
 
 
-
 class CreateTipsTableMetadataTool(BaseTool):
     def __init__(self):
 
@@ -21,7 +19,7 @@ class CreateTipsTableMetadataTool(BaseTool):
         self.tip_order = []
         self.extractions = None
 
-    @input_tableview("geodata_table", "Table of Geodata")
+    @input_tableview()
     @parameter("tip_template", "Tip Template", "GPTableView", "Required", False, "Input", None, None, None, None, None)
     @parameter("include_fields", "Include Fields", "Field", "Required", True, "Input", None, None, ["tip_template"], None, None)
     @input_output_table

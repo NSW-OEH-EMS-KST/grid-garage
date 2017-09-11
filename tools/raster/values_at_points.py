@@ -24,7 +24,7 @@ class ValuesAtPointsRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", rasters=True)
+    @input_tableview(rasters=True)
     @parameter("points", "Point Features", "GPFeatureLayer", "Required", False, "Input", ["Point"], None, None, None)
     @input_output_table
     def getParameterInfo(self):

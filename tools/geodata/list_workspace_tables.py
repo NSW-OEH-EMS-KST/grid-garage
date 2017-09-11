@@ -1,5 +1,4 @@
-import base.base_tool
-
+from base.base_tool import BaseTool
 from base.decorators import input_output_table, parameter
 from base.utils import split_up_filename, walk
 import re
@@ -11,10 +10,10 @@ tool_settings = {"label": "List Workspace Tables",
                  "category": "Geodata"}
 
 
-class ListWorkspaceTablesGeodataTool(base.base_tool.BaseTool):
+class ListWorkspaceTablesGeodataTool(BaseTool):
 
     def __init__(self):
-        base.base_tool.BaseTool.__init__(self, tool_settings)
+        BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
         return
@@ -23,7 +22,7 @@ class ListWorkspaceTablesGeodataTool(base.base_tool.BaseTool):
     @input_output_table
     def getParameterInfo(self):
 
-        return base.base_tool.BaseTool.getParameterInfo(self)
+        return BaseTool.getParameterInfo(self)
 
     def iterate(self):
 

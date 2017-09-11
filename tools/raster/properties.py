@@ -29,7 +29,7 @@ class BandPropetiesRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", rasters=True)
+    @input_tableview(rasters=True)
     @input_output_table
     def getParameterInfo(self):
 

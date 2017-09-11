@@ -19,7 +19,7 @@ class AuditMetadataTool(BaseTool):
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
-    @input_tableview("geodata_table", "Table of Geodata")
+    @input_tableview()
     @input_output_table
     def getParameterInfo(self):
 

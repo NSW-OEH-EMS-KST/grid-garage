@@ -1,5 +1,4 @@
-import base.base_tool
-
+from base.base_tool import BaseTool
 from base.decorators import input_output_table_with_output_affixes, input_tableview
 from os.path import splitext
 from base.utils import make_table_name
@@ -12,20 +11,20 @@ tool_settings = {"label": "Copy",
                  "category": "Geodata"}
 
 
-class CopyGeodataTool(base.base_tool.BaseTool):
+class CopyGeodataTool(BaseTool):
 
     def __init__(self):
 
-        base.base_tool.BaseTool.__init__(self, tool_settings)
+        BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
         return
 
-    @input_tableview("geodata_table", "Table of Geodata")
+    @input_tableview()
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
 
-        return base.base_tool.BaseTool.getParameterInfo(self)
+        return BaseTool.getParameterInfo(self)
 
     def iterate(self):
 

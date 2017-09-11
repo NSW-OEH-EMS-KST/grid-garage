@@ -16,7 +16,7 @@ class GetIARIDFromXmlTool(BaseTool):
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
-    @input_tableview("xml_table", "Table for XML Files", False, ["xml:geodata:"])
+    @input_tableview(xmls=True)
     @input_output_table
     def getParameterInfo(self):
 

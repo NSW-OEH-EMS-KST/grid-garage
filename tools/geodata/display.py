@@ -1,4 +1,4 @@
-import base.base_tool
+from base.base_tool import BaseTool
 import base.arcmap
 from base.decorators import input_tableview
 
@@ -9,19 +9,19 @@ tool_settings = {"label": "Display",
                  "category": "Geodata"}
 
 
-class DisplayGeodataTool(base.base_tool.BaseTool):
+class DisplayGeodataTool(BaseTool):
 
     def __init__(self):
 
-        base.base_tool.BaseTool.__init__(self, tool_settings)
+        BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
         return
 
-    @input_tableview("geodata_table", "Table of Geodata")
+    @input_tableview()
     def getParameterInfo(self):
         """Define parameter definitions"""
-        return base.base_tool.BaseTool.getParameterInfo(self)
+        return BaseTool.getParameterInfo(self)
 
     def iterate(self):
 

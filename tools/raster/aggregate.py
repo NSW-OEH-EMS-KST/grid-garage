@@ -21,7 +21,7 @@ class AggregateRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", rasters=True)
+    @input_tableview(rasters=True)
     @parameter("cell_factor", "Cell Aggregation Factor", "GPLong", "Required", False, "Input", ["Range", 2, 1000], None, None, None)
     @parameter("aggregation_type", "Aggregation Method", "GPString", "Optional", False, "Input", aggregation_methods, None, None, aggregation_methods[0], "Options")
     @parameter("extent_handling", "Extent Boundary", "GPString", "Optional", False, "Input", expand_trunc, None, None, expand_trunc[0], "Options")

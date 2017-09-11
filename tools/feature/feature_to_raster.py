@@ -20,7 +20,7 @@ class FeatureToRasterTool(BaseTool):
 
         return
 
-    @input_tableview("feature_table", "Table for Features and Fields", other_fields="table_fields fields Required table_fields")
+    @input_tableview(features=True, other_fields="table_fields fields Required table_fields")
     @parameter("cell_size", "Cell Size", "GPSACellSize", "Required", False, "Input", None, "cellSize", None, None)
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table_with_output_affixes

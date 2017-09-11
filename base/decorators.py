@@ -1,6 +1,5 @@
 import arcpy
 import functools
-# import here to allow easier import for tools - AFTER REFACTORING GEODATA THIS IS LESS USEFUL TODO: REMOVE AND TEST ALL TOOLS?
 from base.utils import raster_formats, resample_methods, aggregation_methods, data_nodata, expand_trunc, stats_type, pixel_type, raster_formats2, transform_methods
 
 
@@ -123,7 +122,8 @@ def validate_parameter(name, display_name, data_type, parameter_type, multi_valu
     return
 
 
-def input_tableview(object_name, display_name, multi_value=False, other_fields=None, features=False, rasters=False, xml=True):
+def input_tableview(multi_value=False, other_fields=None, ob_name=None, ob_title=None,
+                    features=False, rasters=False, xmls=False):
     """ Wrap a function with a function that generates an input tableview parameter
 
     Args:
@@ -136,46 +136,48 @@ def input_tableview(object_name, display_name, multi_value=False, other_fields=N
 
     """
 
+    def parse_fields(fields):
+
+        parsed_list = []
+
+        if not isinstance(fields, str):
+            raise ValueError("Bad fields descriptor '{}': should be like 'a b c d, e f g h, ...'".format(fields))
+
+        field_list = fields.split(",")    # ["w x y z", "w x y z", ...]
+        print field_list
+        for f in field_list:
+            x = f.split()                 # [["w", "x", "y", "z"]] or [["w", "x", "y", "z"], ["w", "x", "y", "z"], ...]
+            assert len(x) == 4
+            f[2].replace("_", " ")
+            if fields[3] == "None":
+                fields[3] = None
+            parsed_list.append(x)
+
+        return parsed_list
+
     # setup and validate
 
-    def parse_other_fields(fields):
-        if isinstance(fields, str):
-            s = fields.split()
-            if len(s) == 4:
-                return s
-        elif isinstance(fields, (list, tuple)):
-            fs = []
-            for f in fields:
-                s = f.split()
-                if len(s) == 4:
-                    fs.append(s)
-            return fs
-        else:
-            raise ValueError("Bad fields descriptor '{}'".format(fields))
-        return
-
-    required_fields = "geodata geodata Required geodata"
+    s = "geodata Geodata"
 
     if features:
-        required_fields = "geodata feature Required geodata"
+        s = "feature Features"
     elif rasters:
-        required_fields = "geodata raster Required geodata"
-    elif xml:
-        required_fields = "geodata xml Required xml"
+        s = "raster Rasters"
+    elif xmls:
+        s = "xml XMLs"
 
-    required_fields = [parse_other_fields(required_fields)]
-    print required_fields
+    required_fields, display_name = "geodata {} Required geodata, Table for {}".format(*(s.split())).split(",")
+
+    required_fields = parse_fields(required_fields)
 
     if other_fields:
-        other_fields = parse_other_fields(other_fields)
-        print other_fields
-        required_fields.append(other_fields)
-        print required_fields
+        other_fields = parse_fields(other_fields)
+        required_fields.extend(other_fields)
 
     # create parameter
 
-    par = arcpy.Parameter(name=object_name,
-                          displayName=display_name,
+    par = arcpy.Parameter(name=(ob_name or "gg_input_table"),
+                          displayName=(ob_title or display_name),
                           datatype="GPTableView",
                           parameterType="Required",
                           multiValue=multi_value,
@@ -186,7 +188,7 @@ def input_tableview(object_name, display_name, multi_value=False, other_fields=N
 
     for f_name, f_disp, f_type, f_default in required_fields:
 
-        p = arcpy.Parameter(name=f_name,  # name="{0}_field_{1}".format(object_name, f_name),
+        p = arcpy.Parameter(name=f_name,
                             displayName="Field for {0}".format(f_disp),
                             datatype="Field",
                             parameterType=f_type,
@@ -195,9 +197,11 @@ def input_tableview(object_name, display_name, multi_value=False, other_fields=N
         if f_default:
             p.value = f_default
 
-        p.parameterDependencies = [object_name]  # should be constant
+        p.parameterDependencies = ["gg_input_table"]  # should be constant
 
         pars.append(p)
+
+    # wrapper
 
     def decorator(f):
         @functools.wraps(f)
@@ -214,81 +218,8 @@ def input_tableview(object_name, display_name, multi_value=False, other_fields=N
     return decorator
 
 
-def input_output_table(f, add_data_workspace=False):
-    """ Wrap a function with a function that generates output table parameters
-
-    DEPRECATED. TOOLS SHOULD BE REFACTORED TO USE THE NEW FUNCTION BELOW
-
-    Args:
-        f ():
-
-    Returns:
-
-    """
-
-    # Result Table
-    par0 = arcpy.Parameter(displayName="Result Table",
-                           name="result_table",
-                           datatype=["GPTableView"],
-                           parameterType="Derived",
-                           direction="Output")
-
-    # Fail Table
-    par1 = arcpy.Parameter(displayName="Fail Table",
-                           name="fail_table",
-                           datatype=["GPTableView"],
-                           parameterType="Derived",
-                           direction="Output")
-
-    # Output Workspace
-    par2 = arcpy.Parameter(displayName="Output Workspace",
-                           name="output_workspace",
-                           datatype=["DEWorkspace"],
-                           parameterType="Required",
-                           direction="Input")
-    par2.defaultEnvironmentName = "workspace"
-
-    # Output Table Name
-    par3 = arcpy.Parameter(displayName="Result Table Name",
-                           name="result_table_name",
-                           datatype="GPString",
-                           parameterType="Required",
-                           direction="Input")
-
-    par3.value = "#run_id#"
-    # Output Workspace
-    par2 = arcpy.Parameter(displayName="Output Workspace",
-                           name="output_workspace",
-                           datatype=["DEWorkspace"],
-                           parameterType="Required",
-                           direction="Input")
-    par2.defaultEnvironmentName = "workspace"
-
-    # Output Table Name
-    par3 = arcpy.Parameter(displayName="Result Table Name",
-                           name="result_table_name",
-                           datatype="GPString",
-                           parameterType="Required",
-                           direction="Input")
-
-    par3.value = "#run_id#"
-
-    @functools.wraps(f)
-    def wrapped(*args, **kwargs):
-        params = f(*args, **kwargs)
-        pars = [par0, par1, par2, par3]
-        if params:
-            params.insert(0, pars)
-        else:
-            params = pars
-        return params
-    return wrapped
-
-
 def input_output_table(f):
     """ Wrap a function with a function that generates output table parameters
-
-    DEPRECATED. TOOLS SHOULD BE REFACTORED TO USE THE NEW FUNCTION BELOW
 
     Args:
         f ():

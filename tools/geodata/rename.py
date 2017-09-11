@@ -17,7 +17,7 @@ class RenameGeodataTool(base.base_tool.BaseTool):
 
         return
 
-    @input_tableview("geodata_table", "Table of Geodata", other_fields=["candidate_name", "New Name", "Required", "candidate_name"])
+    @input_tableview(other_fields="candidate_name New_Name Required candidate_name")
     @input_output_table
     def getParameterInfo(self):
 

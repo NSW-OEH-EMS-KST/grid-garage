@@ -18,7 +18,6 @@ install_dir = arcpy.GetInstallInfo("desktop")["InstallDir"]
 default_stylesheet = join(install_dir, "Metadata", "Stylesheets", "ArcGIS.xsl")  # ESRI_ISO2ISO19139.xml")
 
 
-
 class ExportXmlMetadataTool(BaseTool):
 
     def __init__(self):
@@ -26,7 +25,7 @@ class ExportXmlMetadataTool(BaseTool):
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
-    @input_tableview("geodata_table", "Table of Geodata")
+    @input_tableview()
     @parameter("xml_folder", "Output Folder", "DEFolder", "Required", False, "Input", None, None, None, None)
     # @parameter("translator", "Translator", "DEFile", "Required", False, "Input", None, None, None, default_translator, None)
     @parameter("stylesheet", "Style Sheet", "DEFile", "Required", False, "Input", None, None, None, default_stylesheet, None)

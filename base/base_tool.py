@@ -25,9 +25,9 @@ def time_stamp(fmt='%Y%m%d_%H%M%S'):
 
 
 @static_vars(logger=None)
-def get_logger():
+def get_logger(logger_name):
     if not get_logger.logger:
-        get_logger.logger = logging.getLogger("gridgarage")
+        get_logger.logger = logging.getLogger(logger_name)
 
     return get_logger.logger
 
@@ -164,14 +164,15 @@ class ArcStreamHandler(logging.StreamHandler):
         msg = msg.replace("\n", ", ").replace("\t", " ").replace("  ", " ")
         lvl = record.levelno
 
-        if lvl in [logging.ERROR, logging.CRITICAL]:
-            self.messages.addErrorMessage(msg)
+        if self.messages:
+            if lvl in [logging.ERROR, logging.CRITICAL]:
+                self.messages.addErrorMessage(msg)
 
-        elif lvl == logging.WARNING:
-            self.messages.addWarningMessage(msg)
+            elif lvl == logging.WARNING:
+                self.messages.addWarningMessage(msg)
 
-        else:
-            self.messages.addMessage(msg)
+            else:
+                self.messages.addMessage(msg)
 
         self.flush()
 
@@ -179,6 +180,7 @@ class ArcStreamHandler(logging.StreamHandler):
 
 
 class BaseTool(object):
+
     def __init__(self, settings):
         print("BaseTool.__init__")
 
@@ -209,9 +211,14 @@ class BaseTool(object):
 
     def configure_logging(self):
         print("BaseTool.configure_logging")
-        self.messages.addMessage("Initialising logging...")
 
-        logger = get_logger()
+        if not self.messages:
+            return
+            print("Initialising logging...")
+        else:
+            self.messages.addMessage("Initialising logging...")
+
+        logger = get_logger(self.tool_name)
         self.debug = logger.debug
         self.info = logger.info
         self.warn = logger.warn
@@ -393,6 +400,9 @@ class BaseTool(object):
 
         self.configure_logging()
 
+        if not self.messages:  # stop ide errors during dev
+            return
+
         parameter_dictionary = OrderedDict([(p.DisplayName, p.valueAsText) for p in self.parameters])
         parameter_summary = ", ".join(["{}: {}".format(k, v) for k, v in parameter_dictionary.iteritems()])
         self.info("Parameter summary: {}".format(parameter_summary))
@@ -468,7 +478,7 @@ class BaseTool(object):
 
         return pd
 
-    @log_error
+    # @log_error
     def iterate_function_on_tableview(self, func, parameter_name, key_names, nonkey_names=None, return_to_results=False):
         """ Runs a function over the values in a tableview parameter - a common tool scenario
 
@@ -493,14 +503,18 @@ class BaseTool(object):
         gg_in_table_text = param.valueAsText
 
         gg_in_table = "gg_in_table"
+
         if arcpy.Exists(gg_in_table):
             arcpy.Delete_management(gg_in_table)
+
         arcpy.MakeTableView_management(gg_in_table_text, gg_in_table)
 
         gg_in_table_fields = [f.name for f in arcpy.ListFields(gg_in_table)]
 
         # map fields
         num_fields = len(key_names)  # [rf1, rf2, ...]
+
+        # TODO FIX THIS
         f_names = ["{0}_field_{1}".format(parameter_name, k) for k in key_names]  # [f_0, f_1, ...]
         f_vals = [self.get_parameter(f_name).valueAsText for f_name in f_names]
         f_vals = [f for f in f_vals if f not in [None, "NONE"]]
@@ -519,7 +533,7 @@ class BaseTool(object):
 
         return
 
-    @log_error
+    # @log_error
     def iterate_function_on_parameter(self, func, parameter_name, key_names, nonkey_names=None, return_to_results=False):
         """ Runs a function over the values in a parameter - a less common tool scenario
 
@@ -553,20 +567,20 @@ class BaseTool(object):
 
         return
 
-    @log_error
+    # @log_error
     def do_iteration(self, func, rows, key_names, return_to_results):
 
         if not rows:
             raise ValueError("No values or records to process.")
 
         fname = func.__name__
-        func = log_error(func)
+        # func = log_error(func)
 
         rows = [{k: v for k, v in zip(key_names, make_tuple(row))} for row in rows]
         total_rows = len(rows)
         self.info("{} items to process".format(total_rows))
-        row_num = 0
 
+        row_num = 0
         for row in rows:
             try:
                 row_num += 1

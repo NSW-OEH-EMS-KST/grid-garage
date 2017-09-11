@@ -26,6 +26,8 @@ class GgResult(object):
         for att in "output_workspace output_workspace_type output_workspace_parent logger".split():
             setattr(self, att, None)
 
+        self.pass_count = self.fail_count = 0
+
         return
 
     def initialise(self, result_table_param, fail_table_param, out_workspace, result_table_name, logger):
@@ -119,6 +121,7 @@ class GgResult(object):
             with open(self.pass_csv, "wb") as csv_file:
                 writer = csv.DictWriter(csv_file, delimiter=',', lineterminator='\n', fieldnames=self.result_fieldnames)
                 writer.writeheader()  # write the header on first call
+
             self.logger.info("Header written to '{}".format(self.pass_csv))
 
         # write the data

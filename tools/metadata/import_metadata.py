@@ -22,7 +22,7 @@ class ImportMetadataTool(BaseTool):
 
         return
 
-    @input_tableview("geodata_table", "Table of Geodata", other_fields="source Source Required geodata")
+    @input_tableview(other_fields="source Source Required geodata")
     @input_output_table
     def getParameterInfo(self):
 
