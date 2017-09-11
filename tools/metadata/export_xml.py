@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-from base.results import result
+
 from base.utils import validate_geodata, split_up_filename, join_up_filename
-from base.method_decorators import input_tableview, input_output_table, parameter
+from base.decorators import input_tableview, input_output_table, parameter
 import arcpy
 from os.path import join, exists
 from hermes import Paperwork
@@ -18,7 +18,6 @@ install_dir = arcpy.GetInstallInfo("desktop")["InstallDir"]
 default_stylesheet = join(install_dir, "Metadata", "Stylesheets", "ArcGIS.xsl")  # ESRI_ISO2ISO19139.xml")
 
 
-@result
 class ExportXmlMetadataTool(BaseTool):
 
     def __init__(self):
@@ -26,7 +25,7 @@ class ExportXmlMetadataTool(BaseTool):
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
-    @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
+    @input_tableview()
     @parameter("xml_folder", "Output Folder", "DEFolder", "Required", False, "Input", None, None, None, None)
     # @parameter("translator", "Translator", "DEFile", "Required", False, "Input", None, None, None, default_translator, None)
     @parameter("stylesheet", "Style Sheet", "DEFile", "Required", False, "Input", None, None, None, default_stylesheet, None)

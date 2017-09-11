@@ -1,6 +1,6 @@
 from base.base_tool import BaseTool
-from base.results import result
-from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats
+
+from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats
 import arcpy
 from base.utils import get_srs, validate_geodata, compare_srs, make_raster_name
 
@@ -14,7 +14,6 @@ tool_settings = {"label": "Clip",
 #     NO_MAINTAIN_EXTENT - Maintain the cell alignment as the input raster and adjust the output extent accordingly."""
 
 
-@result
 class ClipRasterTool(BaseTool):
 
     def __init__(self):
@@ -25,7 +24,7 @@ class ClipRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
+    @input_tableview(rasters=True)
     @parameter("rectangle", "Rectangle", "GPExtent", "Required", False, "Input", None, "extent", None, None)
     @parameter("polygons", "Polygon feature(s) to clip by", "GPFeatureLayer", "Optional", False, "Input", ["Polygon"], None, None, None, "Options")
     @parameter("clipping_geometry", "Use features for clipping", "GPBoolean", "Optional", False, "Input", None, None, None, None, "Options")

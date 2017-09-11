@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-from base.results import result
+
 from base import utils
-from base.method_decorators import input_tableview, input_output_table, parameter
+from base.decorators import input_tableview, input_output_table, parameter
 from arcpy import GetCellValue_management, GetCount_management
 import arcpy.sa
 from collections import OrderedDict
@@ -13,7 +13,6 @@ tool_settings = {"label": "Values at Points",
                  "category": "Raster"}
 
 
-@result
 class ValuesAtPointsRasterTool(BaseTool):
     def __init__(self):
 
@@ -25,7 +24,7 @@ class ValuesAtPointsRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table of Rasters", False, ["raster:geodata:"])
+    @input_tableview(rasters=True)
     @parameter("points", "Point Features", "GPFeatureLayer", "Required", False, "Input", ["Point"], None, None, None)
     @input_output_table
     def getParameterInfo(self):

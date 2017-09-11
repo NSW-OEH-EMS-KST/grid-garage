@@ -1,6 +1,6 @@
 import base.base_tool
-import base.results
-from base.method_decorators import input_output_table, input_tableview
+
+from base.decorators import input_output_table, input_tableview
 from arcpy import Rename_management
 
 tool_settings = {"label": "Rename",
@@ -9,7 +9,6 @@ tool_settings = {"label": "Rename",
                  "category": "Geodata"}
 
 
-@base.results.result
 class RenameGeodataTool(base.base_tool.BaseTool):
 
     def __init__(self):
@@ -18,7 +17,7 @@ class RenameGeodataTool(base.base_tool.BaseTool):
 
         return
 
-    @input_tableview("geodata_table", "Table for Geodata", False, ["new name:candidate_name:", "geodata:geodata:"])
+    @input_tableview(other_fields="candidate_name New_Name Required candidate_name")
     @input_output_table
     def getParameterInfo(self):
 

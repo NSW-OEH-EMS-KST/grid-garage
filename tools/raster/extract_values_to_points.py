@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-from base.results import result
+
 from base.utils import make_vector_name, describe, get_search_cursor_rows, validate_geodata
-from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter
+from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter
 from arcpy.sa import ExtractValuesToPoints
 from arcpy import MakeFeatureLayer_management, Exists, Delete_management
 
@@ -12,7 +12,6 @@ tool_settings = {"label": "Extract Values to Points",
                  "category": "Raster"}
 
 
-@result
 class ExtractValuesToPointsRasterTool(BaseTool):
     def __init__(self):
 
@@ -24,7 +23,7 @@ class ExtractValuesToPointsRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table of Rasters", False, ["query:query:Optional", "raster:geodata:"])
+    @input_tableview(rasters=True, other_fields="query query Optional query")
     @parameter("points", "Point Features", "GPFeatureLayer", "Required", False, "Input", ["Point"], None, None, None)
     @parameter("interpolate", "Interpolate Values", "GPString", "Optional", False, "Input", ["NONE", "INTERPOLATE"], None, None, None, "Options")
     @parameter("add_attributes", "Add Raster Attributes", "GPString", "Optional", False, "Input", ["VALUE_ONLY", "ALL"], None, None, None, "Options")

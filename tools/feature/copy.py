@@ -1,6 +1,5 @@
 import base.base_tool
-import base.results
-from base.method_decorators import input_output_table_with_output_affixes, input_tableview, parameter
+from base.decorators import input_output_table_with_output_affixes, input_tableview, parameter
 from os.path import splitext
 import base.utils
 import arcpy
@@ -12,7 +11,6 @@ tool_settings = {"label": "Copy",
                  "category": "Feature"}
 
 
-@base.results.result
 class CopyFeatureTool(base.base_tool.BaseTool):
 
     def __init__(self):
@@ -21,7 +19,7 @@ class CopyFeatureTool(base.base_tool.BaseTool):
 
         return
 
-    @input_tableview("features_table", "Table for Features", False, ["feature:geodata:"])
+    @input_tableview(features=True)
     @parameter("config_kw", "Config Keyword", "GPString", "Optional", False, "Input", None, "configKeyword", None, None)
     @parameter("sg_1", "Spatial Grid 1", "GPLong", "Optional", False, "Input", None, None, None, 0, "Options")
     @parameter("sg_2", "Spatial Grid 2", "GPLong", "Optional", False, "Input", None, None, None, 0, "Options")

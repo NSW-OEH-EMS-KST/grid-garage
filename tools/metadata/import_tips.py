@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-from base.results import result
+
 from base import utils
-from base.method_decorators import input_tableview, input_output_table
+from base.decorators import input_tableview, input_output_table
 from collections import OrderedDict
 import os
 
@@ -12,14 +12,13 @@ tool_settings = {"label": "Import Tip Files to Table",
                  "category": "Metadata"}
 
 
-@result
 class ImportTipFilesToTableMetadataTool(BaseTool):
     def __init__(self):
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
-    @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
+    @input_tableview()
     @input_output_table
     def getParameterInfo(self):
 

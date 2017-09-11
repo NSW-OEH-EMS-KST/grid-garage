@@ -1,7 +1,6 @@
 from base.base_tool import BaseTool
-from base.results import result
 from base import utils
-from base.method_decorators import input_tableview, input_output_table, parameter
+from base.decorators import input_tableview, input_output_table, parameter
 from collections import OrderedDict
 
 
@@ -11,7 +10,6 @@ tool_settings = {"label": "Export tips",
                  "category": "Metadata"}
 
 
-@result
 class ExportTipsToFileMetadataTool(BaseTool):
     def __init__(self):
 
@@ -19,7 +17,7 @@ class ExportTipsToFileMetadataTool(BaseTool):
 
         self.execution_list = [self.iterate]
 
-    @input_tableview("tip_table", "Table of Tips", False, ["geodata:geodata:"])
+    @input_tableview()
     @parameter("include_fields", "Include Fields", "Field", "Required", True, "Input", None, None, ["tip_table"], None, None)
     @parameter("tip_folder", "Folder for Tip Files", "DEFolder", "Required", False, "Input", None, None, None, None, None)
     @input_output_table

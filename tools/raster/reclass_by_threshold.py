@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-from base.results import result
+
 from base import utils
-from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, data_nodata, raster_formats
+from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter, data_nodata, raster_formats
 import arcpy
 from collections import OrderedDict
 
@@ -12,7 +12,6 @@ tool_settings = {"label": "Reclass by Threshold",
                  "category": "Raster"}
 
 
-@result
 class ReclassByThresholdRasterTool(BaseTool):
 
     def __init__(self):
@@ -23,7 +22,7 @@ class ReclassByThresholdRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", False, ["thresholds:thresholds:", "raster:geodata:"])
+    @input_tableview(rasters=True, other_fields="thresholds Thresholds Required thresholds")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, "Esri Grid")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
@@ -40,50 +39,35 @@ class ReclassByThresholdRasterTool(BaseTool):
 
         return
 
-    def make_remap(self, value, minv, maxv):
-        self.info(locals())
-
-        if not value:
-            raise ValueError("No threshold string")
-
-        thresholds = value.split(",")
-
-        if not thresholds:
-            raise ValueError("\tNo thresholds set")
-
-        thresholds = sorted([float(t.strip()) for t in thresholds])
-        self.info("sorted thresholds are {}".format(thresholds))
-
-        mint, maxt = min(thresholds), max(thresholds)
-
-        if mint < minv:
-            raise ValueError("\tMin threshold under min value {} < {}".format(mint, minv))
-        if maxt > maxv:
-            raise ValueError("\tMax threshold over max value {} > {}".format(maxt, maxv))
-
-        delta = 0.0001
-        thresholds2 = [(minv, thresholds[0], 1), (thresholds[len(thresholds)-1], maxv, thresholds[len(thresholds)-1])]
-        for i, t in enumerate(thresholds):
-            # thresholds2.append("{} {} {}".format(from_v, to_v, i + 1))
-            # if i == 0:
-            #     from_v = minv
-            # else:
-            #     from_v = thresholds[i-1] + delta
-            #
-            # if i == (len(thresholds)+1):
-            #     to_v = maxv
-            # else:
-            #     to_v = thresholds[i]
-
-            thresholds2.append("{} {} {}".format(from_v, to_v, i + 1))
-        # thresholds2 = []
-        # for t in thresholds:
-        #     thresholds2.append(t)
-        #     thresholds2.append(t+1)
-        self.info(thresholds2)
-        remap = ";".join(thresholds2)
-        self.info(remap)
-        return thresholds
+    # def make_remap(self, value, minv, maxv):
+    #     self.info(locals())
+    #
+    #     if not value:
+    #         raise ValueError("No threshold string")
+    #
+    #     thresholds = value.strip().split(";")
+    #
+    #     if not thresholds:
+    #         raise ValueError("\tNo thresholds set")
+    #
+    #     thresholds = [(float(x), float(y), float(z)) for x, y, z in thresholds]
+    #
+    #     flattened = [x for x in y for y in thresholds]  # if isinstance(x, int) else min(x) for x in list2)
+    #
+    #     mint, maxt = min([flattened]), max(flattened)
+    #
+    #     if mint < minv:
+    #         raise ValueError("\tMin threshold under min value {} < {}".format(mint, minv))
+    #
+    #     if maxt > maxv:
+    #         raise ValueError("\tMax threshold over max value {} > {}".format(maxt, maxv))
+    #
+    #     self.info(thresholds)
+    #
+    #     remap = ";".join(thresholds)
+    #
+    #     self.info(remap)
+    #     return thresholds
 
     def reclass(self, data):
 
@@ -100,8 +84,8 @@ class ReclassByThresholdRasterTool(BaseTool):
 
         self.info("Reclassifying {} -->> {}...".format(ras, ras_out))
 
-        remap = data["thresholds"]
-        if not remap:
+        # remap = data["thresholds"]
+        if not data["thresholds"]:
             raise ValueError("\tNo thresholds set")
 
         self.info("\tUpdating RAT...")
@@ -116,25 +100,26 @@ class ReclassByThresholdRasterTool(BaseTool):
         mean = float(arcpy.GetRasterProperties_management(ras, "MEAN").getOutput(0))
         std = float(arcpy.GetRasterProperties_management(ras, "STD").getOutput(0))
 
-        # remap = self.make_remap(data["thresholds"], minv, maxv)
-        remap = remap.replace("MIN", str(minv)).replace("MAX", str(maxv))
+        remap = data["thresholds"].replace("MIN", str(minv)).replace("MAX", str(maxv))
 
-        self.info([ras, "Value", remap, ras_out, "NODATA"])
+        self.info(["Args=", ras, "Value", remap, ras_out, "NODATA"])
+
+        self.info("Reclassifying...")
+
         arcpy.Reclassify_3d(ras, "Value", remap, ras_out, "NODATA")
 
-        # AddField_management(in_table, field_name, field_type, {field_precision}, {field_scale}, {field_length}, {field_alias}, {field_is_nullable},
-        #                     {field_is_required}, {field_domain})
-        arcpy.AddField_management(ras_out, "asdst_value", "TEXT")
-
-        v = ["no", "Low", "Medium", "High"]
-        with arcpy.da.UpdateCursor(ras_out, ["asdst_value", "Value"]) as cursor:
-            for row in cursor:
-                row[0] = v[row[1]]
-                cursor.updateRow(row)
-
-                # arcpy.Reclassify_3d("C:/data/landuse", "VALUE",
-    #                     "1 9;2 8;3 1;4 6;5 3;6 2;7 1",
-    #                     "C:/output/outremap", "DATA")
+        self.info("Done")
+        # self.info("Adding ")
+        #
+        # # AddField_management(in_table, field_name, field_type, {field_precision}, {field_scale}, {field_length}, {field_alias}, {field_is_nullable}, {field_is_required}, {field_domain})
+        # arcpy.AddField_management(ras_out, "asdst_value", "TEXT", 50)
+        #
+        # v = ["no", "Low", "Medium", "High"]
+        #
+        # with arcpy.da.UpdateCursor(ras_out, ["asdst_value", "Value"]) as cursor:
+        #     for row in cursor:
+        #         row[0] = v[row[1]]
+        #         cursor.updateRow(row)
 
         return {"geodata": ras_out, "source_geodata": ras, "min_max_mean_std": "{}_{}_{}_{}".format(minv, maxv, mean, std), "remap": remap}
 

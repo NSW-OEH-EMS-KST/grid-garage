@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-from base.results import result
+
 from base.utils import validate_geodata
-from base.method_decorators import input_output_table, input_tableview
+from base.decorators import input_output_table, input_tableview
 from arcpy import Describe, GetRasterProperties_management
 from os.path import join
 from collections import OrderedDict
@@ -19,7 +19,7 @@ describe_field_groups = dict(
                                "SUNELEVATION", "CLOUDCOVER", "SUNAZIMUTH", "SENSORAZIMUTH", "SENSORELEVATION", "OFFNADIR", "WAVELENGTH"])
 
 
-@result
+
 class BandPropetiesRasterTool(BaseTool):
     def __init__(self):
 
@@ -29,7 +29,7 @@ class BandPropetiesRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
+    @input_tableview(rasters=True)
     @input_output_table
     def getParameterInfo(self):
 

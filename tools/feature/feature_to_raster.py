@@ -1,6 +1,5 @@
 from base.base_tool import BaseTool
-import base.results
-from base.method_decorators import input_output_table_with_output_affixes, input_tableview, parameter, raster_formats
+from base.decorators import input_output_table_with_output_affixes, input_tableview, parameter, raster_formats
 from os.path import splitext
 from arcpy import FeatureToRaster_conversion
 import base.utils
@@ -12,7 +11,6 @@ tool_settings = {"label": "Feature to Raster",
                  "category": "Feature"}
 
 
-@base.results.result
 class FeatureToRasterTool(BaseTool):
 
     def __init__(self):
@@ -22,7 +20,7 @@ class FeatureToRasterTool(BaseTool):
 
         return
 
-    @input_tableview("features_table", "Table for Features and Fields", False, ["fields:table_fields:", "feature:geodata:"])
+    @input_tableview(features=True, other_fields="table_fields fields Required table_fields")
     @parameter("cell_size", "Cell Size", "GPSACellSize", "Required", False, "Input", None, "cellSize", None, None)
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table_with_output_affixes
