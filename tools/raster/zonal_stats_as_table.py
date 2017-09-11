@@ -23,7 +23,6 @@ class ZonalStatisticsAsTableTool(BaseTool):
         return
 
     @input_tableview("raster_table", "Table for Value Rasters", False, ["raster:geodata:"])
-    # @parameter("zones", "Zone Features", ["DERasterLayer", "DEFeatureLayer"], "Required", False, "Input", ["Polygon"], None, None, None, "Options")
     @parameter("zones", "Zone Features", ["DERasterDataset", "GPFeatureLayer"], "Required", False, "Input", None, None, None, None, None)
     @parameter("zone_field", "Zone Field", "Field", "Required", False, "Input", None, None, ["zones"], None, None)
     @parameter("ignore_no_data", "'NoData' treatment", "GPString", "Optional", False, "Input", ["DATA", "NODATA"], None, None, None, "Options")
