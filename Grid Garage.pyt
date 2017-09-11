@@ -38,7 +38,7 @@ from tools.raster.extract_values_to_points import ExtractValuesToPointsRasterToo
 from tools.raster.properties import BandPropetiesRasterTool
 from tools.raster.to_ascii import ToAsciiRasterTool
 # metadata tools
-# from tools.metadata.audit import AuditMetadataTool
+from tools.metadata.audit import AuditMetadataTool
 from tools.metadata.create_tips import CreateTipsTableMetadataTool
 from tools.metadata.import_tips import ImportTipFilesToTableMetadataTool
 from tools.metadata.export_tips import ExportTipsToFileMetadataTool
@@ -93,7 +93,7 @@ class Toolbox(object):
                         }
 
         metadata_tools = {
-                          # AuditMetadataTool,
+                          AuditMetadataTool,
                           CreateTipsTableMetadataTool,
                           ImportTipFilesToTableMetadataTool,
                           ExportTipsToFileMetadataTool,
