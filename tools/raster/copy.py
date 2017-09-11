@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-from base.results import result
+
 from base import utils
-from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats, pixel_type, raster_formats2
+from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats, pixel_type, raster_formats2
 import arcpy
 
 
@@ -11,7 +11,6 @@ tool_settings = {"label": "Copy",
                  "category": "Raster"}
 
 
-@result
 class CopyRasterTool(BaseTool):
 
     def __init__(self):
@@ -22,7 +21,7 @@ class CopyRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
+    @input_tableview(rasters=True)
     @parameter("raster_format", "Output Raster Format", "GPString", "Optional", False, "Input", raster_formats2, None, None, "Esri Grid")
     @parameter("config_keyword", "Config Keyword", "GPString", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("background_value", "Background Value", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")

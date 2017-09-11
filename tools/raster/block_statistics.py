@@ -1,6 +1,6 @@
 from base.base_tool import BaseTool
-from base.results import result
-from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, stats_type, data_nodata, raster_formats
+
+from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter, stats_type, data_nodata, raster_formats
 from arcpy.sa import BlockStatistics
 from base.utils import validate_geodata, make_raster_name
 
@@ -10,7 +10,6 @@ tool_settings = {"label": "Block Statistics",
                  "category": "Raster"}
 
 
-@result
 class BlockStatisticsRasterTool(BaseTool):
 
     def __init__(self):
@@ -21,7 +20,7 @@ class BlockStatisticsRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
+    @input_tableview(rasters=True)
     @parameter("neighbourhood", "Neighbourhood", "GPSANeighborhood", "Required", False, "Input", None, None, None, None)
     @parameter("statistics_type", "Statistics", "GPString", "Optional", False, "Input", stats_type, None, None, stats_type[0], "Options")
     @parameter("ignore_nodata", "No Data Treatment", "GPString", "Optional", False, "Input", data_nodata, None, None, data_nodata[0], "Options")

@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-from base.results import result
+
 from base import utils
-from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, transform_methods, raster_formats
+from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter, transform_methods, raster_formats
 import arcpy
 
 tool_settings = {"label": "Transform",
@@ -10,7 +10,6 @@ tool_settings = {"label": "Transform",
                  "category": "Raster"}
 
 
-@result
 class TransformRasterTool(BaseTool):
 
     def __init__(self):
@@ -20,7 +19,7 @@ class TransformRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:none"])
+    @input_tableview(rasters=True)
     @parameter("method", "Method", "GPString", "Required", False, "Input", transform_methods, None, None, transform_methods[0])
     @parameter("max_stretch", "Stretch to maximum value", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("min_stretch", "Stretch to minimum value", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")

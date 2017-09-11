@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-from base.results import result
+
 import os
-from base.method_decorators import input_tableview, input_output_table
+from base.decorators import input_tableview, input_output_table
 import xml.etree.cElementTree as et
 
 tool_settings = {"label": "Get IAR ID From XML",
@@ -10,14 +10,13 @@ tool_settings = {"label": "Get IAR ID From XML",
                  "category": "Metadata"}
 
 
-@result
 class GetIARIDFromXmlTool(BaseTool):
     def __init__(self):
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
-    @input_tableview("xml_table", "Table for XML Files", False, ["xml:geodata:"])
+    @input_tableview(xmls=True)
     @input_output_table
     def getParameterInfo(self):
 

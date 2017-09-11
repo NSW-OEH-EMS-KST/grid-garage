@@ -1,6 +1,6 @@
 from base.base_tool import BaseTool
-from base.results import result
-from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter
+
+from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter
 import arcpy
 from base.utils import validate_geodata, make_table_name, stats_type
 
@@ -11,7 +11,6 @@ tool_settings = {"label": "Zonal Statistics As Table",
                  "category": "Raster"}
 
 
-@result
 class ZonalStatisticsAsTableTool(BaseTool):
 
     def __init__(self):
@@ -22,7 +21,7 @@ class ZonalStatisticsAsTableTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Value Rasters", False, ["raster:geodata:"])
+    @input_tableview(rasters=True)
     @parameter("zones", "Zone Features", ["DERasterDataset", "GPFeatureLayer"], "Required", False, "Input", None, None, None, None, None)
     @parameter("zone_field", "Zone Field", "Field", "Required", False, "Input", None, None, ["zones"], None, None)
     @parameter("ignore_no_data", "'NoData' treatment", "GPString", "Optional", False, "Input", ["DATA", "NODATA"], None, None, None, "Options")

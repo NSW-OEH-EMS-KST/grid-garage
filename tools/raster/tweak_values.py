@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-from base.results import result
+
 from base import utils
-from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats
+from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats
 import arcpy
 
 tool_settings = {"label": "Tweak Values",
@@ -10,7 +10,6 @@ tool_settings = {"label": "Tweak Values",
                  "category": "Raster"}
 
 
-@result
 class TweakValuesRasterTool(BaseTool):
 
     def __init__(self):
@@ -20,7 +19,7 @@ class TweakValuesRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
+    @input_tableview(rasters=True)
     @parameter("scalar", "Scale Factor", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("constant", "Constant Shift", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("min_val", "Minimum value", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")

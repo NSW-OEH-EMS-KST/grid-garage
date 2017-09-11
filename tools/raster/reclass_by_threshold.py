@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-from base.results import result
+
 from base import utils
-from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, data_nodata, raster_formats
+from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter, data_nodata, raster_formats
 import arcpy
 from collections import OrderedDict
 
@@ -12,7 +12,6 @@ tool_settings = {"label": "Reclass by Threshold",
                  "category": "Raster"}
 
 
-@result
 class ReclassByThresholdRasterTool(BaseTool):
 
     def __init__(self):
@@ -23,7 +22,7 @@ class ReclassByThresholdRasterTool(BaseTool):
 
         return
 
-    @input_tableview("raster_table", "Table for Rasters", False, ["thresholds:thresholds:", "raster:geodata:"])
+    @input_tableview(rasters=True, other_fields="thresholds Thresholds Required thresholds")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, "Esri Grid")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):

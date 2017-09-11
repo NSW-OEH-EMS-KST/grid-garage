@@ -1,6 +1,5 @@
 from base.base_tool import BaseTool
-import base.results
-from base.method_decorators import input_output_table_with_output_affixes, input_tableview, parameter, raster_formats
+from base.decorators import input_output_table_with_output_affixes, input_tableview, parameter, raster_formats
 from os.path import splitext
 from arcpy import PolygonToRaster_conversion
 import base.utils
@@ -12,7 +11,6 @@ tool_settings = {"label": "Polygon to Raster",
                  "category": "Feature"}
 
 
-@base.results.result
 class PolygonToRasterTool(BaseTool):
 
     def __init__(self):
@@ -22,7 +20,7 @@ class PolygonToRasterTool(BaseTool):
 
         return
 
-    @input_tableview("features_table", "Table for Features and Fields", False, ["priority field:priority_field:Optional", "fields:table_fields:", "feature:geodata:"])
+    @input_tableview(features=True)
     @parameter("cell_size", "Cell Size", "GPSACellSize", "Required", False, "Input", None, "cellSize", None, None)
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @parameter("cell_assignment", "Cell Assignment", "GPString", "Optional", False, "Input", ["CELL_CENTER", "MAXIMUM_AREA", "MAXIMUM_COMBINED_AREA"], None, None, None)
