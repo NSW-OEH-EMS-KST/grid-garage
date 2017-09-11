@@ -45,7 +45,7 @@ class ResultsUtils(object):
             fail_table_param ():  Tool fail table parameter
             out_workspace (): Output workspace
             result_table_name (): Base name of result table
-            logger (): 
+            logger ():
 
         Returns:
 
@@ -223,6 +223,7 @@ class ResultsUtils(object):
             self.pass_table = self.pass_csv
 
         self.pass_table_output_parameter.value = self.pass_table
+        self.logger.info("Result table output parameter set".format(self.pass_table))
 
         self.logger.debug(self.__dict__)
         self.logger.info("Final results at {}".format(self.pass_table))
@@ -249,6 +250,7 @@ class ResultsUtils(object):
             self.fail_table = self.fail_csv
 
         self.fail_table_output_parameter.value = self.fail_table
+        self.logger.info("Failure table output parameter set".format(self.fail_table))
 
         self.logger.debug(self.__dict__)
         self.logger.info("Failures at {}".format(self.fail_table))
@@ -272,7 +274,7 @@ class ResultsUtils(object):
             f = Field()
             f.name = fm.outputField.name
             f.type = "String"
-            f.length = 8000
+            f.length = 100000
             fm.outputField = f
             fms.replaceFieldMap(i, fm)
             # self.logger.info("{} type {} length is {}".format(fm.outputField.name, fm.outputField.type, fm.outputField.length))

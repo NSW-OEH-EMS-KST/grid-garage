@@ -6,14 +6,14 @@ from arcpy.sa import ExtractValuesToPoints
 from arcpy import MakeFeatureLayer_management, Exists, Delete_management
 
 
-tool_settings = {"label": "Values to Points",
+tool_settings = {"label": "Extract Values to Points",
                  "description": "Extracts cell values of a raster at specified points into a new feature class",
                  "can_run_background": "True",
                  "category": "Raster"}
 
 
 @result
-class ValuesToPointsRasterTool(BaseTool):
+class ExtractValuesToPointsRasterTool(BaseTool):
     def __init__(self):
 
         BaseTool.__init__(self, tool_settings)
@@ -57,7 +57,7 @@ class ValuesToPointsRasterTool(BaseTool):
     def process(self, data):
 
         ras = data["geodata"]
-        qry = data["query"]
+        qry = data.get("query", None)
         validate_geodata(ras, raster=True, srs_known=True)
 
         d = describe(ras)
