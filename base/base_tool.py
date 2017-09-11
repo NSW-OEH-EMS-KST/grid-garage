@@ -215,7 +215,7 @@ class BaseTool(object):
 
     def configure_logging(self):
 
-       print("BaseTool.configure_logging")
+        print("BaseTool.configure_logging")
 
         if not self.messages:
             return

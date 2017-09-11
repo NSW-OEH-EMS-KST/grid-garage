@@ -2,7 +2,6 @@
 from tools.geodata.compare_extents import CompareExtentsGeodataTool
 from tools.geodata.copy import CopyGeodataTool
 from tools.geodata.delete import DeleteGeodataTool
-# from tools.geodata.extract_parent import ExtractParentGeodataTool
 from tools.geodata.generate_names import GenerateNamesGeodataTool
 from tools.geodata.rename import RenameGeodataTool
 from tools.geodata.display import DisplayGeodataTool
@@ -33,7 +32,7 @@ from tools.raster.transform import TransformRasterTool
 from tools.raster.tweak_values import TweakValuesRasterTool
 from tools.raster.reclass_by_threshold import ReclassByThresholdRasterTool
 from tools.raster.extract_values_to_points import ExtractValuesToPointsRasterTool
-# from tools.raster.slice import SliceRasterTool
+from tools.raster.slice import SliceRasterTool
 from tools.raster.zonal_stats_as_table import ZonalStatisticsAsTableTool
 from tools.raster.properties import BandPropetiesRasterTool
 from tools.raster.to_ascii import ToAsciiRasterTool
@@ -43,8 +42,6 @@ from tools.metadata.create_tips import CreateTipsTableMetadataTool
 from tools.metadata.import_tips import ImportTipFilesToTableMetadataTool
 from tools.metadata.export_tips import ExportTipsToFileMetadataTool
 from tools.metadata.export_xml import ExportXmlMetadataTool
-# from tools.metadata.id_from_xml import GetIARIDFromXmlTool
-# from tools.metadata.import_metadata import ImportMetadataTool
 
 
 class Toolbox(object):
@@ -87,7 +84,7 @@ class Toolbox(object):
                         TransformRasterTool,
                         TweakValuesRasterTool,
                         ExtractValuesToPointsRasterTool,
-                        # SliceRasterTool,
+                        SliceRasterTool,
                         ValuesAtPointsRasterTool,
                         ZonalStatisticsAsTableTool,
                         }
