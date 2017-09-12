@@ -1,7 +1,6 @@
 from base.base_tool import BaseTool
-from base.results import result
-from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter
-from netCDF4 import Dataset
+from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter
+# from netCDF4 import Dataset
 import arcpy
 from base.utils import validate_geodata, make_raster_name, stats_type
 
@@ -12,7 +11,6 @@ tool_settings = {"label": "Export CDF",
                  "category": "NetCDF"}
 
 
-@result
 class ExportCdfTool(BaseTool):
 
     def __init__(self):
@@ -23,7 +21,7 @@ class ExportCdfTool(BaseTool):
 
         return
 
-    @input_tableview("cdf_table", "Table for CDF Files", False, ["CDF:geodata:"])
+    @input_tableview(cdfs=True)
     @parameter("var_field", "Variable Field", "Field", "Required", False, "Input", None, None, ["cdf_table"], None, None)
     @parameter("xdim", "X dimension", "Field", "Required", False, "Input", None, None, ["cdf_table"], None, None)
     @parameter("ydim", "Y dimension", "Field", "Required", False, "Input", None, None, ["cdf_table"], None, None)

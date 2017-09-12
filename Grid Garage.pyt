@@ -1,10 +1,9 @@
 # geodata tools
-from tools.cdf.export_cdf import ExportCdfTool
 from tools.feature.clip import ClipFeatureTool
 from tools.feature.copy import CopyFeatureTool
-# feature tools
 from tools.feature.feature_to_raster import FeatureToRasterTool
 from tools.feature.polygon_to_raster import PolygonToRasterTool
+# feature tools
 from tools.geodata.compare_extents import CompareExtentsGeodataTool
 from tools.geodata.copy import CopyGeodataTool
 from tools.geodata.delete import DeleteGeodataTool
@@ -38,10 +37,13 @@ from tools.raster.reproject import ReprojectRasterTool
 from tools.raster.resample import ResampleRasterTool
 from tools.raster.set_no_data_value import SetNodataValueRasterTool
 from tools.raster.set_value_to_null import SetValueToNullRasterTool
+from tools.raster.slice import SliceRasterTool
 from tools.raster.to_ascii import ToAsciiRasterTool
 from tools.raster.transform import TransformRasterTool
 from tools.raster.tweak_values import TweakValuesRasterTool
 from tools.raster.values_at_points import ValuesAtPointsRasterTool
+# cdf tools
+from tools.cdf.export_cdf import ExportCdfTool
 
 
 class Toolbox(object):
@@ -82,11 +84,11 @@ class Toolbox(object):
                         ResampleRasterTool,
                         SetNodataValueRasterTool,
                         SetValueToNullRasterTool,
+                        SliceRasterTool,
                         ToAsciiRasterTool,
                         TransformRasterTool,
                         TweakValuesRasterTool,
                         ExtractValuesToPointsRasterTool,
-                        SliceRasterTool,
                         ValuesAtPointsRasterTool,
                         ZonalStatisticsAsTableTool
                         }
@@ -98,5 +100,12 @@ class Toolbox(object):
                           ExportXmlMetadataTool,
                           }
 
-        self.tools = list(geodata_tools | feature_tools | raster_tools | metadata_tools)
+        cdf_tools = {
+                     CreateTipsTableMetadataTool,
+                     ImportTipFilesToTableMetadataTool,
+                     ExportTipsToFileMetadataTool,
+                     ExportXmlMetadataTool,
+                     }
+
+        self.tools = list(geodata_tools | feature_tools | raster_tools | metadata_tools | cdf_tools)
 
