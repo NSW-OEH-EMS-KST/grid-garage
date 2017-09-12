@@ -512,7 +512,7 @@ def get_srs(geodata, raise_unknown_error=False, as_object=False):
         return srs.name
 
 
-def validate_geodata(geodata, raster=False, vector=False, table=False, srs_known=False, polygon=False, message_func=None):
+def validate_geodata(geodata, raster=False, vector=False, table=False, srs_known=False, polygon=False, message_func=None, NetCdf=False):
 
     if message_func:
         message_func("Validating '{}'".format(geodata))
