@@ -358,6 +358,7 @@ def input_output_raster_format(f):
 
     """
 
+
     # Format
     par0 = parameter("output_raster_format", "Output Raster Format", "GPString", "Optional", False, "Input", raster_formats2, None, None, None)
 
