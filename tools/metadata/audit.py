@@ -40,11 +40,13 @@ class AuditMetadataTool(BaseTool):
         self.info("Auditing {0}".format(geodata))
 
         desc = arcpy.Describe(geodata)
+        self.info(str(desc))
 
         pw = Paperwork(dataset=geodata)
+        self.info(str(pw))
 
         meta = pw.convert()
-        meta['metadata']['grid_garage'] = {}
+        # meta['metadata']['grid_garage'] = {}
         # meta['metadata']['grid_garage']['metadata_audit'] = {"@date": datetime.now().time(), }
 
         pw.save(meta)

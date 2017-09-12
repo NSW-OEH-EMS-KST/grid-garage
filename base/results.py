@@ -268,7 +268,7 @@ class GgResult(object):
             f = Field()
             f.name = fm.outputField.name
             f.type = "String"
-            f.length = 8000
+            f.length = 100000
             fm.outputField = f
             fms.replaceFieldMap(i, fm)
             # self.logger.info("{} type {} length is {}".format(fm.outputField.name, fm.outputField.type, fm.outputField.length))
