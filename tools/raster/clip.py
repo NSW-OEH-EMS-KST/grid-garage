@@ -24,7 +24,7 @@ class ClipRasterTool(BaseTool):
 
         return
 
-    @input_tableview(rasters=True)
+    @input_tableview(data_type="raster")
     @parameter("rectangle", "Rectangle", "GPExtent", "Required", False, "Input", None, "extent", None, None)
     @parameter("polygons", "Polygon feature(s) to clip by", "GPFeatureLayer", "Optional", False, "Input", ["Polygon"], None, None, None, "Options")
     @parameter("clipping_geometry", "Use features for clipping", "GPBoolean", "Optional", False, "Input", None, None, None, None, "Options")

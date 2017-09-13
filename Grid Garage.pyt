@@ -43,6 +43,7 @@ from tools.raster.transform import TransformRasterTool
 from tools.raster.tweak_values import TweakValuesRasterTool
 from tools.raster.values_at_points import ValuesAtPointsRasterTool
 # cdf tools
+from tools.cdf.describe_cdf import DescribeCdfTool
 from tools.cdf.export_cdf import ExportCdfTool
 
 
@@ -101,10 +102,8 @@ class Toolbox(object):
                           }
 
         cdf_tools = {
-                     CreateTipsTableMetadataTool,
-                     ImportTipFilesToTableMetadataTool,
-                     ExportTipsToFileMetadataTool,
-                     ExportXmlMetadataTool,
+                     DescribeCdfTool,
+                     ExportCdfTool
                      }
 
         self.tools = list(geodata_tools | feature_tools | raster_tools | metadata_tools | cdf_tools)

@@ -20,7 +20,7 @@ class CalculateStatisticsRasterTool(BaseTool):
 
         return
 
-    @input_tableview(rasters=True)
+    @input_tableview(data_type="raster")
     @parameter("x_skip_factor", "X Skip Factor", "GPLong", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("y_skip_factor", "Y Skip Factor", "GPLong", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("ignore_values", "Ignore Values", "GPLong", "Optional", True, "Input", None, None, None, None, "Options")

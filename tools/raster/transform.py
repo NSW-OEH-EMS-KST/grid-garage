@@ -19,7 +19,7 @@ class TransformRasterTool(BaseTool):
 
         return
 
-    @input_tableview(rasters=True)
+    @input_tableview(data_type="raster")
     @parameter("method", "Method", "GPString", "Required", False, "Input", transform_methods, None, None, transform_methods[0])
     @parameter("max_stretch", "Stretch to maximum value", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("min_stretch", "Stretch to minimum value", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")

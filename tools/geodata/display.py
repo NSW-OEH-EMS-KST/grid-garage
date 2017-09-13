@@ -32,18 +32,22 @@ class DisplayGeodataTool(BaseTool):
     def display_geodata(self, data):
 
         geodata = data["geodata"]
-        try:
-            # see if it's a layer
+
+        try:  # see if it's a layer
+
             base.arcmap.add_layer(geodata, "BOTTOM")
             self.info("Added layer {0} to display".format(geodata))
+
         except Exception:
-            try:
-                # see if it's a table
+            try:  # see if it's a table
+
                 base.arcmap.add_tableview(geodata)
                 self.info("Added table {0} to display".format(geodata))
-            except Exception as e:
-                # bugger it for now
+
+            except Exception as e:  # bugger it for now
+
                 self.warn("Could not add {0} to display: {1}".format(geodata, str(e)))
+
         finally:
             # Refresh things
             base.arcmap.refresh_active_view()

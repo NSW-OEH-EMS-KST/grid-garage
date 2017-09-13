@@ -122,71 +122,90 @@ def validate_parameter(name, display_name, data_type, parameter_type, multi_valu
     return
 
 
-def input_tableview(multi_value=False, other_fields=None, ob_name=None, ob_title=None,
-                    features=False, rasters=False, xmls=False, cdfs=False):
+class FieldText(object):
+    def __init__(self):
+        pass
+
+
+class TableSetting(object):
+    def __init__(self, data_type):
+
+        data_types = ["geodata", "raster", "feature", "xml", "cdf"]
+
+        if data_type not in data_types:
+            raise ValueError("Unsupported type: '{}' is not a member of {}".format(data_type, data_types))
+
+        self.table_name = "{}_table".format(data_type)
+        self.fields = "{0} {1} Required geodata".format(data_type, data_type.title())
+
+        if len(data_type) != 3:  # for T.L.A.s we will capitalise
+            self.table_display_name = "Table for {}".format(data_type.title())
+        else:
+            self.table_display_name = "Table for {}".format(data_type.upper())
+
+        return
+
+
+def parse_fields(fields):
+
+    parsed_list = []
+
+    if not isinstance(fields, str):
+        raise ValueError("Bad fields descriptor '{}': should be like 'a b c d, e f g h, ...'".format(fields))
+
+    field_list = fields.split(",")  # ["w x y z", "w x y z", ...]
+    print field_list
+
+    for f in field_list:
+
+        x = f.split()  # [["w", "x", "y", "z"]] or [["w", "x", "y", "z"], ["w", "x", "y", "z"], ...]
+        assert len(x) == 4
+
+        f[2].replace("_", " ")
+
+        if fields[3] == "None":
+            fields[3] = None
+
+        parsed_list.append(x)
+
+    return parsed_list
+
+
+def input_tableview(data_type="geodata", multi_value=False, other_fields=None, ob_name=None, ob_title=None):
     """ Wrap a function with a function that generates an input tableview parameter
 
     Args:
-        object_name ():
-        display_name ():
+        ob_title ():
+        ob_name ():
+        other_fields ():
+        data_type ():
         multi_value ():
-        required_fields ():
 
     Returns: Wrapped function
 
     """
 
-    def parse_fields(fields):
-
-        parsed_list = []
-
-        if not isinstance(fields, str):
-            raise ValueError("Bad fields descriptor '{}': should be like 'a b c d, e f g h, ...'".format(fields))
-
-        field_list = fields.split(",")    # ["w x y z", "w x y z", ...]
-        print field_list
-        for f in field_list:
-            x = f.split()                 # [["w", "x", "y", "z"]] or [["w", "x", "y", "z"], ["w", "x", "y", "z"], ...]
-            assert len(x) == 4
-            f[2].replace("_", " ")
-            if fields[3] == "None":
-                fields[3] = None
-            parsed_list.append(x)
-
-        return parsed_list
-
     # setup and validate
+    tset = TableSetting(data_type)
 
-    s = "geodata Geodata"
-
-    if features:
-        s = "feature Features"
-    elif rasters:
-        s = "raster Rasters"
-    elif xmls:
-        s = "xml XMLs"
-    elif cdfs:
-        s = "cdf CDFs"
-
-    required_fields, display_name = "geodata {} Required geodata, Table for {}".format(*(s.split())).split(",")
-
-    required_fields = parse_fields(required_fields)
+    required_fields = parse_fields(tset.fields)
 
     if other_fields:
         other_fields = parse_fields(other_fields)
         required_fields.extend(other_fields)
 
     # create parameter
-
-    par = arcpy.Parameter(name=(ob_name or "gg_input_table"),
-                          displayName=(ob_title or display_name),
+    pn = ob_name or tset.table_name
+    dn =ob_title or tset.table_display_name
+    par = arcpy.Parameter(name=pn,
+                          displayName=dn,
                           datatype="GPTableView",
                           parameterType="Required",
                           multiValue=multi_value,
                           direction="Input")
     pars = [par]
 
-    # create dependencies
+    # create dependent parameters
 
     for f_name, f_disp, f_type, f_default in required_fields:
 
@@ -199,7 +218,7 @@ def input_tableview(multi_value=False, other_fields=None, ob_name=None, ob_title
         if f_default:
             p.value = f_default
 
-        p.parameterDependencies = ["gg_input_table"]  # should be constant
+        p.parameterDependencies = [pn]  # should be constant
 
         pars.append(p)
 
@@ -217,6 +236,7 @@ def input_tableview(multi_value=False, other_fields=None, ob_name=None, ob_title
                 params = pars
             return params
         return wrapper
+
     return decorator
 
 

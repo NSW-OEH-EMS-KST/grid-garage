@@ -19,7 +19,7 @@ class TweakValuesRasterTool(BaseTool):
 
         return
 
-    @input_tableview(rasters=True)
+    @input_tableview(data_type="raster")
     @parameter("scalar", "Scale Factor", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("constant", "Constant Shift", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("min_val", "Minimum value", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")

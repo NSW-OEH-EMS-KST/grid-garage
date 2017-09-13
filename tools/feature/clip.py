@@ -19,7 +19,7 @@ class ClipFeatureTool(base.base_tool.BaseTool):
 
         return
 
-    @input_tableview(features=True)
+    @input_tableview(data_type="feature")
     @parameter("clip_features", "Clip Features", "GPFeatureLayer", "Required", False, "Input", ["Polygon"], None, None, None,)
     @parameter("xy_tolerance", "XY Tolerance", "GPLinearUnit", "Optional", False, "Input", None, None, None, None, "Options")
     @input_output_table_with_output_affixes

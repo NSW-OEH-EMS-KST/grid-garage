@@ -1,5 +1,4 @@
 from base.base_tool import BaseTool
-
 from base import utils
 from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter, data_nodata, raster_formats
 import arcpy
@@ -22,7 +21,7 @@ class ReclassByThresholdRasterTool(BaseTool):
 
         return
 
-    @input_tableview(rasters=True, other_fields="thresholds Thresholds Required thresholds")
+    @input_tableview(data_type="raster", other_fields="thresholds Thresholds Required thresholds")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, "Esri Grid")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):

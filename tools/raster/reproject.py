@@ -18,7 +18,7 @@ class ReprojectRasterTool(BaseTool):
 
         return
 
-    @input_tableview(rasters=True)
+    @input_tableview(data_type="raster")
     @parameter("output_cs", "Output Spatial Reference", "Spatial Reference", "Required", False, "Input", None, "outputCoordinateSystem", None, None)
     @parameter("cell_size", "Cell Size", "GPSACellSize", "Required", False, "Input", None, "cellSize", None, None)
     @parameter("resample_type", "Resampling Method", "GPString", "Required", False, "Input", resample_methods, "resamplingMethod", None, None)

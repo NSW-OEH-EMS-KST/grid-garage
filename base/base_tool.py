@@ -16,90 +16,16 @@ import arcpy
 import logging
 from collections import OrderedDict
 from base.results import GgResult
+from datetime import datetime
 
 
 def time_stamp(fmt='%Y%m%d_%H%M%S'):
-    from datetime import datetime
 
     return datetime.now().strftime(fmt)
 
-debug = print  # updated to logger.debug after logging set up
 
-# @static_vars(logger=None)
-# def get_logger():
-#     if not get_logger.logger:
-#         get_logger.logger = logging.getLogger("gridgarage")
-#
-#     return get_logger.logger
+debug = print  # updated to logger.debug after logging is configured
 
-
-# def debug(message):
-#     message = make_tuple(message)
-#
-#     try:
-#         logger = get_logger()
-#         debug_func = logger.debug
-#     except:
-#         debug_func = print
-#         message = ["DEBUG: " + str(msg) for msg in message]
-#
-#     for msg in message:
-#         debug_func(msg)
-#
-#     return
-
-
-# def info(message):
-#     message = make_tuple(message)
-#
-#     try:
-#         logger = get_logger()
-#         info_func = logger.info
-#     except:
-#         info_func = print
-#         message = ["INFO: " + str(msg) for msg in message]
-#
-#     for msg in message:
-#         info_func(msg)
-#
-#     return
-
-
-# def warn(message):
-#     message = make_tuple(message)
-#
-#     try:
-#         logger = get_logger()
-#         warn_func = logger.warn
-#     except:
-#         warn_func = print
-#         message = ["WARN: " + str(msg) for msg in message]
-#
-#     for msg in message:
-#         warn_func(msg)
-#
-#     return
-
-
-# def error(message):
-#     message = make_tuple(message)
-#
-#     try:
-#         logger = get_logger()
-#         error_func = logger.error
-#     except:
-#         error_func = print
-#         message = ["ERROR: " + str(msg) for msg in message]
-#
-#     for msg in message:
-#         error_func(msg)
-#
-#     return
-
-@static_vars(logger=None)
-def get_logger(logger_name):
-    if not get_logger.logger:
-        get_logger.logger = logging.getLogger(logger_name)
 
 @contextmanager
 def error_trap(context):
@@ -223,7 +149,7 @@ class BaseTool(object):
         else:
             self.messages.addMessage("Initialising logging...")
 
-        logger = get_logger(self.tool_name)
+        logger = logging.getLogger(self.tool_name)
 
         self.debug = logger.debug
         self.info = logger.info
@@ -405,9 +331,10 @@ class BaseTool(object):
         if not self.messages:  # stop ide errors during dev
             return
 
-        parameter_dictionary = OrderedDict([(p.DisplayName, p.valueAsText) for p in self.parameters])
-        parameter_summary = ", ".join(["{}: {}".format(k, v) for k, v in parameter_dictionary.iteritems()])
-        self.info("Parameter summary: {}".format(parameter_summary))
+        # parameter_dictionary = OrderedDict([(p.name, p.valueAsText) for p in self.parameters])
+        # parameter_dictionary = OrderedDict([(p.DisplayName, p.valueAsText) for p in self.parameters])
+        # parameter_summary = ", ".join(["{}: {}".format(k, v) for k, v in parameter_dictionary.iteritems()])
+        self.info("Parameter summary: {}".format(["{} ({}): {}".format(p.DisplayName, p.name, p.valueAsText) for p in self.parameters]))
 
         for k, v in self.get_parameter_dict().iteritems():
             setattr(self, k, v)
@@ -416,12 +343,14 @@ class BaseTool(object):
 
         try:
             self.result.initialise(self.get_parameter("result_table"), self.get_parameter("fail_table"), self.get_parameter("output_workspace").value, self.get_parameter("result_table_name").value, self.logger)
+
         except AttributeError:
             pass
 
         try:
             if self.output_file_workspace in [None, "", "#"]:
                 self.output_file_workspace = self.result.output_workspace
+
         except Exception:
             pass
 
@@ -431,7 +360,8 @@ class BaseTool(object):
 
         try:
             self.result.write()
-        except AttributeError:
+
+        except TypeError:
             pass
 
         return
@@ -483,8 +413,7 @@ class BaseTool(object):
 
         return pd
 
-    # @log_error
-    def iterate_function_on_tableview(self, func, parameter_name, key_names, nonkey_names=None, return_to_results=False):
+    def iterate_function_on_tableview(self, func, parameter_name="", key_names=(), nonkey_names=(), return_to_results=False):
         """ Runs a function over the values in a tableview parameter - a common tool scenario
 
         Args:
@@ -497,7 +426,9 @@ class BaseTool(object):
         """
         self.debug("locals = {}".format(locals()))
 
-        param = self.get_parameter(parameter_name)
+        param = self.get_parameter(parameter_name) if parameter_name else self.parameters[0]
+        self.info(["param name: ", param.name])
+
         if param.datatype != "Table View":
             raise ValueError("That parameter is not a table or table view ({0})".format(param.name))
 
@@ -505,22 +436,14 @@ class BaseTool(object):
         if multi_val:
             raise ValueError("Multi-value tableview iteration is not yet implemented")
 
-        gg_in_table_text = param.valueAsText
+        if arcpy.Exists(param.name):
+            arcpy.Delete_management(param.name)
 
-        gg_in_table = "gg_in_table"
+        arcpy.MakeTableView_management(param.valueAsText, param.name)
 
-        if arcpy.Exists(gg_in_table):
-            arcpy.Delete_management(gg_in_table)
+        gg_in_table_fields = [f.name for f in arcpy.ListFields(param.name)]
 
-        arcpy.MakeTableView_management(gg_in_table_text, gg_in_table)
-
-        gg_in_table_fields = [f.name for f in arcpy.ListFields(gg_in_table)]
-
-        # map fields
-        num_fields = len(key_names)  # [rf1, rf2, ...]
-
-        # TODO FIX THIS
-        f_names = ["{0}_field_{1}".format(parameter_name, k) for k in key_names]  # [f_0, f_1, ...]
+        f_names = [p.name for i, p in enumerate(self.parameters[1:]) if 0 in p.parameterDependencies]
         f_vals = [self.get_parameter(f_name).valueAsText for f_name in f_names]
         f_vals = [f for f in f_vals if f not in [None, "NONE"]]
         if nonkey_names:
@@ -528,7 +451,7 @@ class BaseTool(object):
 
         self.info(f_vals)
 
-        rows = [r for r in arcpy.da.SearchCursor(gg_in_table, f_vals)]
+        rows = [r for r in arcpy.da.SearchCursor(param.name, f_vals)]
 
         # iterate
         if nonkey_names:

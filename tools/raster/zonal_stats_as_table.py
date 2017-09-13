@@ -21,7 +21,7 @@ class ZonalStatisticsAsTableTool(BaseTool):
 
         return
 
-    @input_tableview(rasters=True)
+    @input_tableview(data_type="raster")
     @parameter("zones", "Zone Features", ["DERasterDataset", "GPFeatureLayer"], "Required", False, "Input", None, None, None, None, None)
     @parameter("zone_field", "Zone Field", "Field", "Required", False, "Input", None, None, ["zones"], None, None)
     @parameter("ignore_no_data", "'NoData' treatment", "GPString", "Optional", False, "Input", ["DATA", "NODATA"], None, None, None, "Options")

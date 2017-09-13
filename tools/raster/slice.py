@@ -20,7 +20,7 @@ class SliceRasterTool(BaseTool):
 
         return
 
-    @input_tableview(rasters=True)
+    @input_tableview(data_type="raster")
     @parameter("raster_format", "Output Raster Format", "GPString", "Optional", False, "Input", raster_formats, None, None, "Esri Grid")
     @parameter("num_zones", "Number of Zones", "GPLong", "Required", False, "Input", None, None, None, 10, "Options")
     @parameter("slice_type", "Type of Slice", "GPString", "Required", False, "Input", ["EQUAL_INTERVAL", "EQUAL_AREA", "NATURAL_BREAKS"], None, None, None)
