@@ -4,11 +4,7 @@ from sys import exc_info
 from traceback import format_exception
 import os
 import csv
-
-
-# def result(cls):
-#     setattr(cls, "result", GgResult())
-#     return cls
+import collections
 
 
 class GgResult(object):
@@ -114,7 +110,20 @@ class GgResult(object):
 
         results = make_tuple(results)
 
+        def make_string(data):
+            if isinstance(data, basestring):
+                return str(data)
+            elif isinstance(data, collections.Mapping):
+                return dict(map(make_string, data.iteritems()))
+            elif isinstance(data, collections.Iterable):
+                return type(data)(map(make_string, data))
+            else:
+                return data
+
+        results = [make_string(result) for result in results]
+
         # here we will just store the keys from the first result, re-using these will force an error for any inconsistency
+        # HACK !
         if not os.path.isfile(self.pass_csv):
             result_fieldnames = results[0].keys()
             setattr(self, "result_fieldnames", result_fieldnames)

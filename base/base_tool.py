@@ -189,7 +189,6 @@ class BaseTool(object):
 
         return
 
-    @log_error
     def get_parameter(self, param_name, raise_not_found_error=False, parameters=None):
 
         if not parameters:
@@ -213,7 +212,6 @@ class BaseTool(object):
 
         return True
 
-    @log_error
     def updateParameters(self, parameters):
 
         try:
@@ -253,7 +251,6 @@ class BaseTool(object):
 
         return
 
-    @log_error
     def updateMessages(self, parameters):
 
         debug("updateMessages exposure code")
@@ -366,7 +363,6 @@ class BaseTool(object):
 
         return
 
-    @log_error
     def get_parameter_dict(self, leave_as_object=(), parameters=()):
         """ Create a dictionary of parameters
 
@@ -384,7 +380,7 @@ class BaseTool(object):
             parameters = self.parameters
 
         pd = {}
-        for p in self.parameters:
+        for p in parameters:
             name = p.name
             if name in leave_as_object:
                 pd[name] = p
@@ -413,7 +409,7 @@ class BaseTool(object):
 
         return pd
 
-    def iterate_function_on_tableview(self, func, parameter_name="", key_names=(), nonkey_names=(), return_to_results=False):
+    def iterate_function_on_tableview(self, func, parameter_name="", nonkey_names=[], return_to_results=False):
         """ Runs a function over the values in a tableview parameter - a common tool scenario
 
         Args:
@@ -427,7 +423,6 @@ class BaseTool(object):
         self.debug("locals = {}".format(locals()))
 
         param = self.get_parameter(parameter_name) if parameter_name else self.parameters[0]
-        self.info(["param name: ", param.name])
 
         if param.datatype != "Table View":
             raise ValueError("That parameter is not a table or table view ({0})".format(param.name))
@@ -441,28 +436,22 @@ class BaseTool(object):
 
         arcpy.MakeTableView_management(param.valueAsText, param.name)
 
-        gg_in_table_fields = [f.name for f in arcpy.ListFields(param.name)]
+        f_alias = [p.name for i, p in enumerate(self.parameters[1:]) if 0 in p.parameterDependencies]
+        f_name = [self.get_parameter(f_name).valueAsText for f_name in f_alias]
+        alias_name = {k: v for k, v in dict(zip(f_alias, f_name)).iteritems() if v not in [None, "NONE"]}
 
-        f_names = [p.name for i, p in enumerate(self.parameters[1:]) if 0 in p.parameterDependencies]
-        f_vals = [self.get_parameter(f_name).valueAsText for f_name in f_names]
-        f_vals = [f for f in f_vals if f not in [None, "NONE"]]
         if nonkey_names:
-            f_vals.extend(nonkey_names)
+            alias_name.update({v: v for v in nonkey_names})  # this is a list at the mo
 
-        self.info(f_vals)
-
-        rows = [r for r in arcpy.da.SearchCursor(param.name, f_vals)]
+        rows = [r for r in arcpy.da.SearchCursor(param.name, alias_name.values())]
 
         # iterate
-        if nonkey_names:
-            key_names.extend(nonkey_names)
 
-        self.do_iteration(func, rows, key_names, return_to_results)
+        self.do_iteration(func, rows, alias_name, return_to_results)
 
         return
 
-    # @log_error
-    def iterate_function_on_parameter(self, func, parameter_name, key_names, nonkey_names=None, return_to_results=False):
+    def iterate_function_on_parameter(self, func, parameter_name, key_names, return_to_results=False):
         """ Runs a function over the values in a parameter - a less common tool scenario
 
         Args:
@@ -487,31 +476,28 @@ class BaseTool(object):
 
         self.debug("Processing rows will be {}".format(rows))
 
+        key_names = {v: v for v in key_names}
+
         # iterate
-        if nonkey_names:
-            key_names.extend(nonkey_names)
 
         self.do_iteration(func, rows, key_names, return_to_results)
 
         return
 
-    # @log_error
-    def do_iteration(self, func, rows, key_names, return_to_results):
+    def do_iteration(self, func, rows, name_vals, return_to_results):
 
         if not rows:
             raise ValueError("No values or records to process.")
 
         fname = func.__name__
-        # func = log_error(func)
 
-        rows = [{k: v for k, v in zip(key_names, make_tuple(row))} for row in rows]
+        rows = [{k: v for k, v in zip(name_vals.keys(), make_tuple(row))} for row in rows]
         total_rows = len(rows)
+
         self.info("{} items to process".format(total_rows))
 
-        row_num = 0
-        for row in rows:
+        for row_num, row in enumerate(rows, start=1):
             try:
-                row_num += 1
                 self.info("{} > Processing row {} of {}".format(time_stamp("%H:%M:%S%f")[:-3], row_num, total_rows))
                 self.debug("Running {} with row={}".format(fname, row))
                 res = func(row)
@@ -526,8 +512,6 @@ class BaseTool(object):
                 self.error("error executing {}: {}".format(fname, str(e)))
 
                 try:
-                    # fail = log_error(self.result.add_fail)
-                    # fail(row)
                     self.result.add_fail(row)
                 except AttributeError:
                     pass

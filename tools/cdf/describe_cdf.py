@@ -4,7 +4,6 @@ from netCDF4 import Dataset
 import arcpy
 from base.utils import validate_geodata
 
-
 tool_settings = {"label": "Describe CDF",
                  "description": "Describe a CDF file",
                  "can_run_background": "True",
@@ -12,7 +11,6 @@ tool_settings = {"label": "Describe CDF",
 
 
 class DescribeCdfTool(BaseTool):
-
     def __init__(self):
 
         BaseTool.__init__(self, tool_settings)
@@ -29,36 +27,43 @@ class DescribeCdfTool(BaseTool):
 
     def iterate(self):
 
-        self.iterate_function_on_tableview(self.calc, return_to_results=True)
+        self.iterate_function_on_tableview(self.cdf_describe, return_to_results=True)
 
         return
 
-    def calc(self, data):
-        self.info(data)
-        # cdf = data["cdf"]
-        # validate_geodata(cdf, NetCdf=True)
+    def cdf_describe(self, data):
 
-        # print "Making layer for {}".format(cdf)
-        # arcpy.MakeNetCDFRasterLayer_md(cdf, var_field, x_dimension, y_dimension, out_raster_layer, {band_dimension}, {dimension_values}, {value_selection_method})
+        cdf = data["cdf"]
 
-        # ras_out = make_raster_name(cdf, self.output_file_workspace, None, self.output_file_workspace, self. output_filename_suffix)
+        validate_geodata(cdf, NetCdf=True)  # not implemented in function TODO
 
-        # self.info("Saving {0} -->> {1} ...".format(cdf, ras_out))
+        nc_fprops = arcpy.NetCDFFileProperties(cdf)
 
-        # try:
-        #     pass
-        # except Exception as e:
-        #     if "ERROR 00276" in e.message:
-        #         self.info("Caught the 00276")
+        # get global attributes
+        datts = [{att: nc_fprops.getAttributeValue("", att)} for att in nc_fprops.getAttributeNames("")]
 
+        # get variables
+        gvars = []
+        for nc_var in nc_fprops.getVariables():
 
+            vatts = [{att: nc_fprops.getAttributeValue(nc_var, att)} for att in nc_fprops.getAttributeNames(nc_var)]
 
+            vdims = {}
+            for nc_dim in nc_fprops.getDimensionsByVariable(nc_var):
+                vdims[nc_dim] = {"size": nc_fprops.getDimensionSize(nc_dim), "type": nc_fprops.getFieldType(nc_dim)}
 
-        # MakeNetCDFRasterLayer_md (in_netCDF_file, variable, x_dimension, y_dimension, out_raster_layer, {band_dimension}, {dimension_values}, {value_selection_method})
-        # arcpy.MakeNetCDFRasterLayer_md(cdf, var_field, x_dimension, y_dimension, out_raster_layer, {band_dimension}, {dimension_values}, {value_selection_method})
+            var_d = {nc_var: {"type": nc_fprops.getFieldType(nc_var), "dimensions": vdims, "attributes": vatts}}
 
+            gvars.append(var_d)
 
-        # DefineProjection_management(in_dataset, coor_system)
+        # get dimensions
+        ddims = []
+        for nc_dim in nc_fprops.getDimensions():
 
-        return {"geodata": "dummy", "source_geodata": "dummy"}
+            dvars = {nc_dim: nc_fprops.getFieldType(dvar) for dvar in nc_fprops.getVariablesByDimension(nc_dim)}
 
+            ddim = {nc_dim: {"size": nc_fprops.getDimensionSize(nc_dim), "type": nc_fprops.getFieldType(nc_dim), "variables": dvars}}
+
+            ddims.append(ddim)
+
+        return {"geodata": cdf, "global_attributes": datts, "variables": gvars, "dimensions": ddims}
