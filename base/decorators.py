@@ -138,6 +138,9 @@ class TableSetting(object):
         self.table_name = "{}_table".format(data_type)
         self.fields = "{0} {1} Required geodata".format(data_type, data_type.title())
 
+        # special case for cdf at the moment
+        self.fields = "{0} {1} Required cdf".format(data_type, data_type.title())
+
         if len(data_type) != 3:  # for T.L.A.s we will capitalise
             self.table_display_name = "Table for {}".format(data_type.title())
         else:

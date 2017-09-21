@@ -1,10 +1,10 @@
 from base.base_tool import BaseTool
 from base.decorators import input_tableview, input_output_table
-from netCDF4 import Dataset
+# from netCDF4 import Dataset
 import arcpy
 from base.utils import validate_geodata
 
-tool_settings = {"label": "Describe CDF",
+tool_settings = {"label": "Describe",
                  "description": "Describe a CDF file",
                  "can_run_background": "True",
                  "category": "NetCDF"}

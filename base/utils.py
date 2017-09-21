@@ -273,6 +273,11 @@ def parse_proj_string_for_name(proj_string):
 
 # @base.log.log_error
 def make_raster_name(like_name, out_wspace, ext='', prefix='', suffix=''):
+    """
+
+    Returns:
+        object:
+    """
     _, __, r_name, r_ext = split_up_filename(like_name)
 
     ext = "" if (is_local_gdb(out_wspace) or ext == "Esri Grid") else ext

@@ -37,14 +37,16 @@ from tools.raster.reproject import ReprojectRasterTool
 from tools.raster.resample import ResampleRasterTool
 from tools.raster.set_no_data_value import SetNodataValueRasterTool
 from tools.raster.set_value_to_null import SetValueToNullRasterTool
-from tools.raster.slice import SliceRasterTool
 from tools.raster.to_ascii import ToAsciiRasterTool
 from tools.raster.transform import TransformRasterTool
 from tools.raster.tweak_values import TweakValuesRasterTool
 from tools.raster.values_at_points import ValuesAtPointsRasterTool
 # cdf tools
 from tools.cdf.describe_cdf import DescribeCdfTool
+from tools.cdf.to_standard_grid import ToStandardGridCdfTool
+from tools.cdf.extract_timeslices import ExtractTimeslicesCdfTool
 from tools.cdf.export_cdf import ExportCdfTool
+from tools.cdf.search_cdf import SearchCdfTool
 
 
 class Toolbox(object):
@@ -102,7 +104,10 @@ class Toolbox(object):
                           }
 
         cdf_tools = {
+                     SearchCdfTool,
                      DescribeCdfTool,
+                     ToStandardGridCdfTool,
+                     ExtractTimeslicesCdfTool,
                      ExportCdfTool
                      }
 

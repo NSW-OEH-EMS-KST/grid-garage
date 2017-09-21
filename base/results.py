@@ -177,16 +177,19 @@ class GgResult(object):
         # tbinfo + str(exc_info()[1])
         msg = msg.strip().replace('\n', ', ').replace('\r', ' ').replace('  ', ' ')
 
-        try:
-            geodata = row["raster"]
-        except KeyError:
-            try:
-                geodata = row["feature"]
-            except KeyError:
-                try:
-                    geodata = row["geodata"]
-                except KeyError:
-                    geodata = "geodata not set for row"
+        geodata = row.values()[0]  #row[0]
+
+        # try:
+        #     geodata = row["raster"]
+        # except KeyError:
+        #     try:
+        #         geodata = row["feature"]
+        #     except KeyError:
+        #         try:
+        #             geodata = row["geodata"]
+        #         except KeyError:
+        #             try:
+        #             geodata = "geodata not set for row"
 
         # write the failure record
         with open(self.fail_csv, "ab") as csv_file:

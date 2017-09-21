@@ -3,32 +3,25 @@ from base.decorators import input_tableview, input_output_table_with_output_affi
 # from netCDF4 import Dataset
 import arcpy
 from base.utils import validate_geodata, make_raster_name, raster_formats2
+import numpy as np
 
 
-tool_settings = {"label": "Export CDF",
-                 "description": "Exports a CDF file to another format",
+tool_settings = {"label": "To Standard Grid",
+                 "description": "Exports CDF files with a standard grid",
                  "can_run_background": "True",
                  "category": "NetCDF"}
 
 
-class ExportCdfTool(BaseTool):
+class ToStandardGridCdfTool(BaseTool):
 
     def __init__(self):
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
-        self.polygon_srs = None
 
         return
 
-    @input_tableview(data_type="cdf")
-    # @parameter("var_field", "Variable Field", "Field", "Required", False, "Input", None, None, ["cdf_table"], None, None)
-    # @parameter("xdim", "X dimension", "Field", "Required", False, "Input", None, None, ["cdf_table"], None, None)
-    # @parameter("ydim", "Y dimension", "Field", "Required", False, "Input", None, None, ["cdf_table"], None, None)
-    # @parameter("bdim", "Band dimension", "Field", "Required", False, "Input", None, None, ["cdf_table"], None, None)
-    # @parameter("dvals", "Band dimension values", "Field", "Required", False, "Input", None, None, ["cdf_table"], None, None)
-    # @parameter("selec", "Value Selection Method", "Field", "Required", False, "Input", None, None, ["cdf_table"], None, None)
-    @parameter("raster_format", "Output Raster Format", "GPString", "Optional", False, "Input", raster_formats2, None, None, "Esri Grid")
+    @input_tableview(data_type="geodata")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
 
@@ -42,9 +35,58 @@ class ExportCdfTool(BaseTool):
 
     def calc(self, data):
 
-        cdf = data["cdf"]
+        geodata = data["geodata"]
 
-        # scratch = arcpy.env.scratchFolder
+        # function[grid_out] = rotated_grid_transform(grid_in, option, SP_coor)
+#     def rotated_grid_transform(self, grid_in, option, SP_coor)
+#
+#         lon = grid_in(:, 1);
+#         lat = grid_in(:, 2);
+#
+#         lon = (lon * pi) / 180; % Convert degrees to radians
+#         lat = (lat * pi) / 180;
+#
+#         SP_lon = SP_coor(1);
+#         SP_lat = SP_coor(2);
+#
+#         theta = 90 + SP_lat; % Rotation around y - axis
+#         phi = SP_lon; % Rotation around z - axis
+#
+#         phi = (phi * pi) / 180; % Convert degrees to radians
+#         theta = (theta * pi) / 180;
+#
+#         x = cos(lon). * cos(lat); % Convert from spherical to cartesian coordinates
+#         y = sin(lon). * cos(lat);
+#         z = sin(lat);
+#
+#         if option == 1 % Regular -> Rotated
+#
+#         x_new = cos(theta). * cos(phi). * x + cos(theta). * sin(phi). * y + sin(theta). * z;
+#         y_new = -sin(phi). * x + cos(phi). * y;
+#         z_new = -sin(theta). * cos(phi). * x - sin(theta). * sin(phi). * y + cos(theta). * z;
+#
+#     elseif
+#     option == 2 % Rotated -> Regular
+#
+#     phi = -phi;
+#     theta = -theta;
+#
+#     x_new = cos(theta). * cos(phi). * x + sin(phi). * y + sin(theta). * cos(phi). * z;
+#     y_new = -cos(theta). * sin(phi). * x + cos(phi). * y - sin(theta). * sin(phi). * z;
+#     z_new = -sin(theta). * x + cos(theta). * z;
+#
+#
+# end
+#
+# lon_new = atan2(y_new, x_new); % Convert  cartesian back to spherical coordinates
+# lat_new = asin(z_new);
+#
+# lon_new = (lon_new * 180) / pi; % Convert radians back to degrees
+# lat_new = (lat_new * 180) / pi;
+#
+# grid_out = [lon_new lat_new];
+
+# scratch = arcpy.env.scratchFolder
         #
         # validate_geodata(cdf, NetCdf=True)
         #
