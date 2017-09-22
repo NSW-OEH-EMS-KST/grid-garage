@@ -2,8 +2,8 @@ from base.base_tool import BaseTool
 from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter
 # from netCDF4 import Dataset
 import arcpy
-from base.utils import validate_geodata, make_raster_name, raster_formats2
-
+from base.utils import validate_geodata, make_raster_name, raster_formats
+from os.path import join
 
 tool_settings = {"label": "Extract Timeslices",
                  "description": "Extracts timeslices from CDF files",
@@ -21,6 +21,7 @@ class ExtractTimeslicesCdfTool(BaseTool):
         return
 
     @input_tableview(data_type="cdf")
+    @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, raster_formats[0])
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
 
@@ -36,186 +37,103 @@ class ExtractTimeslicesCdfTool(BaseTool):
 
         cdf = data["cdf"]
 
-        # Inputs
-        # Input_NetCDF_layer = arcpy.GetParameterAsText(0)
-        # Output_Folder = arcpy.GetParameterAsText(1)
+        nc_fprops = arcpy.NetCDFFileProperties(cdf)
 
-        # MAke layer...
+        gvars = nc_fprops.getVariables()
 
-        # Input_Name = Input_NetCDF_layer
-        # Output_Raster = Output_Folder + os.sep + "NetCDF_Raster.tif"
-        #
-        # # Copy the NetCDF layer as a TIF file.
-        # arcpy.CopyRaster_management(Input_Name, Output_Raster)
-        # arcpy.AddMessage(Output_Raster + " " + "created from NetCDF layer")
-        #
-        # # Reading number of band information from saved TIF
-        # bandcount = arcpy.GetRasterProperties_management(Output_Raster, "BANDCOUNT")
-        # resultValue = bandcount.getOutput(0)
-        #
-        # count = 1
-        # arcpy.AddMessage("Exporting individual bands from" + Output_Raster)
-        #
-        # # Loop through the bands and copy bands as a seperate TIF file.
-        # while count <= int(resultValue):
-        #     Input_Raster_Name = Output_Raster + os.sep + "Band_" + str(count)
-        #     Output_Band = Output_Folder + os.sep + "Band_" + str(count) + ".tif"
-        #     arcpy.CopyRaster_management(Input_Raster_Name, Output_Band)
-        #     arcpy.AddMessage("Band_" + str(count) + ".tif" + " " "exported" + " " + "successfully")
-        #     count += 1
-        #
-        # # The following will delete the TIFF file that was created by CopyRaster tool.
-        # arcpy.Delete_management(Output_Raster, "#")
-        #
-        # arcpy.AddMessage("Tool Executed Successfully")
-        # # scratch = arcpy.env.scratchFolder
-        # #
-        # # validate_geodata(cdf, NetCdf=True)
-        # #
-        # nc_fprops = arcpy.NetCDFFileProperties(cdf)
-        # #
-        # # ncDim = nc_fprops.getDimensions()
-        # #
-        # # for dim in ncDim:
-        # #     print "%s (%s)" % (dim, nc_fprops.getFieldType(dim))
-        # #     top = nc_fprops.getDimensionSize(dim)
-        # #     for i in range(0, top):
-        # #         print nc_fprops.getDimensionValue(dim, i)
-        # #
-        # # return
-        # gvars = nc_fprops.getVariables()
-        # #
-        # # # for v in gvars:
-        # # #     self.info("Creating layer from {} on {} ...".format(cdf, v))
-        # #
-        # ras_tmp = "in_memory\\tmp_lyr"  # make_raster_name("TMP_LYR", "in_memory", "Esri Grid", "", "")
+        rp = "Rotated_pole"
+
+        if rp in gvars:
+            raise ValueError("Could not create layer from {}, variable {} was found".format(cdf, rp))
+            # self.warn(e)
+            # data.update({"error": e})
+            # self.result.add_fail(data)
+            # return
+
+        tll = ["time", "lat", "lon"]
+        exc = ["time_bands", "time_bnds"]
+
+        if not all(v in gvars for v in tll):
+            raise ValueError("Variable set {} was not found".format(cdf, tll))
+            # self.warn(e)
+            # data.update({"error": e})
+            # self.result.add_fail(data)
+            # return
+
+        ovars = [v for v in gvars if v not in (tll + exc)]
+        ov = ovars[-1]
+
+        self.info("Creating layer from {} on {} ...".format(cdf, ov))
+
+        lyr_tmp = r"in_memory\tmp_lyr"
+
+        arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(4326)  # TO DO for now hard-wire wgs84
+
         # try:
-        #     arcpy.Delete_management(ras_tmp)
-        # except:
-        #     pass
-        #
-        # ras_out = make_raster_name(cdf, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
-        #
+        # arcpy.MakeNetCDFRasterLayer_md(cdf, ov, "lon", "lat", lyr_tmp, "time", None, "BY_VALUE")  #, {band_dimension}, {dimension_values}, {value_selection_method})
+        arcpy.MakeNetCDFRasterLayer_md(cdf, ov, "x", "y", lyr_tmp, "time", None, "BY_VALUE")  #, {band_dimension}, {dimension_values}, {value_selection_method})
+
+        # except Exception as e:
+        #     self.warn(e)
+        #     data.update({"error": e})
+        #     self.result.add_fail(data)
+        #     return
+
+        self.info("... creating temporary dataset ...")
+
+        ras_tmp = r"in_memory\tmp_ras"
         # try:
-        #         # The following will delete the TIF file that was created by CopyRaster tool.
-        #         # arcpy.Delete_management(Output_Raster, "#")
-        #
-        #     if all(["lat", "lon", "time"] in gvars for v in gvars):
-        #         arcpy.MakeNetCDFRasterLayer_md(cdf, v, "lon", "lat", ras_out, "", "time", "BY_VALUE")  #, {band_dimension}, {dimension_values}, {value_selection_method})
-        #     elif all(["lat", "lon"] in gvars for v in gvars):
-        #         arcpy.MakeNetCDFRasterLayer_md(cdf, v, "lon", "lat", ras_out, "", "", "BY_VALUE")  #, {band_dimension}, {dimension_values}, {value_selection_method})
-        #     else:
-        #         out = "{}_layer".format(v)
-        #     # arcpy.MakeNetCDFRasterLayer_md(cdf, v, "x", "y", ras_out)  #, {band_dimension}, {dimension_values}, {value_selection_method})
-        #     arcpy.MakeNetCDFRasterLayer_md(in_netCDF_file=cdf, variable=v, x_dimension="x", y_dimension="y",
-        #                                    out_raster_layer=out, band_dimension="", dimension_values="", value_selection_method="BY_VALUE")
-        # #
-        # #         self.info("... attempting export -->> {} ...".format(ras_out))
-        # #                     # arcpy.MakeNetCDFRasterLayer_md(inNetCDF, variable, x_dimension, y_dimension, nowFile, band_dimension, dimension_values, valueSelectionMethod)
-        # #
-        # #         arcpy.CopyRaster_management(out, ras_out, "", "", "", "NONE", "NONE", "")
-        # #     arcpy.mapping.Layer(out).save(ras_out)
-        # #
-        # #     self.result.add_pass({"geodata": ras_out, "source_geodata": cdf})
-        # #
-        # # except Exception as e:
-        # #     self.error("FAILED exporting {}: {}".format(cdf, str(e)))
-        # #     self.result.add_fail(data)
+        arcpy.CopyRaster_management(lyr_tmp, ras_tmp)
+
+        # except Exception as e:
+        #     self.warn(e)
+        #     data.update({"error": e})
+        #     self.result.add_fail(data)
+        #     return
+
+        bandcount = int(arcpy.GetRasterProperties_management(ras_tmp, "BANDCOUNT").getOutput(0))
+
+        self.info("Exporting {} individual bands from {}".format(bandcount, ras_tmp))
+
+        for i in range(1, bandcount + 1):
+            band = "Band_{}".format(i)
+            i_ras = join(ras_tmp, band)
+            dimension_value = sanitise_dimension(nc_fprops.getDimensionValue("time", i))
+            o_ras = make_name(cdf, dimension_value, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+            try:
+                arcpy.CopyRaster_management(i_ras, o_ras)
+                self.info("{} exported successfully".format(o_ras))
+                self.result.add_pass({"geodata}": o_ras, "source_geodata": cdf, "global_vars": gvars})
+
+            except Exception as e:
+                self.warn("Failed to export {} : {}".format(o_ras, str(e)))
+                data.update({"error": e})
+                self.result.add_fail(data)
+
+        try:
+            arcpy.Delete_management(ras_tmp)
+        except:
+            pass
+
+        try:
+            arcpy.Delete_management(lyr_tmp)
+        except:
+            pass
 
         return
 
 
-def extractAllNetCDF(cdf, variable, dimension, x_dimension, y_dimension, band_dimension, value_selection_method="BY_VALUE"):
+def make_name(cdf, dimval, ws, fmt, pfx, sfx):
 
-    # variable = "RRt_10m"
-    # x_dimension = "lon"
-    # y_dimension = "lat"
-    # band_dimension = ""
-    # dimension = "time"
-    # value_selection_method = "BY_VALUE"
+    likename = "{}_{}".format(cdf.replace(".", "_"), dimval)
 
-    outLoc = "E:/New Folder/"
-    inNetCDF = "E:/netCDFFiles/RRt.nc"
-
-    nc_FP = arcpy.NetCDFFileProperties(cdf)
-    nc_Dim = nc_FP.getDimensions()
-
-    for dimension in nc_Dim:
-
-        top = nc_FP.getDimensionSize(dimension)
-
-        for i in range(0, top):
-
-            if dimension == "time":
-                dimension_value = nc_FP.getDimensionValue(dimension, i)
-                nowFile = str(dimension_value)
-
-                # THIS IS THE NEW CODE HERE
-                dv1 = ["time", dimension_value]
-                dimension_values = [dv1]
-                # END NEW CODE
-
-                arcpy.MakeNetCDFRasterLayer_md(inNetCDF, variable, x_dimension, y_dimension, nowFile, band_dimension, dimension_values,
-                                               value_selection_method)
-                arcpy.CopyRaster_management(nowFile, outLoc + nowFile + ".img", "", "", "", "NONE", "NONE", "")
-                print dimension_values, i
+    return make_raster_name(likename, ws, fmt, pfx, sfx)
 
 
-                    # # Copy the NetCDF layer as a TIF file.
-    # arcpy.CopyRaster_management(Input_Name, Output_Raster)
-    # arcpy.AddMessage(Output_Raster + " " + "created from NetCDF layer")
-    #
-    # # Reading number of band information from saved TIF
-    # bandcount = arcpy.GetRasterProperties_management(Output_Raster, "BANDCOUNT")
-    # resultValue = bandcount.getOutput(0)
-    #
-    # count = 1
-    # arcpy.AddMessage("Exporting individual bands from" + Output_Raster)
-    #
-    # # Loop through the bands and copy bands as a seperate TIF file.
-    # while count <= int(resultValue):
-    #     Input_Raster_Name = Output_Raster + os.sep + "Band_" + str(count)
-    #     Output_Band = Output_Folder + os.sep + "Band_" + str(count) + ".tif"
-    #     arcpy.CopyRaster_management(Input_Raster_Name, Output_Band)
-    #     arcpy.AddMessage("Band_" + str(count) + ".tif" + " " "exported" + " " + "successfully")
-    #     count += 1
-    #
-    # # The following will delete the TIF file that was created by CopyRaster tool.
-    # arcpy.Delete_management(Output_Raster, "#")
-    #
-    # arcpy.AddMessage("Tool Executed Successfully")
-# def extractAllNetCDF():
-#
-#     variable = "RRt_10m"
-#     x_dimension = "lon"
-#     y_dimension = "lat"
-#     band_dimension = ""
-#     dimension = "time"
-#     valueSelectionMethod = "BY_VALUE"
-#
-#     outLoc = "E:/New Folder/"
-#     inNetCDF = "E:/netCDFFiles/RRt.nc"
-#
-#     nc_FP = arcpy.NetCDFFileProperties(inNetCDF)
-#     nc_Dim = nc_FP.getDimensions()
-#
-#     for dimension in nc_Dim:
-#
-#         top = nc_FP.getDimensionSize(dimension)
-#
-#         for i in range(0, top):
-#
-#             if dimension == "time":
-#
-#                 dimension_values = nc_FP.getDimensionValue(dimension, i)
-#                 nowFile = str(dimension_values)
-#
-#                 #THIS IS THE NEW CODE HERE
-#                 dv1 = ["time", dimension_value]
-#                 dimension_values = [dv1]
-#                 #END NEW CODE
-#
-#                 arcpy.MakeNetCDFRasterLayer_md(inNetCDF, variable, x_dimension, y_dimension, nowFile, band_dimension, dimension_values, valueSelectionMethod)
-#                 arcpy.CopyRaster_management(nowFile, outLoc + nowFile + ".img", "", "", "", "NONE", "NONE", "")
-#                 print dimension_values, i
+def sanitise_dimension(d):
 
+    d = d.replace("/", "-")
+
+    d = d.replace("\\", "-")
+
+    return d

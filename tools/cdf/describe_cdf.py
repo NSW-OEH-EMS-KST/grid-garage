@@ -44,7 +44,8 @@ class DescribeCdfTool(BaseTool):
 
         # get variables
         gvars = []
-        for nc_var in nc_fprops.getVariables():
+        vars = nc_fprops.getVariables()
+        for nc_var in vars:
 
             vatts = [{att: nc_fprops.getAttributeValue(nc_var, att)} for att in nc_fprops.getAttributeNames(nc_var)]
 
@@ -58,7 +59,8 @@ class DescribeCdfTool(BaseTool):
 
         # get dimensions
         ddims = []
-        for nc_dim in nc_fprops.getDimensions():
+        dims = nc_fprops.getDimensions()
+        for nc_dim in dims:
 
             dvars = {nc_dim: nc_fprops.getFieldType(dvar) for dvar in nc_fprops.getVariablesByDimension(nc_dim)}
 
@@ -66,4 +68,4 @@ class DescribeCdfTool(BaseTool):
 
             ddims.append(ddim)
 
-        return {"geodata": cdf, "global_attributes": datts, "variables": gvars, "dimensions": ddims}
+        return {"geodata": cdf, "variables": vars, "dimensions": dims, "global_attributes_x": datts, "variables_x": gvars, "dimensions_x": ddims}

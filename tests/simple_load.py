@@ -120,7 +120,7 @@ def test_tools():
     for t in tb.tools:
         try:
             tool = t()
-            print "Dummy run  - {}".format(tool.label)
+            print "Load test - {}".format(tool.label)
             tool.execute(tool.getParameterInfo(), None)
         except Exception as e:
             print e
