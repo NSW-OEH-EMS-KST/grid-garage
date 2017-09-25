@@ -1,8 +1,12 @@
 from base.base_tool import BaseTool
 from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter
-# from netCDF4 import Dataset
+from netCDF4 import Dataset
+import numpy as np
+import pandas as pd
 import arcpy
-from base.utils import validate_geodata, make_raster_name, raster_formats2
+from base.utils import validate_geodata, make_raster_name, raster_formats
+from os.path import join
+from math import cos, sin, atan2, asin, radians, degrees
 
 
 tool_settings = {"label": "Extract Timeslices",
@@ -21,6 +25,7 @@ class ExtractTimeslicesCdfTool(BaseTool):
         return
 
     @input_tableview(data_type="cdf")
+    @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, raster_formats[0])
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
 
@@ -36,186 +41,232 @@ class ExtractTimeslicesCdfTool(BaseTool):
 
         cdf = data["cdf"]
 
-        # Inputs
-        # Input_NetCDF_layer = arcpy.GetParameterAsText(0)
-        # Output_Folder = arcpy.GetParameterAsText(1)
+        nc_fprops = arcpy.NetCDFFileProperties(cdf)
 
-        # MAke layer...
+        gvars = nc_fprops.getVariables()
 
-        # Input_Name = Input_NetCDF_layer
-        # Output_Raster = Output_Folder + os.sep + "NetCDF_Raster.tif"
-        #
-        # # Copy the NetCDF layer as a TIF file.
-        # arcpy.CopyRaster_management(Input_Name, Output_Raster)
-        # arcpy.AddMessage(Output_Raster + " " + "created from NetCDF layer")
-        #
-        # # Reading number of band information from saved TIF
-        # bandcount = arcpy.GetRasterProperties_management(Output_Raster, "BANDCOUNT")
-        # resultValue = bandcount.getOutput(0)
-        #
-        # count = 1
-        # arcpy.AddMessage("Exporting individual bands from" + Output_Raster)
-        #
-        # # Loop through the bands and copy bands as a seperate TIF file.
-        # while count <= int(resultValue):
-        #     Input_Raster_Name = Output_Raster + os.sep + "Band_" + str(count)
-        #     Output_Band = Output_Folder + os.sep + "Band_" + str(count) + ".tif"
-        #     arcpy.CopyRaster_management(Input_Raster_Name, Output_Band)
-        #     arcpy.AddMessage("Band_" + str(count) + ".tif" + " " "exported" + " " + "successfully")
-        #     count += 1
-        #
-        # # The following will delete the TIFF file that was created by CopyRaster tool.
-        # arcpy.Delete_management(Output_Raster, "#")
-        #
-        # arcpy.AddMessage("Tool Executed Successfully")
-        # # scratch = arcpy.env.scratchFolder
-        # #
-        # # validate_geodata(cdf, NetCdf=True)
-        # #
-        # nc_fprops = arcpy.NetCDFFileProperties(cdf)
-        # #
-        # # ncDim = nc_fprops.getDimensions()
-        # #
-        # # for dim in ncDim:
-        # #     print "%s (%s)" % (dim, nc_fprops.getFieldType(dim))
-        # #     top = nc_fprops.getDimensionSize(dim)
-        # #     for i in range(0, top):
-        # #         print nc_fprops.getDimensionValue(dim, i)
-        # #
-        # # return
-        # gvars = nc_fprops.getVariables()
-        # #
-        # # # for v in gvars:
-        # # #     self.info("Creating layer from {} on {} ...".format(cdf, v))
-        # #
-        # ras_tmp = "in_memory\\tmp_lyr"  # make_raster_name("TMP_LYR", "in_memory", "Esri Grid", "", "")
-        # try:
-        #     arcpy.Delete_management(ras_tmp)
-        # except:
-        #     pass
-        #
-        # ras_out = make_raster_name(cdf, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
-        #
-        # try:
-        #         # The following will delete the TIF file that was created by CopyRaster tool.
-        #         # arcpy.Delete_management(Output_Raster, "#")
-        #
-        #     if all(["lat", "lon", "time"] in gvars for v in gvars):
-        #         arcpy.MakeNetCDFRasterLayer_md(cdf, v, "lon", "lat", ras_out, "", "time", "BY_VALUE")  #, {band_dimension}, {dimension_values}, {value_selection_method})
-        #     elif all(["lat", "lon"] in gvars for v in gvars):
-        #         arcpy.MakeNetCDFRasterLayer_md(cdf, v, "lon", "lat", ras_out, "", "", "BY_VALUE")  #, {band_dimension}, {dimension_values}, {value_selection_method})
-        #     else:
-        #         out = "{}_layer".format(v)
-        #     # arcpy.MakeNetCDFRasterLayer_md(cdf, v, "x", "y", ras_out)  #, {band_dimension}, {dimension_values}, {value_selection_method})
-        #     arcpy.MakeNetCDFRasterLayer_md(in_netCDF_file=cdf, variable=v, x_dimension="x", y_dimension="y",
-        #                                    out_raster_layer=out, band_dimension="", dimension_values="", value_selection_method="BY_VALUE")
-        # #
-        # #         self.info("... attempting export -->> {} ...".format(ras_out))
-        # #                     # arcpy.MakeNetCDFRasterLayer_md(inNetCDF, variable, x_dimension, y_dimension, nowFile, band_dimension, dimension_values, valueSelectionMethod)
-        # #
-        # #         arcpy.CopyRaster_management(out, ras_out, "", "", "", "NONE", "NONE", "")
-        # #     arcpy.mapping.Layer(out).save(ras_out)
-        # #
-        # #     self.result.add_pass({"geodata": ras_out, "source_geodata": cdf})
-        # #
-        # # except Exception as e:
-        # #     self.error("FAILED exporting {}: {}".format(cdf, str(e)))
-        # #     self.result.add_fail(data)
+        tll = ["time", "lat", "lon"]
+        exc = ["time_bands", "time_bnds"]
+
+        if not all(v in gvars for v in tll):
+            raise ValueError("Georeferenced variable set {} was not found in {}".format(tll, cdf))
+
+        rp = "Rotated_pole" if "Rotated_pole" in gvars else None  # flag for Rotated_pole projection
+
+        if rp:
+            self.info("'{}' is on a Rotated_pole projection".format(cdf))
+
+        ovars = [v for v in gvars if v not in (tll + exc)]
+        ov = ovars[-1]
+
+        self.info("Exports will be based on variable {} ...".format(ov))
+
+        arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(4326)  # TO DO for now hard-wire wgs84
+
+        if rp:
+            self.info("Reading rotated pole array")
+            ds = Dataset(cdf)
+            lon = ds.variables["lon"][:]
+            lat = ds.variables["lat"][:]
+            time = ds.variables["time"][:]
+            ovz = ds.variables[ov]
+            self.info(ovz)
+            self.info(ovz.shape)
+            # ntimes, ny, nx = time.shape
+            # cold_days = zeros((ny, nx), dtype=int)
+
+            # for o in ov:
+            #     print ds.variables[ov][:, :, :]
+                # cold_days += atemp[i, :, :].data - 273.15 < 0
+
+            # for t in time:
+
+            # df = pd.DataFrame(time)
+            # z = zip(time, lon, lat)
+            # dim_lon, dim_lat = ds.get
+            # df = arcpy.RasterToNumPyArray(i_ras)
+            # df = pd.DataFrame(z)
+            # self.info(df)
+            # x = self.rotated_grid_transform(df, 150.73153686523438, -31.704599380493164)
+            # self.info(x)
+        else:
+            lyr_tmp = r"in_memory\tmp_lyr"
+            arcpy.MakeNetCDFRasterLayer_md(cdf, ov, "x", "y", lyr_tmp, "time", None, "BY_VALUE")
+
+            self.info("... creating temporary dataset ...")
+
+            ras_tmp = r"in_memory\tmp_ras"
+            arcpy.CopyRaster_management(lyr_tmp, ras_tmp)
+
+            bandcount = int(arcpy.GetRasterProperties_management(ras_tmp, "BANDCOUNT").getOutput(0))
+
+            self.info("Exporting {} individual bands from {}".format(bandcount, ras_tmp))
+
+            for i in range(1, bandcount + 1):
+                band = "Band_{}".format(i)
+                i_ras = join(ras_tmp, band)
+                dimension_value = sanitise_dimension(nc_fprops.getDimensionValue("time", i))
+                o_ras = make_name(cdf, dimension_value, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+                try:
+                    arcpy.CopyRaster_management(i_ras, o_ras)
+                    self.info("{} exported successfully".format(o_ras))
+                    self.result.add_pass({"geodata}": o_ras, "source_geodata": cdf, "global_vars": gvars})
+
+                except Exception as e:
+                    self.warn("Failed to export {} : {}".format(o_ras, str(e)))
+                    data.update({"error": e})
+                    self.result.add_fail(data)
+
+        try:
+            arcpy.Delete_management(ras_tmp)
+        except:
+            pass
+
+        try:
+            arcpy.Delete_management(lyr_tmp)
+        except:
+            pass
 
         return
 
+    def rotated_grid_transform(self, df, np_lon, np_lat, reverse=True):
 
-def extractAllNetCDF(cdf, variable, dimension, x_dimension, y_dimension, band_dimension, value_selection_method="BY_VALUE"):
+        """
+        Transformation script: Regular lon/lat <-> Rotated pole lon/lat
 
-    # variable = "RRt_10m"
-    # x_dimension = "lon"
-    # y_dimension = "lat"
-    # band_dimension = ""
-    # dimension = "time"
-    # value_selection_method = "BY_VALUE"
+        This function transforms a coordinate tuple(lon,lat) in regular lon/lat
+        degrees to a coordinate in rotated lon/lat degrees, and vice versa.
 
-    outLoc = "E:/New Folder/"
-    inNetCDF = "E:/netCDFFiles/RRt.nc"
+        Adapted from: http://ch.mathworks.com/matlabcentral/fileexchange/43435-rotated-grid-transform
 
-    nc_FP = arcpy.NetCDFFileProperties(cdf)
-    nc_Dim = nc_FP.getDimensions()
+        INSER SA, David Reksten, dr@inser.ch
+        2017-05-03
+        """
 
-    for dimension in nc_Dim:
+        """
+        position:   tuple(lon, lat) = input coordinate
+        reverse:  0 = Regular -> Rotated, 1 = Rotated -> Regular
+        south_pole: tuple(lon, lat) = position of rotated south pole
+        returns:    tuple(lon, lat) = output coordinate
+        """
 
-        top = nc_FP.getDimensionSize(dimension)
+        self.info("Transforming raw coordinates...")
 
-        for i in range(0, top):
+        # Convert degrees to radians
+        df['rlat'] = df['lat'].apply(radians)
+        df['rlon'] = df['lon'].apply(radians)
+        # df['rlat'], df['rlon'] = np.radians(df['lat']), np.radians(df['lon'])
 
-            if dimension == "time":
-                dimension_value = nc_FP.getDimensionValue(dimension, i)
-                nowFile = str(dimension_value)
+        self.info("Dataframe " * 10)
+        self.info(df)
 
-                # THIS IS THE NEW CODE HERE
-                dv1 = ["time", dimension_value]
-                dimension_values = [dv1]
-                # END NEW CODE
+        # Rotations in radians
+        theta = radians(90 + np_lat)  # Rotation around y-axis
+        phi = radians(np_lon)  # Rotation around z-axis
 
-                arcpy.MakeNetCDFRasterLayer_md(inNetCDF, variable, x_dimension, y_dimension, nowFile, band_dimension, dimension_values,
-                                               value_selection_method)
-                arcpy.CopyRaster_management(nowFile, outLoc + nowFile + ".img", "", "", "", "NONE", "NONE", "")
-                print dimension_values, i
+        # Convert from spherical to cartesian coordinates
+        df["x"] = df.apply(lambda x: cos(x["rlat"]) * cos(x["rlon"]))
+        # x = cos(lon) * cos(lat)
+        df["y"] = df.apply(lambda x: sin(x["rlon"]) * cos(x["rlat"]))
+        # y = sin(lon) * cos(lat)
+        df["z"] = sin(df["rlat"])
+        # z = sin(lat)
+
+        self.info("Dataframe " * 10)
+        self.info(df)
+
+        if not reverse:  # Regular -> Rotated
+
+            df["x_new"] = df.apply(lambda x: cos(theta) * cos(phi) * x["x"] + cos(theta) * sin(phi) * x["y"] + sin(theta) * x["z"])
+            df["y_new"] = df.apply(lambda x: -sin(phi) * x["x"] + cos(phi) * x["y"])
+            df["z_new"] = df.apply(lambda x: -sin(theta) * cos(phi) * x["x"] - sin(theta) * sin(phi) * x["y"] + cos(theta) * x["z"])
+
+        else:  # Rotated -> Regular
+            self.info("reverse")
+            phi = -phi
+            theta = -theta
+
+            df["x_new"] = df.apply(lambda x: cos(theta) * cos(phi) * x["x"] + sin(phi) * x["y"] + sin(theta) * cos(phi) * x["z"])
+            df["y_new"] = df.apply(lambda x: -cos(theta) * sin(phi) * x["x"] + cos(phi) * x["y"] - sin(theta) * sin(phi) * x["z"])
+            df["z_new"] = df.apply(lambda x: -sin(theta) * x["x"] + cos(theta) * x["z"])
+
+        # Convert cartesian back to spherical coordinates (degrees)
+        df["lon_new"] = df.apply(lambda x: degrees(atan2(x["y_new"], x["x_new"])))
+        df["lat_new"] = degrees(asin(df["z_new"])) #asin(z_new)
+
+        self.info("Dataframe " * 10)
+        self.info(df)
+
+        return df[["time", "lat_new", "lon_new"]]
 
 
-                    # # Copy the NetCDF layer as a TIF file.
-    # arcpy.CopyRaster_management(Input_Name, Output_Raster)
-    # arcpy.AddMessage(Output_Raster + " " + "created from NetCDF layer")
-    #
-    # # Reading number of band information from saved TIF
-    # bandcount = arcpy.GetRasterProperties_management(Output_Raster, "BANDCOUNT")
-    # resultValue = bandcount.getOutput(0)
-    #
-    # count = 1
-    # arcpy.AddMessage("Exporting individual bands from" + Output_Raster)
-    #
-    # # Loop through the bands and copy bands as a seperate TIF file.
-    # while count <= int(resultValue):
-    #     Input_Raster_Name = Output_Raster + os.sep + "Band_" + str(count)
-    #     Output_Band = Output_Folder + os.sep + "Band_" + str(count) + ".tif"
-    #     arcpy.CopyRaster_management(Input_Raster_Name, Output_Band)
-    #     arcpy.AddMessage("Band_" + str(count) + ".tif" + " " "exported" + " " + "successfully")
-    #     count += 1
-    #
-    # # The following will delete the TIF file that was created by CopyRaster tool.
-    # arcpy.Delete_management(Output_Raster, "#")
-    #
-    # arcpy.AddMessage("Tool Executed Successfully")
-# def extractAllNetCDF():
+def make_name(cdf, dimval, ws, fmt, pfx, sfx):
+
+    likename = "{}_{}".format(cdf.replace(".", "_"), dimval)
+
+    return make_raster_name(likename, ws, fmt, pfx, sfx)
+
+
+def sanitise_dimension(d):
+
+    d = d.replace("/", "-")
+
+    d = d.replace("\\", "-")
+
+    return d
+
+    # from netCDF4 import Dataset
+    # import numpy
+
+    # # lons, lats, weather_elements and time_values are numpy arrays
+    # # print the longitude, latitude, time and temperature (T_SFC) at the first data point at the initial time
+    # print lons[0], lats[0], time_values[0], weather_elements[0, 0, 0]
+    # ncdf.close()
+
+
 #
-#     variable = "RRt_10m"
-#     x_dimension = "lon"
-#     y_dimension = "lat"
-#     band_dimension = ""
-#     dimension = "time"
-#     valueSelectionMethod = "BY_VALUE"
+#     if __name__ == '__main__':
+#         south_pole_relocated = (10, -40)  # COSMO-EU shift
 #
-#     outLoc = "E:/New Folder/"
-#     inNetCDF = "E:/netCDFFiles/RRt.nc"
+#         cosmo_origo = rotated_grid_transform((0, 0), 2, south_pole_relocated)
+#         print "Cosmo origo", cosmo_origo
 #
-#     nc_FP = arcpy.NetCDFFileProperties(inNetCDF)
-#     nc_Dim = nc_FP.getDimensions()
+#         print "Cosmo-EU lower left", rotated_grid_transform((-18.0, -20.0), 2, south_pole_relocated)
+#         print "Cosmo-EU lower right", rotated_grid_transform((23.5, -20.0), 2, south_pole_relocated)
+#         print "Cosmo-EU upper right", rotated_grid_transform((23.5, 21.0), 2, south_pole_relocated)
+#         print "Cosmo-EU upper left", rotated_grid_transform((-18.0, 21.0), 2, south_pole_relocated)
 #
-#     for dimension in nc_Dim:
+#         print ""
+#         print "Cosmo-7 lower left", rotated_grid_transform((-9.8, 35.16), 1, south_pole_relocated)
+#         print "Cosmo-7 upper right", rotated_grid_transform((23.02, 56.84), 1, south_pole_relocated)
 #
-#         top = nc_FP.getDimensionSize(dimension)
-#
-#         for i in range(0, top):
-#
-#             if dimension == "time":
-#
-#                 dimension_values = nc_FP.getDimensionValue(dimension, i)
-#                 nowFile = str(dimension_values)
-#
-#                 #THIS IS THE NEW CODE HERE
-#                 dv1 = ["time", dimension_value]
-#                 dimension_values = [dv1]
-#                 #END NEW CODE
-#
-#                 arcpy.MakeNetCDFRasterLayer_md(inNetCDF, variable, x_dimension, y_dimension, nowFile, band_dimension, dimension_values, valueSelectionMethod)
-#                 arcpy.CopyRaster_management(nowFile, outLoc + nowFile + ".img", "", "", "", "NONE", "NONE", "")
-#                 print dimension_values, i
+#         print ""
+#         print "Cosmo-2 lower left", rotated_grid_transform((2.25, 42.72), 1, south_pole_relocated)
+#         print "Cosmo-2 upper right", rotated_grid_transform((17.25, 49.76), 1, south_pole_relocated)
 
+
+# def rotated_grid_transform(grid_in, option, SP_coor):
+# function [grid_out] = rotated_grid_transform(grid_in, option, SP_coor)
+#     lon = grid_in(:,1);
+#     lat = grid_in(:,2);
+#     lon = (lon*pi)/180; % Convert degrees to radians
+#     lat = (lat*pi)/180;
+#     SP_lon = SP_coor(1);
+#     SP_lat = SP_coor(2);
+#     theta = 90+SP_lat; % Rotation around y-axis
+#     phi = SP_lon; % Rotation around z-axis
+#     phi = (phi*pi)/180; % Convert degrees to radians
+#     theta = (theta*pi)/180;
+#     x = cos(lon).*cos(lat); % Convert from spherical to cartesian coordinates
+#     y = sin(lon).*cos(lat);
+#     z = sin(lat);
+#     if option == 1 % Regular -> Rotated
+#         x_new = cos(theta).*cos(phi).*x + cos(theta).*sin(phi).*y + sin(theta).*z;
+#         y_new = -sin(phi).*x + cos(phi).*y;
+#         z_new = -sin(theta).*cos(phi).*x - sin(theta).*sin(phi).*y + cos(theta).*z;
+#     elseif option == 2 % Rotated -> Regular
+#         phi = -phi;
+#         theta = -theta;
+#         x_new = cos(theta).*cos(phi).*x + sin(phi).*y + sin(theta).*cos(phi).*z;
+#         y_new = -cos(theta).*sin(phi).*x + cos(phi).*y - sin(theta).*sin(phi).*z;
+#         z_new = -sin(theta).*x + cos(theta).*z;
