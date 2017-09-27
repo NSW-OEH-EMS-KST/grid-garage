@@ -12,8 +12,15 @@ tool_settings = {"label": "Copy",
 
 
 class CopyGeodataTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
@@ -23,16 +30,34 @@ class CopyGeodataTool(BaseTool):
     @input_tableview()
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.copy, "geodata_table", ["geodata"], return_to_results=True)
 
         return
 
     def copy(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         gd = data["geodata"]
 

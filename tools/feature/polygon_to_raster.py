@@ -12,8 +12,15 @@ tool_settings = {"label": "Polygon to Raster",
 
 
 class PolygonToRasterTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
@@ -26,10 +33,20 @@ class PolygonToRasterTool(BaseTool):
     @parameter("cell_assignment", "Cell Assignment", "GPString", "Optional", False, "Input", ["CELL_CENTER", "MAXIMUM_AREA", "MAXIMUM_COMBINED_AREA"], None, None, None)
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
         self.info(self.get_parameter_dict())
 
         self.cell_assignment = "CELL_CENTER" if self.cell_assignment in [None, "#"] else self.cell_assignment
@@ -39,6 +56,11 @@ class PolygonToRasterTool(BaseTool):
         return
 
     def rasterise(self, data):
+        """
+
+        Args:
+            data:
+        """
         self.info(data)
 
         feat_ds = data["geodata"]

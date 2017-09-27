@@ -12,8 +12,15 @@ tool_settings = {"label": "To ASCII",
 
 
 class ToAsciiRasterTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
 
@@ -24,16 +31,34 @@ class ToAsciiRasterTool(BaseTool):
     @input_tableview(data_type="raster")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.copy, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def copy(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         ras = data["geodata"]
 

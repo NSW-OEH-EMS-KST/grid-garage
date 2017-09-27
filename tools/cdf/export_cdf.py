@@ -12,8 +12,15 @@ tool_settings = {"label": "Export CDF",
 
 
 class ExportCdfTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
@@ -31,16 +38,34 @@ class ExportCdfTool(BaseTool):
     @parameter("raster_format", "Output Raster Format", "GPString", "Optional", False, "Input", raster_formats2, None, None, "Esri Grid")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.calc, return_to_results=False)
 
         return
 
     def calc(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         cdf = data["cdf"]
 
@@ -98,6 +123,17 @@ class ExportCdfTool(BaseTool):
 
 
 def extractAllNetCDF(cdf, variable, dimension, x_dimension, y_dimension, band_dimension, value_selection_method="BY_VALUE"):
+    """
+
+    Args:
+        cdf:
+        variable:
+        dimension:
+        x_dimension:
+        y_dimension:
+        band_dimension:
+        value_selection_method:
+    """
 
     # variable = "RRt_10m"
     # x_dimension = "lon"

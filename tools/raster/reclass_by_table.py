@@ -11,8 +11,15 @@ tool_settings = {"label": "Reclass by Table",
 
 
 class ReclassByTableRasterTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
 
@@ -30,10 +37,20 @@ class ReclassByTableRasterTool(BaseTool):
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, "Esri Grid")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         p = self.get_parameter_dict()
 
@@ -46,6 +63,14 @@ class ReclassByTableRasterTool(BaseTool):
         return
 
     def reclass(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         ras = data["geodata"]
 

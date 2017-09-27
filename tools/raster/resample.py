@@ -11,8 +11,15 @@ tool_settings = {"label": "Resample",
 
 
 class ResampleRasterTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
 
@@ -26,16 +33,34 @@ class ResampleRasterTool(BaseTool):
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.resample, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def resample(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         ras = data["geodata"]
 

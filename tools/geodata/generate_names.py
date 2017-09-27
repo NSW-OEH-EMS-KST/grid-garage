@@ -11,8 +11,15 @@ tool_settings = {"label": "Generate Names",
 
 
 class GenerateNamesGeodataTool(base.base_tool.BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate, self.test_duplicates]
@@ -23,6 +30,11 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
     @parameter("replacements", "Replacements", "GPString", "Optional", False, "Input", None, None, None, None)
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return base.base_tool.BaseTool.getParameterInfo(self)
 
@@ -46,6 +58,11 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
             self.warn(['!! There seems to be non-unique new names. DOH! Please check the following...'] + duplicates)
 
     def initialise(self):
+        """
+
+        Returns:
+
+        """
 
         # look for an early exit as all parameters are optional
         if not (self.output_filename_prefix or self.output_filename_suffix) and self.replacements == "#":
@@ -73,6 +90,11 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
         return
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.process, "geodata_table", ["geodata"], return_to_results=True)
 

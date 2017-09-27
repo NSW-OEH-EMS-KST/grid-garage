@@ -10,8 +10,15 @@ tool_settings = {"label": "Display",
 
 
 class DisplayGeodataTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
@@ -24,12 +31,22 @@ class DisplayGeodataTool(BaseTool):
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.display_geodata, "geodata_table", ["geodata"])
 
         return
 
     def display_geodata(self, data):
+        """
+
+        Args:
+            data:
+        """
 
         geodata = data["geodata"]
 

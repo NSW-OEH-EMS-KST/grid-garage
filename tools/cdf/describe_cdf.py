@@ -11,7 +11,14 @@ tool_settings = {"label": "Describe",
 
 
 class DescribeCdfTool(BaseTool):
+    """
+    """
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
@@ -22,16 +29,34 @@ class DescribeCdfTool(BaseTool):
     @input_tableview(data_type="cdf")
     @input_output_table
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.cdf_describe, return_to_results=True)
 
         return
 
     def cdf_describe(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         cdf = data["cdf"]
 

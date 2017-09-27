@@ -13,8 +13,15 @@ tool_settings = {"label": "To Standard Grid",
 
 
 class ToStandardGridCdfTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
@@ -24,16 +31,34 @@ class ToStandardGridCdfTool(BaseTool):
     @input_tableview(data_type="geodata")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.calc, return_to_results=False)
 
         return
 
     def calc(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         geodata = data["geodata"]
 
@@ -140,6 +165,17 @@ class ToStandardGridCdfTool(BaseTool):
 
 
 def extractAllNetCDF(cdf, variable, dimension, x_dimension, y_dimension, band_dimension, value_selection_method="BY_VALUE"):
+    """
+
+    Args:
+        cdf:
+        variable:
+        dimension:
+        x_dimension:
+        y_dimension:
+        band_dimension:
+        value_selection_method:
+    """
 
     # variable = "RRt_10m"
     # x_dimension = "lon"

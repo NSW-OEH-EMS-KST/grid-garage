@@ -8,6 +8,8 @@ import collections
 
 
 class GgResult(object):
+    """
+    """
 
     def __init__(self):
         """ Add class members """
@@ -111,6 +113,14 @@ class GgResult(object):
         results = make_tuple(results)
 
         def make_string(data):
+            """
+
+            Args:
+                data:
+
+            Returns:
+
+            """
             if isinstance(data, basestring):
                 return str(data)
             elif isinstance(data, collections.Mapping):

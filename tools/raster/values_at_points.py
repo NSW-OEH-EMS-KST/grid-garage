@@ -14,7 +14,14 @@ tool_settings = {"label": "Values at Points",
 
 
 class ValuesAtPointsRasterTool(BaseTool):
+    """
+    """
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate, self.finish]
@@ -28,10 +35,20 @@ class ValuesAtPointsRasterTool(BaseTool):
     @parameter("points", "Point Features", "GPFeatureLayer", "Required", False, "Input", ["Point"], None, None, None)
     @input_output_table
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def initialise(self):
+        """
+
+        Returns:
+
+        """
 
         d = utils.describe(self.points)
         self.points_srs = d.get("dataset_spatialReference", "Unknown")
@@ -48,12 +65,25 @@ class ValuesAtPointsRasterTool(BaseTool):
         return
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.process, "raster_table", ["geodata"])
 
         return
 
     def process(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         ras = data["geodata"]
         utils.validate_geodata(ras, raster=True, srs_known=True)
@@ -92,6 +122,11 @@ class ValuesAtPointsRasterTool(BaseTool):
         return
 
     def finish(self):
+        """
+
+        Returns:
+
+        """
 
         result_list = []
 

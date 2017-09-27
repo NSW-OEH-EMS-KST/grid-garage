@@ -12,8 +12,15 @@ tool_settings = {"label": "Copy",
 
 
 class CopyFeatureTool(base.base_tool.BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
         base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
@@ -26,16 +33,34 @@ class CopyFeatureTool(base.base_tool.BaseTool):
     @parameter("sg_3", "Spatial Grid 3", "GPLong", "Optional", False, "Input", None, None, None, 0, "Options")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return base.base_tool.BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.process, "features_table", ["geodata"], return_to_results=True)
 
         return
 
     def process(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         fc = data["geodata"]
         base.utils.validate_geodata(fc, vector=True)

@@ -11,8 +11,15 @@ tool_settings = {"label": "Tweak Values",
 
 
 class TweakValuesRasterTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
@@ -30,10 +37,20 @@ class TweakValuesRasterTool(BaseTool):
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def initialise(self):
+        """
+
+        Returns:
+
+        """
 
         if not (self.min_val or self.max_val or self.constant or self.scalar or self.integerise):
             raise ValueError("No tweaks specified")
@@ -41,12 +58,25 @@ class TweakValuesRasterTool(BaseTool):
         return
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.tweak, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def tweak(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         r_in = data["geodata"]
         utils.validate_geodata(r_in, raster=True)

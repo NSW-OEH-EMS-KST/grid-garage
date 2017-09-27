@@ -16,8 +16,15 @@ tool_settings = {"label": "Extract Timeslices",
 
 
 class ExtractTimeslicesCdfTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
@@ -28,16 +35,34 @@ class ExtractTimeslicesCdfTool(BaseTool):
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, raster_formats[0])
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.calc, return_to_results=False)
 
         return
 
     def calc(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         cdf = data["cdf"]
 
@@ -66,9 +91,9 @@ class ExtractTimeslicesCdfTool(BaseTool):
         if rp:
             self.info("Reading rotated pole array")
             ds = Dataset(cdf)
-            lon = ds.variables["lon"][:]
-            lat = ds.variables["lat"][:]
-            time = ds.variables["time"][:]
+            # lon = ds.variables["lon"][:]
+            # lat = ds.variables["lat"][:]
+            # time = ds.variables["time"][:]
             ovz = ds.variables[ov]
             self.info(ovz)
             self.info(ovz.shape)
@@ -91,7 +116,7 @@ class ExtractTimeslicesCdfTool(BaseTool):
             # self.info(x)
         else:
             lyr_tmp = r"in_memory\tmp_lyr"
-            arcpy.MakeNetCDFRasterLayer_md(cdf, ov, "x", "y", lyr_tmp, "time", None, "BY_VALUE")
+            arcpy.MakeNetCDFRasterLayer_md(cdf, ov, "lon", "lat", lyr_tmp, "time", None, "BY_VALUE")
 
             self.info("... creating temporary dataset ...")
 
@@ -110,6 +135,11 @@ class ExtractTimeslicesCdfTool(BaseTool):
                 try:
                     arcpy.CopyRaster_management(i_ras, o_ras)
                     self.info("{} exported successfully".format(o_ras))
+                    # at this point, if Rotated_pole, apply tx
+                    df = arcpy.RasterToNumPyArray(o_ras)
+                    # self.rotated_grid_transform(df)
+                    self.info(df)
+                    # than finally
                     self.result.add_pass({"geodata}": o_ras, "source_geodata": cdf, "global_vars": gvars})
 
                 except Exception as e:
@@ -155,7 +185,6 @@ class ExtractTimeslicesCdfTool(BaseTool):
         # Convert degrees to radians
         df['rlat'] = df['lat'].apply(radians)
         df['rlon'] = df['lon'].apply(radians)
-        # df['rlat'], df['rlon'] = np.radians(df['lat']), np.radians(df['lon'])
 
         self.info("Dataframe " * 10)
         self.info(df)
@@ -201,6 +230,19 @@ class ExtractTimeslicesCdfTool(BaseTool):
 
 
 def make_name(cdf, dimval, ws, fmt, pfx, sfx):
+    """
+
+    Args:
+        cdf:
+        dimval:
+        ws:
+        fmt:
+        pfx:
+        sfx:
+
+    Returns:
+
+    """
 
     likename = "{}_{}".format(cdf.replace(".", "_"), dimval)
 
@@ -208,6 +250,14 @@ def make_name(cdf, dimval, ws, fmt, pfx, sfx):
 
 
 def sanitise_dimension(d):
+    """
+
+    Args:
+        d:
+
+    Returns:
+
+    """
 
     d = d.replace("/", "-")
 

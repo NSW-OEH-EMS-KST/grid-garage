@@ -20,8 +20,15 @@ tool_settings = {"label": "Delete",
 
 
 class DeleteGeodataTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
@@ -30,16 +37,34 @@ class DeleteGeodataTool(BaseTool):
     @input_tableview()
     @input_output_table
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.delete, "geodata_table", ["geodata"], return_to_results=True)
 
         return
 
     def delete(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         gd = data["geodata"]
         self.info('Deleting {0}'.format(gd))

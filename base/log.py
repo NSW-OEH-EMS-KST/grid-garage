@@ -15,12 +15,25 @@ LOG_FILE = os.path.join(APPDATA_PATH, "gridgarage.log")
 
 
 def make_tuple(ob):
+    """
+
+    Args:
+        ob:
+
+    Returns:
+
+    """
 
     return ob if isinstance(ob, (list, tuple)) else [ob]
 
 
 @static_vars(logger=None)
 def get_logger():
+    """
+
+    Returns:
+
+    """
 
     if not get_logger.logger:
         get_logger.logger = logging.getLogger("gridgarage")
@@ -29,6 +42,14 @@ def get_logger():
 
 
 def debug(message):
+    """
+
+    Args:
+        message:
+
+    Returns:
+
+    """
 
     message = make_tuple(message)
 
@@ -46,6 +67,14 @@ def debug(message):
 
 
 def info(message):
+    """
+
+    Args:
+        message:
+
+    Returns:
+
+    """
 
     message = make_tuple(message)
 
@@ -63,6 +92,14 @@ def info(message):
 
 
 def warn(message):
+    """
+
+    Args:
+        message:
+
+    Returns:
+
+    """
 
     message = make_tuple(message)
 
@@ -80,6 +117,14 @@ def warn(message):
 
 
 def error(message):
+    """
+
+    Args:
+        message:
+
+    Returns:
+
+    """
 
     message = make_tuple(message)
 
@@ -100,6 +145,11 @@ class ArcStreamHandler(logging.StreamHandler):
     """ Logging handler to log messages to ArcGIS """
 
     def __init__(self, messages):
+        """
+
+        Args:
+            messages:
+        """
 
         logging.StreamHandler.__init__(self)
 

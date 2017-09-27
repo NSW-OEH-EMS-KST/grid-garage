@@ -11,8 +11,15 @@ tool_settings = {"label": "Transform",
 
 
 class TransformRasterTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
@@ -26,10 +33,23 @@ class TransformRasterTool(BaseTool):
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def updateParameters(self, parameters):
+        """
+
+        Args:
+            parameters:
+
+        Returns:
+
+        """
 
         ps = [(i, p.name) for i, p in enumerate(parameters)]
         self.debug("TransformRasterTool.updateParameters {}".format(ps))
@@ -51,6 +71,14 @@ class TransformRasterTool(BaseTool):
         return
 
     def updateMessages(self, parameters):
+        """
+
+        Args:
+            parameters:
+
+        Returns:
+
+        """
 
         # print [(i, p.name) for i, p in enumerate(parameters)]
         #
@@ -64,12 +92,26 @@ class TransformRasterTool(BaseTool):
         return
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.transform, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def get_property(self, raster, property):
+        """
+
+        Args:
+            raster:
+            property:
+
+        Returns:
+
+        """
 
         v = arcpy.GetRasterProperties_management(raster, property)
         v = v.getOutput(0)
@@ -78,6 +120,14 @@ class TransformRasterTool(BaseTool):
         return float(v)
 
     def transform(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         r_in = data["geodata"]
         utils.validate_geodata(r_in, raster=True)

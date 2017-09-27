@@ -12,8 +12,15 @@ tool_settings = {"label": "Reclass by Threshold",
 
 
 class ReclassByThresholdRasterTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
 
@@ -25,10 +32,20 @@ class ReclassByThresholdRasterTool(BaseTool):
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, "Esri Grid")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         try:
             self.info(self.thresholds)
@@ -69,6 +86,14 @@ class ReclassByThresholdRasterTool(BaseTool):
     #     return thresholds
 
     def reclass(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         parameter_dictionary = OrderedDict([(p.DisplayName, p.valueAsText) for p in self.parameters])
         parameter_summary = ", ".join(["{}: {}".format(k, v) for k, v in parameter_dictionary.iteritems()])

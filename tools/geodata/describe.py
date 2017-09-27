@@ -10,8 +10,15 @@ tool_settings = {"label": "Describe",
 
 
 class DescribeGeodataTool(base.base_tool.BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
@@ -21,16 +28,34 @@ class DescribeGeodataTool(base.base_tool.BaseTool):
     @input_tableview()
     @input_output_table
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return base.base_tool.BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.describe, "geodata_table", ["geodata"], return_to_results=True)
 
         return
 
     def describe(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         item = data["geodata"]
         self.info("Describing {0}".format(item))

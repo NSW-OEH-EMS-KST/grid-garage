@@ -12,8 +12,15 @@ tool_settings = {"label": "Zonal Statistics As Table",
 
 
 class ZonalStatisticsAsTableTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
@@ -28,16 +35,34 @@ class ZonalStatisticsAsTableTool(BaseTool):
     @parameter("statistics_type", "statistics_type", "GPString", "Optional", False, "Input", stats_type + ["ALL"], None, None, "ALL", "Options")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.calc, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def calc(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         ras = data["geodata"]
         validate_geodata(ras, raster=True)

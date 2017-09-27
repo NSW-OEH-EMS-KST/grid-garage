@@ -12,8 +12,15 @@ tool_settings = {"label": "Copy",
 
 
 class CopyRasterTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
 
@@ -34,16 +41,34 @@ class CopyRasterTool(BaseTool):
     @parameter("transform", "Transform", "GPString", "Optional", False, "Input", None, None, None, None, "Options")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.copy, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def copy(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         ras = data["geodata"]
 

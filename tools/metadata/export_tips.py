@@ -11,7 +11,12 @@ tool_settings = {"label": "Export tips",
 
 
 class ExportTipsToFileMetadataTool(BaseTool):
+    """
+    """
     def __init__(self):
+        """
+
+        """
 
         BaseTool.__init__(self, tool_settings)
 
@@ -22,16 +27,34 @@ class ExportTipsToFileMetadataTool(BaseTool):
     @parameter("tip_folder", "Folder for Tip Files", "DEFolder", "Required", False, "Input", None, None, None, None, None)
     @input_output_table
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.export, "tip_table", ["geodata"], nonkey_names=self.include_fields.split(";") , return_to_results=True)
 
         return
 
     def export(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         geodata = data["geodata"]
 
