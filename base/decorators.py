@@ -49,8 +49,25 @@ def parameter(name, display_name, data_type, parameter_type, multi_value, direct
         par.parameterDependencies = dependancy_list  # should be constant
 
     def decorated(f):
+        """
+
+        Args:
+            f:
+
+        Returns:
+
+        """
         @functools.wraps(f)
         def wrapped(*args, **kwargs):
+            """
+
+            Args:
+                args:
+                kwargs:
+
+            Returns:
+
+            """
             params = f(*args, **kwargs)
             if params:
                 params.insert(0, par)
@@ -123,12 +140,28 @@ def validate_parameter(name, display_name, data_type, parameter_type, multi_valu
 
 
 class FieldText(object):
+    """
+    """
     def __init__(self):
+        """
+
+        """
         pass
 
 
 class TableSetting(object):
+    """
+
+    """
     def __init__(self, data_type):
+        """
+
+        Args:
+            data_type:
+
+        Returns:
+
+        """
 
         data_types = ["geodata", "raster", "feature", "xml", "cdf"]
 
@@ -136,10 +169,7 @@ class TableSetting(object):
             raise ValueError("Unsupported type: '{}' is not a member of {}".format(data_type, data_types))
 
         self.table_name = "{}_table".format(data_type)
-        self.fields = "{0} {1} Required geodata".format(data_type, data_type.title())
-
-        # special case for cdf at the moment
-        self.fields = "{0} {1} Required cdf".format(data_type, data_type.title())
+        self.fields = "{0} {1} Required {0}".format(data_type, data_type.title())
 
         if len(data_type) != 3:  # for T.L.A.s we will capitalise
             self.table_display_name = "Table for {}".format(data_type.title())
@@ -150,6 +180,14 @@ class TableSetting(object):
 
 
 def parse_fields(fields):
+    """
+
+    Args:
+        fields:
+
+    Returns:
+
+    """
 
     parsed_list = []
 
@@ -228,8 +266,25 @@ def input_tableview(data_type="geodata", multi_value=False, other_fields=None, o
     # wrapper
 
     def decorator(f):
+        """
+
+        Args:
+            f:
+
+        Returns:
+
+        """
         @functools.wraps(f)
         def wrapper(*args, **kwargs):
+            """
+
+            Args:
+                args:
+                kwargs:
+
+            Returns:
+
+            """
             params = f(*args, **kwargs)
             if params:
                 params.insert(0, pars[0])
@@ -286,6 +341,15 @@ def input_output_table(f):
 
     @functools.wraps(f)
     def wrapped(*args, **kwargs):
+        """
+
+        Args:
+            args:
+            kwargs:
+
+        Returns:
+
+        """
         params = f(*args, **kwargs)
         pars = [par0, par1, par2, par3]
         if params:
@@ -363,6 +427,15 @@ def input_output_table_with_output_affixes(f):
 
     @functools.wraps(f)
     def wrapped(*args, **kwargs):
+        """
+
+        Args:
+            args:
+            kwargs:
+
+        Returns:
+
+        """
         params = f(*args, **kwargs)
         pars = [par0, par1, par2, par3, par4, par5, par6]
         if params:
@@ -395,8 +468,25 @@ def input_output_raster_format(f):
     pars = [par0, par1]
 
     def decorator(f):
+        """
+
+        Args:
+            f:
+
+        Returns:
+
+        """
         @functools.wraps(f)
         def wrapper(*args, **kwargs):
+            """
+
+            Args:
+                args:
+                kwargs:
+
+            Returns:
+
+            """
             params = f(*args, **kwargs)
             if params:
                 params.insert(0, pars[0])

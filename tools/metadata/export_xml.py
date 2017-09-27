@@ -19,8 +19,13 @@ default_stylesheet = join(install_dir, "Metadata", "Stylesheets", "ArcGIS.xsl") 
 
 
 class ExportXmlMetadataTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
@@ -31,10 +36,20 @@ class ExportXmlMetadataTool(BaseTool):
     @parameter("stylesheet", "Style Sheet", "DEFile", "Required", False, "Input", None, None, None, default_stylesheet, None)
     @input_output_table
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         # if not exists(self.translator):
         #     raise ValueError("Translator '{}' does not exist".format(self.translator))
@@ -47,6 +62,14 @@ class ExportXmlMetadataTool(BaseTool):
         return
 
     def export(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         geodata = data["geodata"]
 

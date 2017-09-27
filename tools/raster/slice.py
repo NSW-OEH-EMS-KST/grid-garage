@@ -11,8 +11,15 @@ tool_settings = {"label": "Slice",
 
 
 class SliceRasterTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
 
@@ -27,10 +34,20 @@ class SliceRasterTool(BaseTool):
     @parameter("base_output_zone", "Base Output Zone", "GPLong", "Required", False, "Input", None, None, None, 1, "Options")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         # p = self.get_parameter_dict()
 
@@ -43,6 +60,14 @@ class SliceRasterTool(BaseTool):
         return
 
     def slice(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         ras = data["geodata"]
 

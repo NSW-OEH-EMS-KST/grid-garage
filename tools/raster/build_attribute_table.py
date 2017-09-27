@@ -12,8 +12,15 @@ tool_settings = {"label": "Build Attribute Table",
 
 
 class BuildAttributeTableRasterTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
 
@@ -25,10 +32,20 @@ class BuildAttributeTableRasterTool(BaseTool):
     @parameter("overwrite", "Overwrite existing table", "GPBoolean", "Required", False, "Input", None, None, None, None)
     @input_output_table
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.overwrite = "Overwrite" if self.overwrite else "NONE"
 
@@ -37,6 +54,14 @@ class BuildAttributeTableRasterTool(BaseTool):
         return
 
     def build_rat(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         ras = data["geodata"]
 

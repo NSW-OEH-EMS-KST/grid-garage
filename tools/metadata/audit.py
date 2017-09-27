@@ -15,23 +15,46 @@ tool_settings = {"label": "Audit",
 
 
 class AuditMetadataTool(BaseTool):
+    """
+    """
     def __init__(self):
+        """
+
+        """
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
     @input_tableview()
     @input_output_table
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.audit, "geodata_table", ["geodata"], return_to_results=True)
 
         return
 
     def audit(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         geodata = data["geodata"]
 

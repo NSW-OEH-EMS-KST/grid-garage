@@ -11,8 +11,15 @@ tool_settings = {"label": "Reproject",
 
 
 class ReprojectRasterTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
 
@@ -27,10 +34,20 @@ class ReprojectRasterTool(BaseTool):
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def initialise(self):
+        """
+
+        Returns:
+
+        """
 
         self.debug("initialise locals={}".format(locals()))
 
@@ -49,12 +66,25 @@ class ReprojectRasterTool(BaseTool):
         return
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.reproject, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def reproject(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         r_in = data['geodata']
 

@@ -12,8 +12,15 @@ tool_settings = {"label": "Search",
 
 
 class SearchCdfTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
@@ -24,16 +31,34 @@ class SearchCdfTool(BaseTool):
     @parameter("validate", "Do validation", "GPBoolean", "Optional", False, "Input", None, None, None, None)
     @input_output_table
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_parameter(self.search, "workspaces", ["workspace"])
 
         return
 
     def search(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         ws = data["workspace"]
 
@@ -69,6 +94,14 @@ class SearchCdfTool(BaseTool):
         return
 
     def valid(self, cdf):
+        """
+
+        Args:
+            cdf:
+
+        Returns:
+
+        """
         try:
             ds = Dataset(cdf)
             del ds

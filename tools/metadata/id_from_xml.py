@@ -11,7 +11,12 @@ tool_settings = {"label": "Get IAR ID From XML",
 
 
 class GetIARIDFromXmlTool(BaseTool):
+    """
+    """
     def __init__(self):
+        """
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
@@ -19,16 +24,34 @@ class GetIARIDFromXmlTool(BaseTool):
     @input_tableview(xmls=True)
     @input_output_table
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_parameter(self.get_ids, "xml_table", ["xml"], return_to_results=True)
 
         return
 
     def get_ids(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         xmlfile = data["xml"]
 

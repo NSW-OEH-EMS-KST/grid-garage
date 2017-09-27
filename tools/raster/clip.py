@@ -15,8 +15,15 @@ tool_settings = {"label": "Clip",
 
 
 class ClipRasterTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
@@ -33,10 +40,20 @@ class ClipRasterTool(BaseTool):
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         if self.clipping_geometry:
             self.clipping_geometry = "ClippingGeometry"
@@ -50,6 +67,14 @@ class ClipRasterTool(BaseTool):
         return
 
     def clip(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         ras = data["geodata"]
         validate_geodata(ras, raster=True, srs_known=True)

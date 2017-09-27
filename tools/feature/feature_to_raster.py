@@ -12,8 +12,15 @@ tool_settings = {"label": "Feature to Raster",
 
 
 class FeatureToRasterTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
@@ -25,16 +32,31 @@ class FeatureToRasterTool(BaseTool):
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.rasterise, "features_table", ["geodata", "table_fields"])
 
         return
 
     def rasterise(self, data):
+        """
+
+        Args:
+            data:
+        """
 
         feat_ds = data["geodata"]
         base.utils.validate_geodata(feat_ds, vector=True)

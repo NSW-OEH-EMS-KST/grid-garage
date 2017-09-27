@@ -17,6 +17,8 @@ dstdir =  os.path.join(dstroot, os.path.dirname(srcfile))
 os.makedirs(dstdir) # create all directories, raise an error if it already exists
 shutil.copy(srcfile, dstdir)
 class TestToolbox(TestCase):
+    """
+    """
     pass
     # tb = Toolbox()
     # for t in tb.tools:

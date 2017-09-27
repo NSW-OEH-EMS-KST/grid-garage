@@ -21,7 +21,14 @@ describe_field_groups = dict(
 
 
 class BandPropetiesRasterTool(BaseTool):
+    """
+    """
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
 
@@ -32,16 +39,34 @@ class BandPropetiesRasterTool(BaseTool):
     @input_tableview(data_type="raster")
     @input_output_table
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.describe, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def describe(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         ras = data["geodata"]
 

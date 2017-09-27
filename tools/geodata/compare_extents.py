@@ -11,8 +11,15 @@ tool_settings = {"label": "Compare Extents",
 
 
 class CompareExtentsGeodataTool(BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
@@ -26,10 +33,20 @@ class CompareExtentsGeodataTool(BaseTool):
     @parameter("aoi_dataset", "Dataset (Area of Interest) to compare with", ["DEFeatureClass", "DERasterDataset"], "Required", False, "Input", None, None, None, None)
     @input_output_table
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def initialise(self):
+        """
+
+        Returns:
+
+        """
 
         self.aoi_extent = arcpy.Describe(self.aoi_dataset).extent
         self.aoi_srs_name = self.aoi_extent.spatialReference.name
@@ -38,12 +55,25 @@ class CompareExtentsGeodataTool(BaseTool):
         return
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.compare, "geodata_table", ["geodata"], return_to_results=True)
 
         return
 
     def compare(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         ds_in = data["geodata"]
         base.utils.validate_geodata(ds_in, srs_known=True)

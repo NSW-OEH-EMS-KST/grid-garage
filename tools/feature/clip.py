@@ -10,8 +10,15 @@ tool_settings = {"label": "Clip",
 
 
 class ClipFeatureTool(base.base_tool.BaseTool):
+    """
+    """
 
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         base.base_tool.BaseTool.__init__(self, tool_settings)
         self.clip_srs = None
@@ -24,10 +31,20 @@ class ClipFeatureTool(base.base_tool.BaseTool):
     @parameter("xy_tolerance", "XY Tolerance", "GPLinearUnit", "Optional", False, "Input", None, None, None, None, "Options")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return base.base_tool.BaseTool.getParameterInfo(self)
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.clip_srs = base.utils.get_srs(self.clip_features, raise_unknown_error=True)
         self.iterate_function_on_tableview(self.clip, "feature_table", ["geodata"], return_to_results=True)
@@ -35,6 +52,14 @@ class ClipFeatureTool(base.base_tool.BaseTool):
         return
 
     def clip(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         fc = data["geodata"]
         base.utils.validate_geodata(fc, vector=True, srs_known=True)

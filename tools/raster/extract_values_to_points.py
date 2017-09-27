@@ -13,7 +13,14 @@ tool_settings = {"label": "Extract Values to Points",
 
 
 class ExtractValuesToPointsRasterTool(BaseTool):
+    """
+    """
     def __init__(self):
+        """
+
+        Returns:
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
@@ -29,10 +36,20 @@ class ExtractValuesToPointsRasterTool(BaseTool):
     @parameter("add_attributes", "Add Raster Attributes", "GPString", "Optional", False, "Input", ["VALUE_ONLY", "ALL"], None, None, None, "Options")
     @input_output_table_with_output_affixes
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def initialise(self):
+        """
+
+        Returns:
+
+        """
 
         d = describe(self.points)
         self.points_srs = d.get("dataset_spatialReference", "Unknown")
@@ -48,12 +65,25 @@ class ExtractValuesToPointsRasterTool(BaseTool):
         return
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.process, "raster_table", ["geodata", "query"], return_to_results=True)
 
         return
 
     def process(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         ras = data["geodata"]
         qry = data.get("query", None)

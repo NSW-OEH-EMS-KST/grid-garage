@@ -11,7 +11,12 @@ tool_settings = {"label": "Create Tips Table",
 
 
 class CreateTipsTableMetadataTool(BaseTool):
+    """
+    """
     def __init__(self):
+        """
+
+        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
@@ -24,10 +29,20 @@ class CreateTipsTableMetadataTool(BaseTool):
     @parameter("include_fields", "Include Fields", "Field", "Required", True, "Input", None, None, ["tip_template"], None, None)
     @input_output_table
     def getParameterInfo(self):
+        """
+
+        Returns:
+
+        """
 
         return BaseTool.getParameterInfo(self)
 
     def initialise(self):
+        """
+
+        Returns:
+
+        """
 
         self.include_fields = self.include_fields.split(";")
         self.info("Tip fields to be included are: {}".format(self.include_fields))
@@ -48,6 +63,15 @@ class CreateTipsTableMetadataTool(BaseTool):
         self.info("Base tips will be: {}".format(self.base_tips))
 
         def startsnends(string, code):
+            """
+
+            Args:
+                string:
+                code:
+
+            Returns:
+
+            """
             return string.startswith(code) and string.endswith(code)
 
         self.extractions = {k: v for k, v in self.base_tips.iteritems() if startsnends(v.strip().strip('"'), "$")}
@@ -56,12 +80,25 @@ class CreateTipsTableMetadataTool(BaseTool):
         return
 
     def iterate(self):
+        """
+
+        Returns:
+
+        """
 
         self.iterate_function_on_tableview(self.create, "geodata_table", ["geodata"], return_to_results=True)
 
         return
 
     def create(self, data):
+        """
+
+        Args:
+            data:
+
+        Returns:
+
+        """
 
         geodata = data["geodata"]
 

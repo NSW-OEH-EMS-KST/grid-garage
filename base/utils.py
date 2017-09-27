@@ -24,47 +24,125 @@ transform_methods = ["STANDARDISE", "STRETCH", "NORMALISE", "LOG", "SQUAREROOT",
 
 
 class DoesNotExistError(ValueError):
+    """
+    """
     def __init__(self, geodata):
+        """
+
+        Args:
+            geodata:
+        """
         super(DoesNotExistError, self).__init__(self, "{} does not exist".format(geodata))
 
 
 class NotRasterError(ValueError):
+    """
+    """
     def __init__(self, geodata, datatype):
+        """
+
+        Args:
+            geodata:
+            datatype:
+        """
         super(NotRasterError, self).__init__(self, "{} is not a raster dataset. Its data type is '{}'".format(geodata, datatype))
 
 
 class NotVectorError(ValueError):
+    """
+    """
     def __init__(self, geodata, datatype):
+        """
+
+        Args:
+            geodata:
+            datatype:
+        """
         super(NotVectorError, self).__init__(self, "{} is not a vector dataset. Its data type is '{}'".format(geodata, datatype))
 
 
 class NotTableError(ValueError):
+    """
+    """
     def __init__(self, geodata, datatype):
+        """
+
+        Args:
+            geodata:
+            datatype:
+        """
         super(NotTableError, self).__init__(self, "{} is not a table dataset. Its data type is '{}'".format(geodata, datatype))
 
 
 class UnknownSrsError(ValueError):
+    """
+    """
     def __init__(self, geodata):
+        """
+
+        Args:
+            geodata:
+        """
         super(UnknownSrsError, self).__init__(self, "Dataset '{}' has an unknown spatial reference system".format(geodata))
 
 
 class UnknownDataTypeError(ValueError):
+    """
+    """
     def __init__(self, geodata, datatype):
+        """
+
+        Args:
+            geodata:
+            datatype:
+        """
         super(UnknownDataTypeError, self).__init__(self, "Dataset '{}' has an unknown data type".format(geodata, datatype))
 
 
 class UnmatchedSrsError(ValueError):
+    """
+    """
     def __init__(self, srs1, srs2):
+        """
+
+        Args:
+            srs1:
+            srs2:
+        """
         super(UnmatchedSrsError, self).__init__(self, "Spatial references do not match '{}' != '{}'".format(srs1, srs2))
 
 
 class NotPolygonError(ValueError):
+    """
+    """
     def __init__(self, geodata, shapetype):
+        """
+
+        Args:
+            geodata:
+            shapetype:
+        """
         super(NotPolygonError, self).__init__(self, "Dataset '{}' has a unknown data type of '{}', not 'Polygon'".format(geodata, shapetype))
 
 
 def static_vars(**kwargs):
+    """
+
+    Args:
+        kwargs:
+
+    Returns:
+
+    """
     def decorate(func):
+        """
+
+        Args:
+            func:
+
+        Returns:
+
+        """
         for k in kwargs:
             setattr(func, k, kwargs[k])
         return func
@@ -119,6 +197,14 @@ def static_vars(**kwargs):
 
 
 def describe_arc(geodata):
+    """
+
+    Args:
+        geodata:
+
+    Returns:
+
+    """
 
     if not geodata_exists(geodata):
         raise DoesNotExistError(geodata)
@@ -127,16 +213,55 @@ def describe_arc(geodata):
 
 
 def is_local_gdb(workspace):
+    """
+
+    Args:
+        workspace:
+
+    Returns:
+
+    """
     return describe_arc(workspace).workspaceType == "LocalDatabase"
 
 
 def is_file_system(workspace):
+    """
+
+    Args:
+        workspace:
+
+    Returns:
+
+    """
     return describe_arc(workspace).workspaceType == "FileSystem"
 
 
 def get_search_cursor_rows(in_table, field_names, where_clause=None):
+    """
+
+    Args:
+        in_table:
+        field_names:
+        where_clause:
+
+    Returns:
+
+    """
 
     def _get_search_cursor(in_table_sc, field_names_sc, where_clause_sc=where_clause, spatial_reference=None, explode_to_points=None, sql_clause=None):
+        """
+
+        Args:
+            in_table_sc:
+            field_names_sc:
+            where_clause_sc:
+            spatial_reference:
+            explode_to_points:
+            sql_clause:
+
+        Returns:
+
+        """
 
         return ap.da.SearchCursor(in_table_sc, field_names_sc, where_clause_sc, spatial_reference, explode_to_points, sql_clause)
 
@@ -149,6 +274,14 @@ def get_search_cursor_rows(in_table, field_names, where_clause=None):
 
 
 def geodata_exists(geodata):
+    """
+
+    Args:
+        geodata:
+
+    Returns:
+
+    """
     if geodata:
         return ap.Exists(geodata)
     else:
@@ -156,6 +289,14 @@ def geodata_exists(geodata):
 
 
 def make_tuple(ob):
+    """
+
+    Args:
+        ob:
+
+    Returns:
+
+    """
     return ob if isinstance(ob, (list, tuple)) else [ob]
 
 
@@ -200,6 +341,15 @@ def join_up_filename(workspace, filename, ext=''):
 
 
 def get_ordered_dict_from_keys(key_seq, initial_val):
+    """
+
+    Args:
+        key_seq:
+        initial_val:
+
+    Returns:
+
+    """
     return OrderedDict.fromkeys(sorted(key_seq), initial_val)
 
 
@@ -214,6 +364,14 @@ def decorate_func(var_name, var_value):
     """
 
     def decorated(func):
+        """
+
+        Args:
+            func:
+
+        Returns:
+
+        """
         setattr(func, var_name, var_value)
         return func
 
@@ -262,6 +420,14 @@ def find_date(s):
 
 # @base.log.log_error
 def parse_proj_string_for_name(proj_string):
+    """
+
+    Args:
+        proj_string:
+
+    Returns:
+
+    """
     # s = PROJCS['GDA_1994_Australia_Albers', GEOGCS[
     #     'GCS_GDA_1994', DATUM['D_GDA_1994', SPHEROID['GRS_1980', 6378137.0, 298.257222101]], PRIMEM['Greenwich', 0.0],
     #     UNIT['Degree', 0.0174532925199433]], PROJECTION['Albers'], PARAMETER['False_Easting', 0.0], PARAMETER[
@@ -291,6 +457,18 @@ def make_raster_name(like_name, out_wspace, ext='', prefix='', suffix=''):
 
 # @base.log.log_error
 def make_table_name(like_name, out_wspace, ext='', prefix='', suffix=''):
+    """
+
+    Args:
+        like_name:
+        out_wspace:
+        ext:
+        prefix:
+        suffix:
+
+    Returns:
+
+    """
     _, __, t_name, t_ext = split_up_filename(like_name)
 
     ext = "" if (is_local_gdb(out_wspace) or ext == "Esri Grid") else ext
@@ -304,6 +482,18 @@ def make_table_name(like_name, out_wspace, ext='', prefix='', suffix=''):
 
 # @base.log.log_error
 def make_vector_name(like_name, out_wspace, ext='', prefix='', suffix=''):
+    """
+
+    Args:
+        like_name:
+        out_wspace:
+        ext:
+        prefix:
+        suffix:
+
+    Returns:
+
+    """
     _, __, v_name, v_ext = split_up_filename(like_name)
 
     ext = "" if is_local_gdb(out_wspace) else ext
@@ -317,6 +507,14 @@ def make_vector_name(like_name, out_wspace, ext='', prefix='', suffix=''):
 
 # @base.log.log_error
 def is_table(item):
+    """
+
+    Args:
+        item:
+
+    Returns:
+
+    """
     if not geodata_exists(item):
         raise DoesNotExistError(item)
 
@@ -329,6 +527,14 @@ def is_table(item):
 
 # @base.log.log_error
 def is_vector(item):
+    """
+
+    Args:
+        item:
+
+    Returns:
+
+    """
     if not geodata_exists(item):
         raise DoesNotExistError(item)
 
@@ -341,6 +547,14 @@ def is_vector(item):
 
 # @base.log.log_error
 def is_raster(item):
+    """
+
+    Args:
+        item:
+
+    Returns:
+
+    """
     if not geodata_exists(item):
         raise DoesNotExistError(item)
 
@@ -353,6 +567,17 @@ def is_raster(item):
 
 # @base.log.log_error
 def walk(workspace, data_types=None, types=None, followlinks=True):
+    """
+
+    Args:
+        workspace:
+        data_types:
+        types:
+        followlinks:
+
+    Returns:
+
+    """
     x = []
     for root, dirs, files in ap.da.Walk(workspace, datatype=data_types, type=types, followlinks=followlinks):
         for f in files:
@@ -362,6 +587,14 @@ def walk(workspace, data_types=None, types=None, followlinks=True):
 
 # @base.log.log_error
 def describe(geodata):
+    """
+
+    Args:
+        geodata:
+
+    Returns:
+
+    """
 
     describe_field_groups = dict(
         general=["baseName", "catalogPath", "children", "childrenExpanded", "dataElementType", "dataType", "extension", "file", "fullPropsRetrieved", "metadataRetrieved", "name", "path"],
@@ -446,6 +679,16 @@ def describe(geodata):
 
 # @base.log.log_error
 def get_transformation(in_ds, out_cs, overrides=None):
+    """
+
+    Args:
+        in_ds:
+        out_cs:
+        overrides:
+
+    Returns:
+
+    """
 
     cs_in = get_srs(in_ds, raise_unknown_error=True, as_object=True)
     # def parse_proj_string_for_name(proj_string):
@@ -497,6 +740,16 @@ def get_transformation(in_ds, out_cs, overrides=None):
 
 
 def get_srs(geodata, raise_unknown_error=False, as_object=False):
+    """
+
+    Args:
+        geodata:
+        raise_unknown_error:
+        as_object:
+
+    Returns:
+
+    """
 
     if not geodata_exists(geodata):
 
@@ -518,6 +771,21 @@ def get_srs(geodata, raise_unknown_error=False, as_object=False):
 
 
 def validate_geodata(geodata, raster=False, vector=False, table=False, srs_known=False, polygon=False, message_func=None, NetCdf=False):
+    """
+
+    Args:
+        geodata:
+        raster:
+        vector:
+        table:
+        srs_known:
+        polygon:
+        message_func:
+        NetCdf:
+
+    Returns:
+
+    """
 
     if message_func:
         message_func("Validating '{}'".format(geodata))
@@ -561,6 +829,17 @@ def validate_geodata(geodata, raster=False, vector=False, table=False, srs_known
 
 
 def compare_srs(srs1, srs2, raise_no_match_error=False, other_condition=True):
+    """
+
+    Args:
+        srs1:
+        srs2:
+        raise_no_match_error:
+        other_condition:
+
+    Returns:
+
+    """
 
     return_value = False
 
@@ -582,6 +861,15 @@ def compare_srs(srs1, srs2, raise_no_match_error=False, other_condition=True):
 
 # @base.log.log_error
 def get_band_nodata_value(raster, bandindex=1):
+    """
+
+    Args:
+        raster:
+        bandindex:
+
+    Returns:
+
+    """
 
     d = ap.Describe(os.path.join(raster, "Band_{}".format(bandindex)))
     try:
