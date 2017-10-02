@@ -58,7 +58,7 @@ class ReclassByTableRasterTool(BaseTool):
         self.to_value_field = p["in_remap_table_field_to_value_field"]
         self.output_value_field = p["in_remap_table_field_output_value_field"]
 
-        self.iterate_function_on_tableview(self.reclass, "raster_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.reclass, return_to_results=True)
 
         return
 
@@ -72,7 +72,7 @@ class ReclassByTableRasterTool(BaseTool):
 
         """
 
-        ras = data["geodata"]
+        ras = data["raster"]
 
         utils.validate_geodata(ras, raster=True)
 
@@ -82,6 +82,6 @@ class ReclassByTableRasterTool(BaseTool):
 
         arcpy.ReclassByTable_3d(ras, self.in_remap_table, self.from_value_field, self.to_value_field, self.output_value_field, ras_out, self.missing_values)
 
-        return {"geodata": ras_out, "source_geodata": ras}
+        return {"raster": ras_out, "source_geodata": ras}
 
 # "http://desktop.arcgis.com/en/arcmap/latest/tools/3d-analyst-toolbox/reclass-by-table.htm"

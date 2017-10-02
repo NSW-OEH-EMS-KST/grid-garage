@@ -48,7 +48,7 @@ class ResampleRasterTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.resample, "raster_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.resample, return_to_results=True)
 
         return
 
@@ -62,7 +62,7 @@ class ResampleRasterTool(BaseTool):
 
         """
 
-        ras = data["geodata"]
+        ras = data["raster"]
 
         utils.validate_geodata(ras, raster=True)
 
@@ -72,7 +72,7 @@ class ResampleRasterTool(BaseTool):
 
         arcpy.Resample_management(ras, ras_out, self.cell_size, self.resample_type)
 
-        return {"geodata": ras_out, "source_geodata": ras}
+        return {"raster": ras_out, "source_geodata": ras}
 
 # "http://desktop.arcgis.com/en/arcmap/latest/tools/data-management-toolbox/resample.htm"
 

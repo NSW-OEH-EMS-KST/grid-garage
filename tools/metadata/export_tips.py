@@ -23,7 +23,7 @@ class ExportTipsToFileMetadataTool(BaseTool):
         self.execution_list = [self.iterate]
 
     @input_tableview()
-    @parameter("include_fields", "Include Fields", "Field", "Required", True, "Input", None, None, ["tip_table"], None, None)
+    @parameter("include_fields", "Include Fields", "Field", "Required", True, "Input", None, None, ["geodata_table"], None, None)
     @parameter("tip_folder", "Folder for Tip Files", "DEFolder", "Required", False, "Input", None, None, None, None, None)
     @input_output_table
     def getParameterInfo(self):
@@ -42,7 +42,7 @@ class ExportTipsToFileMetadataTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.export, "tip_table", ["geodata"], nonkey_names=self.include_fields.split(";") , return_to_results=True)
+        self.iterate_function_on_tableview(self.export, nonkey_names=self.include_fields.split(";"), return_to_results=True)
 
         return
 

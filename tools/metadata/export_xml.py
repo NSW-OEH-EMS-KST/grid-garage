@@ -57,7 +57,7 @@ class ExportXmlMetadataTool(BaseTool):
         if not exists(self.stylesheet):
             raise ValueError("Stylesheet '{}' does not exist".format(self.stylesheet))
 
-        self.iterate_function_on_tableview(self.export, "geodata_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.export, return_to_results=True)
 
         return
 

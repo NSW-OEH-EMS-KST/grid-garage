@@ -50,7 +50,7 @@ class CalculateStatisticsRasterTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.calculate, "raster_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.calculate, return_to_results=True)
 
         return
 
@@ -64,12 +64,12 @@ class CalculateStatisticsRasterTool(BaseTool):
 
         """
 
-        ras = data["geodata"]
+        ras = data["raster"]
 
         utils.validate_geodata(ras, raster=True)
 
         CalculateStatistics_management(ras, self.x_skip_factor, self.y_skip_factor, self.ignore_values, self.skip_existing, self.area_of_interest)
 
-        return {"geodata": ras, "statistics": "built"}
+        return {"raster": ras, "statistics": "built"}
 
 # "http://desktop.arcgis.com/en/arcmap/latest/tools/data-management-toolbox/calculate-statistics.htm"

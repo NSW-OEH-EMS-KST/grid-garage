@@ -27,7 +27,7 @@ class PolygonToRasterTool(BaseTool):
 
         return
 
-    @input_tableview(data_type="feature")
+    @input_tableview(data_type="feature", other_fields="table_fields Burn_Fields Required table_fields, priority_field Priority_Field Optional priority_field")
     @parameter("cell_size", "Cell Size", "GPSACellSize", "Required", False, "Input", None, "cellSize", None, None)
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @parameter("cell_assignment", "Cell Assignment", "GPString", "Optional", False, "Input", ["CELL_CENTER", "MAXIMUM_AREA", "MAXIMUM_COMBINED_AREA"], None, None, None)
@@ -47,10 +47,10 @@ class PolygonToRasterTool(BaseTool):
         Returns:
 
         """
-        self.info(self.get_parameter_dict())
 
         self.cell_assignment = "CELL_CENTER" if self.cell_assignment in [None, "#"] else self.cell_assignment
 
+        # self.iterate_function_on_tableview(self.rasterise, "features_table", ["geodata", "table_fields", "priority_field"])
         self.iterate_function_on_tableview(self.rasterise, "features_table", ["geodata", "table_fields", "priority_field"])
 
         return

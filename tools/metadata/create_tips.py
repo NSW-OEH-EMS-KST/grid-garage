@@ -63,18 +63,11 @@ class CreateTipsTableMetadataTool(BaseTool):
         self.info("Base tips will be: {}".format(self.base_tips))
 
         def startsnends(string, code):
-            """
-
-            Args:
-                string:
-                code:
-
-            Returns:
-
-            """
+            """ Simple check """
+            code = code.strip().strip('"').strip("'")
             return string.startswith(code) and string.endswith(code)
 
-        self.extractions = {k: v for k, v in self.base_tips.iteritems() if startsnends(v.strip().strip('"'), "$")}
+        self.extractions = {k: v for k, v in self.base_tips.iteritems() if startsnends(v, "$")}
         self.info("Field values extraction from describe will: {}".format(self.extractions))
 
         return
@@ -86,7 +79,7 @@ class CreateTipsTableMetadataTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.create, "geodata_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.create, return_to_results=True)
 
         return
 

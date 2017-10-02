@@ -48,7 +48,7 @@ class SetValueToNullRasterTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.set_null, "raster_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.set_null, return_to_results=True)
 
         return
 
@@ -74,6 +74,6 @@ class SetValueToNullRasterTool(BaseTool):
 
         out_ras.save(r_out)
 
-        return {"geodata": r_out, "source_geodata": r_in}
+        return {"raster": r_out, "source_geodata": r_in}
 
 

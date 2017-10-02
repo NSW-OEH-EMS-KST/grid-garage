@@ -52,7 +52,7 @@ class DeleteGeodataTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.delete, "geodata_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.delete, return_to_results=True)
 
         return
 

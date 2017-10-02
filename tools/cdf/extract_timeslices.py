@@ -91,29 +91,8 @@ class ExtractTimeslicesCdfTool(BaseTool):
         if rp:
             self.info("Reading rotated pole array")
             ds = Dataset(cdf)
-            # lon = ds.variables["lon"][:]
-            # lat = ds.variables["lat"][:]
-            # time = ds.variables["time"][:]
             ovz = ds.variables[ov]
-            self.info(ovz)
-            self.info(ovz.shape)
-            # ntimes, ny, nx = time.shape
-            # cold_days = zeros((ny, nx), dtype=int)
 
-            # for o in ov:
-            #     print ds.variables[ov][:, :, :]
-                # cold_days += atemp[i, :, :].data - 273.15 < 0
-
-            # for t in time:
-
-            # df = pd.DataFrame(time)
-            # z = zip(time, lon, lat)
-            # dim_lon, dim_lat = ds.get
-            # df = arcpy.RasterToNumPyArray(i_ras)
-            # df = pd.DataFrame(z)
-            # self.info(df)
-            # x = self.rotated_grid_transform(df, 150.73153686523438, -31.704599380493164)
-            # self.info(x)
         else:
             lyr_tmp = r"in_memory\tmp_lyr"
             arcpy.MakeNetCDFRasterLayer_md(cdf, ov, "lon", "lat", lyr_tmp, "time", None, "BY_VALUE")
@@ -135,11 +114,12 @@ class ExtractTimeslicesCdfTool(BaseTool):
                 try:
                     arcpy.CopyRaster_management(i_ras, o_ras)
                     self.info("{} exported successfully".format(o_ras))
+
                     # at this point, if Rotated_pole, apply tx
                     df = arcpy.RasterToNumPyArray(o_ras)
                     # self.rotated_grid_transform(df)
                     self.info(df)
-                    # than finally
+
                     self.result.add_pass({"geodata}": o_ras, "source_geodata": cdf, "global_vars": gvars})
 
                 except Exception as e:

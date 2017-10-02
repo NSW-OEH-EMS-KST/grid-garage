@@ -28,6 +28,7 @@ import arcpy
 import logging
 from base.results import GgResult
 from datetime import datetime
+from collections import OrderedDict
 
 
 debug = print  # updated to logger.debug after logging is configured
@@ -219,8 +220,8 @@ class BaseTool(object):
         self.warn = logger.warn
         self.error = logger.error
 
-        # replace debug (print) with the logger function, s
-        # sometimes handy to have this available before logging is properly configured
+        # replace debug (print) with the logger function, sometimes
+        # handy to have this available before logging is properly configured
         debug = self.debug
 
         logger.setLevel(logging.DEBUG)
@@ -439,34 +440,29 @@ class BaseTool(object):
         if not self.messages:  # stop run errors during ide tests
             return
 
-        self.info("Parameter summary: {}".format(["{} ({}): {}".format(p.DisplayName, p.name, p.valueAsText) for p in self.parameters]))
+        self.info(["\n", "Parameter summary: {}".format(["{} ({}): {}".format(p.DisplayName, p.name, p.valueAsText) for p in self.parameters]), "\n"])
 
         # set the input parameters as local attributes
         [setattr(self, k, v) for k, v in self.get_parameter_dict().iteritems()]  # nb side-effect
-        self.debug("Tool attributes set {}".format(self.__dict__))
+        self.info(["\n", "Tool attributes set {}".format(self.__dict__), "\n"])
 
-        # try:
         self.result.initialise(self.get_parameter("result_table"), self.get_parameter("fail_table"), self.get_parameter("output_workspace").value, self.get_parameter("result_table_name").value, self.logger)
+
+        if hasattr(self, "output_file_workspace") and self.output_file_workspace in [None, "", "#"]:
+                self.output_file_workspace = self.result.output_workspace
 
         # except AttributeError:
         #     pass
-
-        try:
-            if self.output_file_workspace in [None, "", "#"]:
-                self.output_file_workspace = self.result.output_workspace
-
-        except AttributeError:
-            pass
 
         for f in self.execution_list:
             f = log_error(f)
             f()
 
-        try:
-            self.result.write()
+        # try:
+        self.result.write()
 
-        except TypeError:
-            pass
+        # except TypeError:
+        #     pass
 
         return
 
@@ -555,17 +551,17 @@ class BaseTool(object):
 
         arcpy.MakeTableView_management(param.valueAsText, param.name)
 
-        # this code is difficult to make any clearer, builds a dict of name/alias pairs for parameters
-        f_alias = [p.name for i, p in enumerate(self.parameters[1:]) if 0 in p.parameterDependencies]
-        f_name = [self.get_parameter(f_name).valueAsText for f_name in f_alias]
-        alias_name = {k: v for k, v in dict(zip(f_alias, f_name)).iteritems() if v not in [None, "NONE"]}
+        # this code is difficult to make any clearer, builds a dict of name/alias pairs for dependant parameters
+        field_alias = [p.name.replace("_", " ") for i, p in enumerate(self.parameters[1:]) if 0 in p.parameterDependencies]
+        field_name = [self.get_parameter(field_name).valueAsText for field_name in field_alias]
+        field_map = {k: v for k, v in OrderedDict(zip(field_alias, field_name)).iteritems() if v not in [None, "NONE"]}
 
         if nonkey_names:  # we want hard-wired fields to be included in the row
-            alias_name.update({v: v for v in nonkey_names})  # nonkey_names is a list at the mo
+            field_map.update(OrderedDict([(v, v) for v in nonkey_names]))  # nonkey_names is a list at the mo
 
-        rows = [r for r in arcpy.da.SearchCursor(param.name, alias_name.values())]
+        rows = [r for r in arcpy.da.SearchCursor(param.name, field_map.values())]
 
-        self.do_iteration(func, rows, alias_name, return_to_results)
+        self.do_iteration(func, rows, field_map, return_to_results)
 
         return
 

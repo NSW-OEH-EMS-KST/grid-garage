@@ -47,7 +47,8 @@ class ClipFeatureTool(base.base_tool.BaseTool):
         """
 
         self.clip_srs = base.utils.get_srs(self.clip_features, raise_unknown_error=True)
-        self.iterate_function_on_tableview(self.clip, "feature_table", ["geodata"], return_to_results=True)
+        # self.iterate_function_on_tableview(self.clip, "feature_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.clip, return_to_results=True)
 
         return
 

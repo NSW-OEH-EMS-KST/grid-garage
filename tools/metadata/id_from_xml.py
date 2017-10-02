@@ -21,7 +21,7 @@ class GetIARIDFromXmlTool(BaseTool):
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
-    @input_tableview(xmls=True)
+    @input_tableview(data_type="xml")
     @input_output_table
     def getParameterInfo(self):
         """
@@ -39,7 +39,7 @@ class GetIARIDFromXmlTool(BaseTool):
 
         """
 
-        self.iterate_function_on_parameter(self.get_ids, "xml_table", ["xml"], return_to_results=True)
+        self.iterate_function_on_parameter(self.get_ids, return_to_results=True)
 
         return
 

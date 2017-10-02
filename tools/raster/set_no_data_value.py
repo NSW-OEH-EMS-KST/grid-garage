@@ -48,7 +48,7 @@ class SetNodataValueRasterTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.set_ndv, "raster_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.set_ndv, return_to_results=True)
 
         return
 
@@ -62,7 +62,7 @@ class SetNodataValueRasterTool(BaseTool):
 
         """
 
-        ras = data['geodata']
+        ras = data['raster']
 
         utils.validate_geodata(ras, raster=True)
 
@@ -76,4 +76,4 @@ class SetNodataValueRasterTool(BaseTool):
 
         out_ras.save(r_out)
 
-        return {"geodata": r_out, "source_geodata": ras}
+        return {"raster": r_out, "source_geodata": ras}

@@ -49,7 +49,7 @@ class BuildAttributeTableRasterTool(BaseTool):
 
         self.overwrite = "Overwrite" if self.overwrite else "NONE"
 
-        self.iterate_function_on_tableview(self.build_rat, "raster_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.build_rat, return_to_results=True)
 
         return
 
@@ -63,7 +63,7 @@ class BuildAttributeTableRasterTool(BaseTool):
 
         """
 
-        ras = data["geodata"]
+        ras = data["raster"]
 
         utils.validate_geodata(ras, raster=True)
 

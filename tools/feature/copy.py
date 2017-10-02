@@ -48,7 +48,8 @@ class CopyFeatureTool(base.base_tool.BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.process, "features_table", ["geodata"], return_to_results=True)
+        # self.iterate_function_on_tableview(self.process, "features_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.process, return_to_results=True)
 
         return
 

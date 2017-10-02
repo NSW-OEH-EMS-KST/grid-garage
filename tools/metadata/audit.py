@@ -5,7 +5,6 @@ from base.decorators import input_tableview, input_output_table
 import arcpy
 from os.path import exists, join
 from hermes import Paperwork
-from datetime import datetime
 
 
 tool_settings = {"label": "Audit",
@@ -42,7 +41,7 @@ class AuditMetadataTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.audit, "geodata_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.audit, return_to_results=True)
 
         return
 

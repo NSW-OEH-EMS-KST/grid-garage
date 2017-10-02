@@ -27,7 +27,7 @@ class FeatureToRasterTool(BaseTool):
 
         return
 
-    @input_tableview(data_type="feature", other_fields="table_fields fields Required table_fields")
+    @input_tableview(data_type="feature", other_fields="table_fields Burn_Fields Required table_fields")
     @parameter("cell_size", "Cell Size", "GPSACellSize", "Required", False, "Input", None, "cellSize", None, None)
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @input_output_table_with_output_affixes
@@ -47,7 +47,8 @@ class FeatureToRasterTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.rasterise, "features_table", ["geodata", "table_fields"])
+        # self.iterate_function_on_tableview(self.rasterise, "features_table", ["geodata", "table_fields"])
+        self.iterate_function_on_tableview(self.rasterise)
 
         return
 

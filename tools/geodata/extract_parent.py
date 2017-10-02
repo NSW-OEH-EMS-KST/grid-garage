@@ -18,7 +18,7 @@ class ExtractParentGeodataTool(base.base_tool.BaseTool):
 
         return
 
-@input_tableview()
+    @input_tableview()
     @input_output_table
     def getParameterInfo(self):
 
@@ -26,7 +26,7 @@ class ExtractParentGeodataTool(base.base_tool.BaseTool):
 
     def iterate(self):
 
-        self.iterate_function_on_tableview(self.process, "geodata_table", ["geodata"])
+        self.iterate_function_on_tableview(self.process)
 
         return
 

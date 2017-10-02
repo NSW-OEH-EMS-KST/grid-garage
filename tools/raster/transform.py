@@ -51,9 +51,6 @@ class TransformRasterTool(BaseTool):
 
         """
 
-        ps = [(i, p.name) for i, p in enumerate(parameters)]
-        self.debug("TransformRasterTool.updateParameters {}".format(ps))
-
         p2, p3, p4 = parameters[2], parameters[3], parameters[4]
 
         stretch = p2.value == 'STRETCH'
@@ -98,7 +95,7 @@ class TransformRasterTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.transform, "raster_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.transform, return_to_results=True)
 
         return
 
@@ -129,7 +126,7 @@ class TransformRasterTool(BaseTool):
 
         """
 
-        r_in = data["geodata"]
+        r_in = data["raster"]
         utils.validate_geodata(r_in, raster=True)
 
         r_out = utils.make_raster_name(r_in, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
@@ -177,7 +174,7 @@ class TransformRasterTool(BaseTool):
 
         data["method"] = self.method
 
-        return {"geodata": r_out, "source_geodata": r_in, "transform": data}
+        return {"raster": r_out, "source_geodata": r_in, "transform": data}
 
         # this numpy stuff.. numpyarraytoraster just not behaving
         # self.send_info(data)

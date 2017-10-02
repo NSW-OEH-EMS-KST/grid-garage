@@ -64,7 +64,7 @@ class TweakValuesRasterTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.tweak, "raster_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.tweak, return_to_results=True)
 
         return
 
@@ -78,7 +78,7 @@ class TweakValuesRasterTool(BaseTool):
 
         """
 
-        r_in = data["geodata"]
+        r_in = data["raster"]
         utils.validate_geodata(r_in, raster=True)
 
         r_out = utils.make_raster_name(r_in, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
@@ -140,6 +140,6 @@ class TweakValuesRasterTool(BaseTool):
         self.info('\tSaving to {}'.format(r_out))
         ras.save(r_out)
 
-        return {"geodata": r_out, "source_geodata": r_in, "tweaks": ' & '.join(tweaks)}
+        return {"raster": r_out, "source_geodata": r_in, "tweaks": ' & '.join(tweaks)}
 
 # Con (in_conditional_raster, in_true_raster_or_constant, {in_false_raster_or_constant}, {where_clause})

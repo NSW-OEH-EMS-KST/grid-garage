@@ -49,7 +49,7 @@ class BlockStatisticsRasterTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.block_statistics, "raster_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.block_statistics, return_to_results=True)
 
         return
 
@@ -63,7 +63,7 @@ class BlockStatisticsRasterTool(BaseTool):
 
         """
 
-        ras = data["geodata"]
+        ras = data["raster"]
 
         validate_geodata(ras, raster=True)
 

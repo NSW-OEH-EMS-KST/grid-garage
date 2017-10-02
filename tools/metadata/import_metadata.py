@@ -3,7 +3,6 @@ from base.base_tool import BaseTool
 from base.utils import validate_geodata
 from base.decorators import input_tableview, input_output_table
 from arcpy import ImportMetadata_conversion
-from hermes import Paperwork
 
 
 tool_settings = {"label": "Import Metadata",
@@ -47,7 +46,7 @@ class ImportMetadataTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.do_import, "geodata_table", ["geodata", "source"], return_to_results=True)
+        self.iterate_function_on_tableview(self.do_import, return_to_results=True)
 
         return
 

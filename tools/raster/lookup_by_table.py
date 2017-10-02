@@ -47,7 +47,7 @@ class LookupByTableRasterTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.lookup, "raster_table", ["table_fields", "geodata"])
+        self.iterate_function_on_tableview(self.lookup)
 
         return
 
@@ -61,7 +61,7 @@ class LookupByTableRasterTool(BaseTool):
 
         """
 
-        ras = data["geodata"]
+        ras = data["raster"]
 
         utils.validate_geodata(ras, raster=True)
 
@@ -74,10 +74,10 @@ class LookupByTableRasterTool(BaseTool):
                 out.save(ras_out)
                 self.info("Saved to {0}".format(ras_out))
 
-                self.result.add_pass({"geodata": ras_out, "source_geodata": ras})
+                self.result.add_pass({"raster": ras_out, "source_geodata": ras})
             except:
                 self.warn("Failed on field '{}'".format(f))
-                data["geodata"] = ras
+                data["raster"] = ras
                 data["failure_field"] = f
                 self.result.add_fail(data)
 

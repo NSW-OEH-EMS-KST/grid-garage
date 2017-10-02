@@ -37,7 +37,7 @@ class DisplayGeodataTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.display_geodata, "geodata_table", ["geodata"])
+        self.iterate_function_on_tableview(self.display_geodata)
 
         return
 

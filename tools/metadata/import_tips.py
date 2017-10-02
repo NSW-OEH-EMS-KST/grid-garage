@@ -1,5 +1,4 @@
 from base.base_tool import BaseTool
-
 from base import utils
 from base.decorators import input_tableview, input_output_table
 from collections import OrderedDict
@@ -41,7 +40,7 @@ class ImportTipFilesToTableMetadataTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.import_tip, "geodata_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.import_tip, return_to_results=True)
 
         return
 

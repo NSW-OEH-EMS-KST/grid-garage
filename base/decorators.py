@@ -237,7 +237,7 @@ def input_tableview(data_type="geodata", multi_value=False, other_fields=None, o
 
     # create parameter
     pn = ob_name or tset.table_name
-    dn =ob_title or tset.table_display_name
+    dn = ob_title or tset.table_display_name
     par = arcpy.Parameter(name=pn,
                           displayName=dn,
                           datatype="GPTableView",

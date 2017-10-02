@@ -50,7 +50,7 @@ class ZonalStatisticsAsTableTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.calc, "raster_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.calc, return_to_results=True)
 
         return
 
@@ -64,15 +64,14 @@ class ZonalStatisticsAsTableTool(BaseTool):
 
         """
 
-        ras = data["geodata"]
+        ras = data["raster"]
+
         validate_geodata(ras, raster=True)
 
         tab_out = make_table_name(ras, self.output_file_workspace, None, self.output_file_workspace, self. output_filename_suffix)
 
-        self.info("Extracting statistics {0} -->> {1} ...".format(ras, tab_out))
+        self.info("Extracting statistics from raster '{0}' into table '{1}' ...".format(ras, tab_out))
 
-        # ZonalStatisticsAsTable (in_zone_data, zone_field, in_value_raster, out_table, {ignore_nodata}, {statistics_type})
-        self.info([self.zones, self.zone_field, ras, tab_out, self.ignore_no_data, self.statistics_type])
         arcpy.sa.ZonalStatisticsAsTable(self.zones, self.zone_field, ras, tab_out, self.ignore_no_data, self.statistics_type)
 
         return {"geodata": tab_out, "source_geodata": ras, "zones": self.zones, "zone_field": self.zone_field, "no_data_handling": self.ignore_no_data, "statistics_type": self.statistics_type}

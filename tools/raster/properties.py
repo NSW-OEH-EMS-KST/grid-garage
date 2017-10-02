@@ -54,7 +54,7 @@ class BandPropetiesRasterTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.describe, "raster_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.describe, return_to_results=True)
 
         return
 
@@ -68,7 +68,7 @@ class BandPropetiesRasterTool(BaseTool):
 
         """
 
-        ras = data["geodata"]
+        ras = data["raster"]
 
         validate_geodata(ras, raster=True)
 
@@ -97,7 +97,7 @@ class BandPropetiesRasterTool(BaseTool):
 
         # return an ordered dictionary
         od = OrderedDict()
-        od["geodata"] = ras
+        od["raster"] = ras
         for i, attributes in sorted(desc.items()):
             od[i] = attributes
 

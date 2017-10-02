@@ -51,7 +51,8 @@ class ReclassByThresholdRasterTool(BaseTool):
             self.info(self.thresholds)
         except:
             pass
-        self.iterate_function_on_tableview(self.reclass, "raster_table", ["geodata", "thresholds"], return_to_results=True)
+
+        self.iterate_function_on_tableview(self.reclass, return_to_results=True)
 
         return
 
@@ -95,12 +96,7 @@ class ReclassByThresholdRasterTool(BaseTool):
 
         """
 
-        parameter_dictionary = OrderedDict([(p.DisplayName, p.valueAsText) for p in self.parameters])
-        parameter_summary = ", ".join(["{}: {}".format(k, v) for k, v in parameter_dictionary.iteritems()])
-        self.info("Parameter summary: {}".format(parameter_summary))
-
-        self.info("data : {}".format(data))
-        ras = data["geodata"]
+        ras = data["raster"]
 
         utils.validate_geodata(ras, raster=True)
 
@@ -145,5 +141,5 @@ class ReclassByThresholdRasterTool(BaseTool):
         #         row[0] = v[row[1]]
         #         cursor.updateRow(row)
 
-        return {"geodata": ras_out, "source_geodata": ras, "min_max_mean_std": "{}_{}_{}_{}".format(minv, maxv, mean, std), "remap": remap}
+        return {"raster": ras_out, "source_geodata": ras, "min_max_mean_std": "{}_{}_{}_{}".format(minv, maxv, mean, std), "remap": remap}
 

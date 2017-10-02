@@ -42,7 +42,8 @@ class RenameGeodataTool(base.base_tool.BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.rename, "geodata_table", ["geodata", "candidate_name"], return_to_results=True)
+        # self.iterate_function_on_tableview(self.rename, "geodata_table", ["geodata", "candidate_name"], return_to_results=True)
+        self.iterate_function_on_tableview(self.rename, return_to_results=True)
 
         return
 

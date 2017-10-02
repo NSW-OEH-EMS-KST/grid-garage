@@ -49,8 +49,6 @@ class ReprojectRasterTool(BaseTool):
 
         """
 
-        self.debug("initialise locals={}".format(locals()))
-
         self.output_cs = self.parameters[2].value  # need the object for later code to work
         self.cell_size = str(self.cell_size)  # this seemed to solve an issue with unicode... strange
 
@@ -72,7 +70,7 @@ class ReprojectRasterTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.reproject, "raster_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.reproject, return_to_results=True)
 
         return
 
@@ -86,7 +84,7 @@ class ReprojectRasterTool(BaseTool):
 
         """
 
-        r_in = data['geodata']
+        r_in = data['raster']
 
         validate_geodata(r_in, raster=True, srs_known=True)
 
@@ -98,4 +96,4 @@ class ReprojectRasterTool(BaseTool):
 
         arcpy.ProjectRaster_management(r_in, r_out, self.output_cs, geographic_transform=tx, resampling_type=self.resample_type, cell_size=self.cell_size, Registration_Point=self.rego_point)
 
-        return {"geodata": r_out, "source": r_in}
+        return {"raster": r_out, "source": r_in}

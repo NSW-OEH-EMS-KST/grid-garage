@@ -71,7 +71,7 @@ class ValuesAtPointsRasterTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.process, "raster_table", ["geodata"])
+        self.iterate_function_on_tableview(self.process)
 
         return
 
@@ -85,7 +85,7 @@ class ValuesAtPointsRasterTool(BaseTool):
 
         """
 
-        ras = data["geodata"]
+        ras = data["raster"]
         utils.validate_geodata(ras, raster=True, srs_known=True)
 
         d = utils.describe(ras)

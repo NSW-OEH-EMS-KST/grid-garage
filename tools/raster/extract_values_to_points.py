@@ -71,7 +71,7 @@ class ExtractValuesToPointsRasterTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.process, "raster_table", ["geodata", "query"], return_to_results=True)
+        self.iterate_function_on_tableview(self.process, return_to_results=True)
 
         return
 
@@ -85,7 +85,7 @@ class ExtractValuesToPointsRasterTool(BaseTool):
 
         """
 
-        ras = data["geodata"]
+        ras = data["raster"]
         qry = data.get("query", None)
         validate_geodata(ras, raster=True, srs_known=True)
 

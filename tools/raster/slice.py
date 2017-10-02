@@ -55,7 +55,7 @@ class SliceRasterTool(BaseTool):
         # self.to_value_field = p["in_remap_table_field_to_value_field"]
         # self.output_value_field = p["in_remap_table_field_output_value_field"]
 
-        self.iterate_function_on_tableview(self.slice, "raster_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.slice, return_to_results=True)
 
         return
 
@@ -69,7 +69,7 @@ class SliceRasterTool(BaseTool):
 
         """
 
-        ras = data["geodata"]
+        ras = data["raster"]
 
         utils.validate_geodata(ras, raster=True)
 
@@ -79,6 +79,6 @@ class SliceRasterTool(BaseTool):
 
         arcpy.Slice_3d(ras, ras_out, self.num_zones, self.slice_type, self.base_output_zone)
 
-        return {"geodata": ras_out, "source_geodata": ras}
+        return {"raster": ras_out, "source_geodata": ras}
 
 #  Slice_3d (in_raster, out_raster, number_zones, {slice_type}, {base_output_zone})

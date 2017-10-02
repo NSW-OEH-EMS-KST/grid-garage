@@ -62,7 +62,7 @@ class ClipRasterTool(BaseTool):
             self.clipping_geometry = "NONE"
             self.polygons = "#"
 
-        self.iterate_function_on_tableview(self.clip, "raster_table", ["geodata"], return_to_results=True)
+        self.iterate_function_on_tableview(self.clip, return_to_results=True)
 
         return
 
@@ -76,7 +76,7 @@ class ClipRasterTool(BaseTool):
 
         """
 
-        ras = data["geodata"]
+        ras = data["raster"]
         validate_geodata(ras, raster=True, srs_known=True)
         ras_srs = get_srs(ras, raise_unknown_error=True)
         self.debug("raster srs = {}".format(ras_srs))
@@ -89,7 +89,7 @@ class ClipRasterTool(BaseTool):
         self.info("Clipping {0} -->> {1} ...".format(ras, ras_out))
         arcpy.Clip_management(ras, self.rectangle, ras_out, self.polygons, self.no_data_val, self.clipping_geometry, self.maintain_extent)
 
-        return {"geodata": ras_out, "source_geodata": ras}
+        return {"raster": ras_out, "source_geodata": ras}
 
 # import arcpy
 # arcpy.Clip_management(
