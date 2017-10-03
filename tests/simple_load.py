@@ -31,7 +31,7 @@ from tools.raster.extract_values_to_points import ExtractValuesToPointsRasterToo
 from tools.raster.lookup_by_table import LookupByTableRasterTool
 from tools.raster.slice import SliceRasterTool
 from tools.raster.zonal_stats_as_table import ZonalStatisticsAsTableTool
-from tools.raster.properties import BandPropetiesRasterTool
+from tools.raster.properties import BandPropertiesRasterTool
 from tools.raster.reclass_by_table import ReclassByTableRasterTool
 from tools.raster.reproject import ReprojectRasterTool
 from tools.raster.resample import ResampleRasterTool
@@ -75,7 +75,7 @@ class Toolbox(object):
                          ClipFeatureTool}
 
         raster_tools = {AggregateRasterTool,
-                        BandPropetiesRasterTool,
+                        BandPropertiesRasterTool,
                         BlockStatisticsRasterTool,
                         BuildAttributeTableRasterTool,
                         CalculateStatisticsRasterTool,

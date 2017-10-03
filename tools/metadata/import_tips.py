@@ -23,7 +23,7 @@ class ImportTipFilesToTableMetadataTool(BaseTool):
         self.execution_list = [self.iterate]
 
     @input_tableview()
-    @input_output_table
+    @input_output_table()
     def getParameterInfo(self):
         """
 

@@ -1,6 +1,6 @@
 from base.base_tool import BaseTool
 
-from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter
+from base.decorators import input_tableview, input_output_table, parameter
 import arcpy
 from base.utils import validate_geodata, make_table_name, stats_type
 
@@ -33,7 +33,7 @@ class ZonalStatisticsAsTableTool(BaseTool):
     @parameter("zone_field", "Zone Field", "Field", "Required", False, "Input", None, None, ["zones"], None, None)
     @parameter("ignore_no_data", "'NoData' treatment", "GPString", "Optional", False, "Input", ["DATA", "NODATA"], None, None, None, "Options")
     @parameter("statistics_type", "statistics_type", "GPString", "Optional", False, "Input", stats_type + ["ALL"], None, None, "ALL", "Options")
-    @input_output_table_with_output_affixes
+    @input_output_table(affixing=True)
     def getParameterInfo(self):
         """
 

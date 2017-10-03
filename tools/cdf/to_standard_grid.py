@@ -1,5 +1,5 @@
 from base.base_tool import BaseTool
-from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter
+from base.decorators import input_tableview, input_output_table, parameter
 # from netCDF4 import Dataset
 import arcpy
 from base.utils import validate_geodata, make_raster_name, raster_formats2
@@ -29,7 +29,7 @@ class ToStandardGridCdfTool(BaseTool):
         return
 
     @input_tableview(data_type="geodata")
-    @input_output_table_with_output_affixes
+    @input_output_table(affixing=True)
     def getParameterInfo(self):
         """
 

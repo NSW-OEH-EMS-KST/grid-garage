@@ -552,8 +552,9 @@ class BaseTool(object):
         arcpy.MakeTableView_management(param.valueAsText, param.name)
 
         # this code is difficult to make any clearer, builds a dict of name/alias pairs for dependant parameters
-        field_alias = [p.name.replace("_", " ") for i, p in enumerate(self.parameters[1:]) if 0 in p.parameterDependencies]
+        field_alias = [p.name for i, p in enumerate(self.parameters[1:]) if 0 in p.parameterDependencies]
         field_name = [self.get_parameter(field_name).valueAsText for field_name in field_alias]
+        # field_alias = [alias.replace("_", " ") for alias in field_alias]
         field_map = {k: v for k, v in OrderedDict(zip(field_alias, field_name)).iteritems() if v not in [None, "NONE"]}
 
         if nonkey_names:  # we want hard-wired fields to be included in the row

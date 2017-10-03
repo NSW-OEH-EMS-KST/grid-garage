@@ -29,7 +29,7 @@ class SearchCdfTool(BaseTool):
 
     @parameter("workspaces", "Workspaces to Search", "DEWorkspace", "Required", True, "Input", None, None, None, None)
     @parameter("validate", "Do validation", "GPBoolean", "Optional", False, "Input", None, None, None, None)
-    @input_output_table
+    @input_output_table()
     def getParameterInfo(self):
         """
 

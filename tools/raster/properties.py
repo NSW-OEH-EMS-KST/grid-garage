@@ -19,8 +19,7 @@ describe_field_groups = dict(
                                "SUNELEVATION", "CLOUDCOVER", "SUNAZIMUTH", "SENSORAZIMUTH", "SENSORELEVATION", "OFFNADIR", "WAVELENGTH"])
 
 
-
-class BandPropetiesRasterTool(BaseTool):
+class BandPropertiesRasterTool(BaseTool):
     """
     """
     def __init__(self):
@@ -37,7 +36,7 @@ class BandPropetiesRasterTool(BaseTool):
         return
 
     @input_tableview(data_type="raster")
-    @input_output_table
+    @input_output_table()
     def getParameterInfo(self):
         """
 

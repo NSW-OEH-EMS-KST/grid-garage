@@ -26,7 +26,7 @@ class SearchGeodataTool(BaseTool):
 
     @parameter("workspaces", "Workspaces to Search", "DEWorkspace", "Required", True, "Input", None, None, None, None)
     @parameter("geodata_types", "Data Types", "GPString", "Required", True, "Input", datatype_list, None, None, None)
-    @input_output_table
+    @input_output_table()
     def getParameterInfo(self):
         """
 

@@ -1,6 +1,6 @@
 import base.base_tool
 
-from base.decorators import input_output_table_with_output_affixes, input_tableview, parameter
+from base.decorators import input_output_table, input_tableview, parameter
 from base.utils import split_up_filename, is_raster, is_vector, make_raster_name, make_vector_name, make_table_name, get_search_cursor_rows
 
 
@@ -28,7 +28,7 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
 
     @input_tableview()
     @parameter("replacements", "Replacements", "GPString", "Optional", False, "Input", None, None, None, None)
-    @input_output_table_with_output_affixes
+    @input_output_table(affixing=True, out_file_workspace=False)
     def getParameterInfo(self):
         """
 

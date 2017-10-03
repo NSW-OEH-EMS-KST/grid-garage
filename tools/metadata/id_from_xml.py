@@ -22,7 +22,7 @@ class GetIARIDFromXmlTool(BaseTool):
         self.execution_list = [self.iterate]
 
     @input_tableview(data_type="xml")
-    @input_output_table
+    @input_output_table()
     def getParameterInfo(self):
         """
 

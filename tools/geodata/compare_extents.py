@@ -31,7 +31,7 @@ class CompareExtentsGeodataTool(BaseTool):
 
     @input_tableview()
     @parameter("aoi_dataset", "Dataset (Area of Interest) to compare with", ["DEFeatureClass", "DERasterDataset"], "Required", False, "Input", None, None, None, None)
-    @input_output_table
+    @input_output_table()
     def getParameterInfo(self):
         """
 

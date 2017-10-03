@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
 
 from base import utils
-from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter, data_nodata, raster_formats
+from base.decorators import input_tableview, input_output_table, parameter, data_nodata, raster_formats
 import arcpy
 
 tool_settings = {"label": "Reclass by Table",
@@ -35,7 +35,7 @@ class ReclassByTableRasterTool(BaseTool):
     @input_tableview(ob_name="in_remap_table", ob_title="Remap Table", other_fields="output_value_field Output_Value Required output_value, to_value_field To_Value Required to_value, from_value_field From_Value Required from_value")
     @parameter("missing_values", "Missing value treatment", "GPString", "Optional", False, "Input", data_nodata, None, None, data_nodata[0], "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, "Esri Grid")
-    @input_output_table_with_output_affixes
+    @input_output_table(affixing=True)
     def getParameterInfo(self):
         """
 

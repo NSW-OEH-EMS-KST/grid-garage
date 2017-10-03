@@ -1,5 +1,5 @@
 from base.base_tool import BaseTool
-from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter
+from base.decorators import input_tableview, input_output_table, parameter
 # from netCDF4 import Dataset
 import arcpy
 from base.utils import validate_geodata, make_raster_name, raster_formats2
@@ -36,7 +36,7 @@ class ExportCdfTool(BaseTool):
     # @parameter("dvals", "Band dimension values", "Field", "Required", False, "Input", None, None, ["cdf_table"], None, None)
     # @parameter("selec", "Value Selection Method", "Field", "Required", False, "Input", None, None, ["cdf_table"], None, None)
     @parameter("raster_format", "Output Raster Format", "GPString", "Optional", False, "Input", raster_formats2, None, None, "Esri Grid")
-    @input_output_table_with_output_affixes
+    @input_output_table(affixing=True)
     def getParameterInfo(self):
         """
 

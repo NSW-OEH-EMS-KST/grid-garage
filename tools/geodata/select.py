@@ -25,7 +25,7 @@ class SelectGeodataTool(BaseTool):
         return
 
     @parameter("geodata", "Select Geodata", "GPType", "Required", True, "Input", None, None, None, None)
-    @input_output_table
+    @input_output_table()
     def getParameterInfo(self):
         """
 

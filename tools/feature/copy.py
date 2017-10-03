@@ -1,5 +1,5 @@
 import base.base_tool
-from base.decorators import input_output_table_with_output_affixes, input_tableview, parameter
+from base.decorators import input_output_table, input_tableview, parameter
 from os.path import splitext
 import base.utils
 import arcpy
@@ -31,7 +31,7 @@ class CopyFeatureTool(base.base_tool.BaseTool):
     @parameter("sg_1", "Spatial Grid 1", "GPLong", "Optional", False, "Input", None, None, None, 0, "Options")
     @parameter("sg_2", "Spatial Grid 2", "GPLong", "Optional", False, "Input", None, None, None, 0, "Options")
     @parameter("sg_3", "Spatial Grid 3", "GPLong", "Optional", False, "Input", None, None, None, 0, "Options")
-    @input_output_table_with_output_affixes
+    @input_output_table(affixing=True)
     def getParameterInfo(self):
         """
 

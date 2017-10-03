@@ -27,7 +27,7 @@ class CreateTipsTableMetadataTool(BaseTool):
     @input_tableview()
     @parameter("tip_template", "Tip Template", "GPTableView", "Required", False, "Input", None, None, None, None, None)
     @parameter("include_fields", "Include Fields", "Field", "Required", True, "Input", None, None, ["tip_template"], None, None)
-    @input_output_table
+    @input_output_table()
     def getParameterInfo(self):
         """
 
