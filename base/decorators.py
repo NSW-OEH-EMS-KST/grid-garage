@@ -1,3 +1,21 @@
+""" This module provides function-style decorators for implementing ArcGIS input parameters
+
+Understanding this code requires an understanding of python decorators which are
+an advanced feature of the python language.
+
+This module became necessary as the amount of tools grew, it is used for two reasons:
+1. Forces tools to present input parameters consistently
+2. Saves LOTS of code. As an example, using it on
+   tools.raster.zonal_stats_as_table
+   saves around *** 100 *** lines of code. So over the project this module saves THOUSANDS of lines of code.
+
+Basically, the base.BaseTool class getParameterInfo method is implemented to return an empty list.
+
+The decorators are applied to the descendant's getParameterInfo method whereby then create their parameters and inject them into the parameter collection.
+
+Works very well.
+
+"""
 from arcpy import Parameter, ListEnvironments
 from functools import wraps
 from base.utils import raster_formats, resample_methods, aggregation_methods, data_nodata, expand_trunc, stats_type, pixel_type, raster_formats2, transform_methods
@@ -6,19 +24,6 @@ from base.utils import raster_formats, resample_methods, aggregation_methods, da
 def parameter(name, display_name, data_type, parameter_type, multi_value, direction, value_list, default_environment, dependancy_list, default_value, category=None):
     """ Wrap a function with a function that generates a generic parameter
 
-    Args:
-        name ():
-        display_name ():
-        data_type ():
-        parameter_type ():
-        multi_value ():
-        direction ():
-        value_list ():
-        default_environment ():
-        dependancy_list ():
-        default_value ():
-
-    Returns: Wrapped function
 
     """
 
@@ -72,12 +77,7 @@ def parameter(name, display_name, data_type, parameter_type, multi_value, direct
             """
             params = f(*args, **kwargs)
 
-            # for i, param in enumerate(params):
-            #     params.insert(i, param)
-            # if params:
             params.insert(0, par)
-            # else:
-            #     params = [par]
 
             return params
 
@@ -194,6 +194,7 @@ def parse_fields(fields):
         fields:
 
     Returns:
+        Parsed List
 
     """
 
@@ -230,7 +231,8 @@ def input_tableview(data_type="geodata", multi_value=False, other_fields=None, o
         data_type ():
         multi_value ():
 
-    Returns: Wrapped function
+    Returns:
+        Wrapped function
 
     """
 
@@ -260,7 +262,7 @@ def input_tableview(data_type="geodata", multi_value=False, other_fields=None, o
     for f_name, f_disp, f_type, f_default in required_fields:
 
         f_disp = f_disp.replace("_", " ").title()
-        
+
         p = Parameter(name=f_name,
                       displayName="Field for {0}".format(f_disp),
                       datatype="Field",
@@ -317,10 +319,12 @@ def input_tableview(data_type="geodata", multi_value=False, other_fields=None, o
 def input_output_table(affixing=False, out_file_workspace=True):
     """ Wrap a function with a function that generates output table parameters
 
-    Args:
-        f ():
+        Kwargs:
+            affixing: Flags if prefix and suffix input parameters should be built
+            out_file_workspace: Flags if output file workspace input parameter should be built
 
-    Returns:
+        Returns:
+            Wrapped function, wrapper implementing parameters
 
     """
 
@@ -391,18 +395,17 @@ def input_output_table(affixing=False, out_file_workspace=True):
     pars.append(par6)
 
     def decorator(f):
-        """
+        """ Adds the parameters functionally
 
         Args:
-            f:
+            f: function to be wrapped
 
         Returns:
-
+            wrapped function
         """
-
         @wraps(f)
         def wrapper(*args, **kwargs):
-            """
+            """ Wrapper
 
             Args:
                 args:
@@ -418,12 +421,6 @@ def input_output_table(affixing=False, out_file_workspace=True):
                     params.insert(i, par)
             except:
                 params = pars
-            # if params:
-            #     params.insert(0, pars)
-            # else:
-            #     params = pars
-
-            print "input_output_table", [p.name for p in params]
 
             return params
 

@@ -27,7 +27,8 @@ class DisplayGeodataTool(BaseTool):
 
     @input_tableview()
     def getParameterInfo(self):
-        """Define parameter definitions"""
+        """ Define parameter definitions """
+
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):

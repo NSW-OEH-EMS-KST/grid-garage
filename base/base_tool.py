@@ -103,6 +103,7 @@ def log_error(f):
 
         """
         with error_trap(f):
+
             return f(*args, **kwargs)
 
     return log_wrap
@@ -446,23 +447,24 @@ class BaseTool(object):
         [setattr(self, k, v) for k, v in self.get_parameter_dict().iteritems()]  # nb side-effect
         self.info(["\n", "Tool attributes set {}".format(self.__dict__), "\n"])
 
-        self.result.initialise(self.get_parameter("result_table"), self.get_parameter("fail_table"), self.get_parameter("output_workspace").value, self.get_parameter("result_table_name").value, self.logger)
+        try:
+            self.result.initialise(self.get_parameter("result_table"), self.get_parameter("fail_table"), self.get_parameter("output_workspace").value, self.get_parameter("result_table_name").value, self.logger)
 
-        if hasattr(self, "output_file_workspace") and self.output_file_workspace in [None, "", "#"]:
-                self.output_file_workspace = self.result.output_workspace
+            if hasattr(self, "output_file_workspace") and self.output_file_workspace in [None, "", "#"]:
+                    self.output_file_workspace = self.result.output_workspace
 
-        # except AttributeError:
-        #     pass
+        except AttributeError:
+            pass
 
         for f in self.execution_list:
             f = log_error(f)
             f()
 
-        # try:
-        self.result.write()
+        try:
+            self.result.write()
 
-        # except TypeError:
-        #     pass
+        except (TypeError, AttributeError):
+            pass
 
         return
 

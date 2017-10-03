@@ -8,6 +8,9 @@
   <component name="PackageRequirementsSettings">
     <option name="requirementsPath" value="" />
   </component>
+  <component name="PyDocumentationSettings">
+    <option name="myDocStringFormat" value="Google" />
+  </component>
   <component name="ReSTService">
     <option name="workdir" value="C:\Data\grid-garage" />
     <option name="DOC_DIR" value="C:\Data\grid-garage" />
