@@ -1,5 +1,5 @@
-import arcpy
-import functools
+from arcpy import Parameter, ListEnvironments
+from functools import wraps
 from base.utils import raster_formats, resample_methods, aggregation_methods, data_nodata, expand_trunc, stats_type, pixel_type, raster_formats2, transform_methods
 
 
@@ -24,7 +24,8 @@ def parameter(name, display_name, data_type, parameter_type, multi_value, direct
 
     validate_parameter(name, display_name, data_type, parameter_type, multi_value, direction, value_list, default_environment, dependancy_list, default_value)
 
-    par = arcpy.Parameter(name=name, displayName=display_name, datatype=data_type, parameterType=parameter_type, multiValue=multi_value, direction=direction, category=category)
+    par = Parameter(name=name, displayName=display_name, datatype=data_type, parameterType=parameter_type, multiValue=multi_value, direction=direction,
+                    category=category)
 
     if value_list:  # and data_type == "GPString":
         if value_list[0] == "Range" and len(value_list) == 3:  # a range, probably need to extend this usage a bit in hindsight
@@ -57,7 +58,8 @@ def parameter(name, display_name, data_type, parameter_type, multi_value, direct
         Returns:
 
         """
-        @functools.wraps(f)
+
+        @wraps(f)
         def wrapped(*args, **kwargs):
             """
 
@@ -69,10 +71,14 @@ def parameter(name, display_name, data_type, parameter_type, multi_value, direct
 
             """
             params = f(*args, **kwargs)
-            if params:
-                params.insert(0, par)
-            else:
-                params = [par]
+
+            # for i, param in enumerate(params):
+            #     params.insert(i, param)
+            # if params:
+            params.insert(0, par)
+            # else:
+            #     params = [par]
+
             return params
 
         return wrapped
@@ -139,20 +145,22 @@ def validate_parameter(name, display_name, data_type, parameter_type, multi_valu
     return
 
 
-class FieldText(object):
-    """
-    """
-    def __init__(self):
-        """
-
-        """
-        pass
+# class FieldText(object):
+#     """
+#     """
+#
+#     def __init__(self):
+#         """
+#
+#         """
+#         pass
 
 
 class TableSetting(object):
     """
 
     """
+
     def __init__(self, data_type):
         """
 
@@ -238,24 +246,27 @@ def input_tableview(data_type="geodata", multi_value=False, other_fields=None, o
     # create parameter
     pn = ob_name or tset.table_name
     dn = ob_title or tset.table_display_name
-    par = arcpy.Parameter(name=pn,
-                          displayName=dn,
-                          datatype="GPTableView",
-                          parameterType="Required",
-                          multiValue=multi_value,
-                          direction="Input")
+
+    par = Parameter(name=pn,
+                    displayName=dn,
+                    datatype="GPTableView",
+                    parameterType="Required",
+                    multiValue=multi_value,
+                    direction="Input")
     pars = [par]
 
     # create dependent parameters
 
     for f_name, f_disp, f_type, f_default in required_fields:
 
-        p = arcpy.Parameter(name=f_name,
-                            displayName="Field for {0}".format(f_disp),
-                            datatype="Field",
-                            parameterType=f_type,
-                            multiValue=False,
-                            direction="Input")
+        f_disp = f_disp.replace("_", " ").title()
+        
+        p = Parameter(name=f_name,
+                      displayName="Field for {0}".format(f_disp),
+                      datatype="Field",
+                      parameterType=f_type,
+                      multiValue=False,
+                      direction="Input")
         if f_default:
             p.value = f_default
 
@@ -274,7 +285,8 @@ def input_tableview(data_type="geodata", multi_value=False, other_fields=None, o
         Returns:
 
         """
-        @functools.wraps(f)
+
+        @wraps(f)
         def wrapper(*args, **kwargs):
             """
 
@@ -286,19 +298,23 @@ def input_tableview(data_type="geodata", multi_value=False, other_fields=None, o
 
             """
             params = f(*args, **kwargs)
-            if params:
-                params.insert(0, pars[0])
-                for param in pars[1:]:
-                    params.insert(1, param)
-            else:
+
+            try:
+                for i, par in enumerate(pars):
+                    params.insert(i, par)
+            except:
                 params = pars
+
+            print "input_tableview", [p.name for p in params]
+
             return params
+
         return wrapper
 
     return decorator
 
 
-def input_output_table(f):
+def input_output_table(affixing=False, out_file_workspace=True):
     """ Wrap a function with a function that generates output table parameters
 
     Args:
@@ -309,141 +325,111 @@ def input_output_table(f):
     """
 
     # Result Table
-    par0 = arcpy.Parameter(displayName="Result Table",
-                           name="result_table",
-                           datatype=["GPTableView"],
-                           parameterType="Derived",
-                           direction="Output")
+    par0 = Parameter(displayName="Result Table",
+                     name="result_table",
+                     datatype=["GPTableView"],
+                     parameterType="Derived",
+                     direction="Output")
 
     # Fail Table
-    par1 = arcpy.Parameter(displayName="Fail Table",
-                           name="fail_table",
-                           datatype=["GPTableView"],
-                           parameterType="Derived",
-                           direction="Output")
+    par1 = Parameter(displayName="Fail Table",
+                     name="fail_table",
+                     datatype=["GPTableView"],
+                     parameterType="Derived",
+                     direction="Output")
 
     # Output Workspace
-    par2 = arcpy.Parameter(displayName="Output Workspace",
-                           name="output_workspace",
-                           datatype=["DEWorkspace"],
-                           parameterType="Required",
-                           direction="Input")
+    par2 = Parameter(displayName="Output Workspace",
+                     name="output_workspace",
+                     datatype=["DEWorkspace"],
+                     parameterType="Required",
+                     direction="Input")
+
     par2.defaultEnvironmentName = "workspace"
 
+    pars = [par0, par1, par2]
+
+    if affixing:
+        # Output filename suffix
+        par3 = Parameter(displayName="Output Filename Prefix",
+                         name="output_filename_prefix",
+                         datatype="GPString",
+                         parameterType="Optional",
+                         direction="Input",
+                         category="Output Filename Affixes")
+
+        # Output filename suffix
+        par4 = Parameter(displayName="Output Filename Suffix",
+                         name="output_filename_suffix",
+                         datatype="GPString",
+                         parameterType="Optional",
+                         direction="Input",
+                         category="Output Filename Affixes")
+
+        # Output file workspace
+        if out_file_workspace:
+            par5 = Parameter(displayName="Output File Workspace",
+                             name="output_file_workspace",
+                             datatype="DEWorkspace",
+                             parameterType="Optional",
+                             direction="Input",
+                             category="Output File (Dataset) Workspace")
+
+            pars.extend([par3, par4, par5])
+        else:
+            pars.extend([par3, par4])
+
     # Output Table Name
-    par3 = arcpy.Parameter(displayName="Result Table Name",
-                           name="result_table_name",
-                           datatype="GPString",
-                           parameterType="Required",
-                           direction="Input")
+    par6 = Parameter(displayName="Result Table Name",
+                     name="result_table_name",
+                     datatype="GPString",
+                     parameterType="Required",
+                     direction="Input")
 
-    par3.value = "#run_id#"
+    par6.value = "#run_id#"
 
-    @functools.wraps(f)
-    def wrapped(*args, **kwargs):
+    pars.append(par6)
+
+    def decorator(f):
         """
 
         Args:
-            args:
-            kwargs:
+            f:
 
         Returns:
 
         """
-        params = f(*args, **kwargs)
-        pars = [par0, par1, par2, par3]
-        if params:
-            params.insert(0, pars)
-        else:
-            params = pars
-        return params
-    return wrapped
 
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            """
 
-def input_output_table_with_output_affixes(f):
-    """ Wrap a function with a function that generates output table parameters including affixes
+            Args:
+                args:
+                kwargs:
 
-    Args:
-        f ():
+            Returns:
 
-    Returns:
+            """
+            params = f(*args, **kwargs)
 
-    """
+            try:
+                for i, par in enumerate(pars):
+                    params.insert(i, par)
+            except:
+                params = pars
+            # if params:
+            #     params.insert(0, pars)
+            # else:
+            #     params = pars
 
-    # Result Table
-    par0 = arcpy.Parameter(displayName="Result Table",
-                           name="result_table",
-                           datatype=["GPTableView"],
-                           parameterType="Derived",
-                           direction="Output")
+            print "input_output_table", [p.name for p in params]
 
-    # Fail Table
-    par1 = arcpy.Parameter(displayName="Fail Table",
-                           name="fail_table",
-                           datatype=["GPTableView"],
-                           parameterType="Derived",
-                           direction="Output")
+            return params
 
-    # Output Workspace
-    par2 = arcpy.Parameter(displayName="Output Workspace",
-                           name="output_workspace",
-                           datatype=["DEWorkspace"],
-                           parameterType="Required",
-                           direction="Input")
-    par2.defaultEnvironmentName = "workspace"
+        return wrapper
 
-    # Output filename suffix
-    par3 = arcpy.Parameter(displayName="Output Filename Prefix",
-                           name="output_filename_prefix",
-                           datatype="GPString",
-                           parameterType="Optional",
-                           direction="Input",
-                           category="Output Filename Affixes")
-
-    # Output filename suffix
-    par4 = arcpy.Parameter(displayName="Output Filename Suffix",
-                           name="output_filename_suffix",
-                           datatype="GPString",
-                           parameterType="Optional",
-                           direction="Input",
-                           category="Output Filename Affixes")
-
-    # Output file workspace
-    par6 = arcpy.Parameter(displayName="Output File Workspace",
-                           name="output_file_workspace",
-                           datatype="DEWorkspace",
-                           parameterType="Optional",
-                           direction="Input",
-                           category="Output File (Dataset) Workspace")
-
-    # Output Table Name
-    par5 = arcpy.Parameter(displayName="Result Table Name",
-                           name="result_table_name",
-                           datatype="GPString",
-                           parameterType="Required",
-                           direction="Input")
-
-    par5.value = "#run_id#"
-
-    @functools.wraps(f)
-    def wrapped(*args, **kwargs):
-        """
-
-        Args:
-            args:
-            kwargs:
-
-        Returns:
-
-        """
-        params = f(*args, **kwargs)
-        pars = [par0, par1, par2, par3, par4, par5, par6]
-        if params:
-            params.insert(0, pars)
-        else:
-            params = pars
-        return params
-    return wrapped
+    return decorator
 
 
 def input_output_raster_format(f):
@@ -456,7 +442,6 @@ def input_output_raster_format(f):
 
     """
 
-
     # Format
     par0 = parameter("output_raster_format", "Output Raster Format", "GPString", "Optional", False, "Input", raster_formats2, None, None, None)
 
@@ -467,38 +452,41 @@ def input_output_raster_format(f):
 
     pars = [par0, par1]
 
-    def decorator(f):
+    # def decorator(f):
+    #     """
+    #
+    #     Args:
+    #         f:
+    #
+    #     Returns:
+    #
+    #     """
+
+    @wraps(f)
+    def wrapper(*args, **kwargs):
         """
 
         Args:
-            f:
+            args:
+            kwargs:
 
         Returns:
 
         """
-        @functools.wraps(f)
-        def wrapper(*args, **kwargs):
-            """
+        params = f(*args, **kwargs)
 
-            Args:
-                args:
-                kwargs:
+        try:
+            for i, par in enumerate(pars):
+                params.insert(i, par)
+        except:
+            params = pars
 
-            Returns:
+        return params
 
-            """
-            params = f(*args, **kwargs)
-            if params:
-                params.insert(0, pars[0])
-                for param in pars[1:]:
-                    params.insert(1, param)
-            else:
-                params = pars
-            return params
+    return wrapper
 
-        return wrapper
+    # return decorator
 
-    return decorator
 
 arc_parameter_types_string = """
 Data type,datatype keyword,Description
@@ -655,5 +643,4 @@ def arc_environment_list():
     Returns: A list of environments
 
     """
-    return arcpy.ListEnvironments()
-
+    return ListEnvironments()

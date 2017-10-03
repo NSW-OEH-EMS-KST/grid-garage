@@ -33,7 +33,7 @@ class ValuesAtPointsRasterTool(BaseTool):
 
     @input_tableview(data_type="raster")
     @parameter("points", "Point Features", "GPFeatureLayer", "Required", False, "Input", ["Point"], None, None, None)
-    @input_output_table
+    @input_output_table()
     def getParameterInfo(self):
         """
 

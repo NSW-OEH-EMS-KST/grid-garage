@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
 
 from base import utils
-from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats, pixel_type, raster_formats2
+from base.decorators import input_tableview, input_output_table, parameter, raster_formats, pixel_type, raster_formats2
 import arcpy
 
 
@@ -29,7 +29,7 @@ class ToAsciiRasterTool(BaseTool):
         return
 
     @input_tableview(data_type="raster")
-    @input_output_table_with_output_affixes
+    @input_output_table(affixing=True)
     def getParameterInfo(self):
         """
 

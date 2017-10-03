@@ -1,5 +1,5 @@
 from base.base_tool import BaseTool
-from base.decorators import input_output_table_with_output_affixes, input_tableview
+from base.decorators import input_output_table, input_tableview
 from os.path import splitext
 from base.utils import make_table_name
 from arcpy import Copy_management
@@ -28,7 +28,7 @@ class CopyGeodataTool(BaseTool):
         return
 
     @input_tableview()
-    @input_output_table_with_output_affixes
+    @input_output_table(affixing=True)
     def getParameterInfo(self):
         """
 

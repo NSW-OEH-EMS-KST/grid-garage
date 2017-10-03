@@ -25,7 +25,7 @@ class ExportTipsToFileMetadataTool(BaseTool):
     @input_tableview()
     @parameter("include_fields", "Include Fields", "Field", "Required", True, "Input", None, None, ["geodata_table"], None, None)
     @parameter("tip_folder", "Folder for Tip Files", "DEFolder", "Required", False, "Input", None, None, None, None, None)
-    @input_output_table
+    @input_output_table()
     def getParameterInfo(self):
         """
 

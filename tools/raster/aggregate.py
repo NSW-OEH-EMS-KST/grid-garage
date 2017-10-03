@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
 
 from base import utils
-from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats, aggregation_methods, data_nodata, expand_trunc
+from base.decorators import input_tableview, input_output_table, parameter, raster_formats, aggregation_methods, data_nodata, expand_trunc
 from arcpy.sa import Aggregate
 
 
@@ -34,7 +34,7 @@ class AggregateRasterTool(BaseTool):
     @parameter("extent_handling", "Extent Boundary", "GPString", "Optional", False, "Input", expand_trunc, None, None, expand_trunc[0], "Options")
     @parameter("ignore_nodata", "No Data Treatment", "GPString", "Optional", False, "Input", data_nodata, None, None, data_nodata[0], "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, raster_formats[0])
-    @input_output_table_with_output_affixes
+    @input_output_table(affixing=True)
     def getParameterInfo(self):
         """
 

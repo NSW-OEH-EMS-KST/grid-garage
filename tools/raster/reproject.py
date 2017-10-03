@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
 
 from base.utils import raster_formats, resample_methods, validate_geodata, make_raster_name, get_transformation
-from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter
+from base.decorators import input_tableview, input_output_table, parameter
 import arcpy
 
 tool_settings = {"label": "Reproject",
@@ -32,7 +32,7 @@ class ReprojectRasterTool(BaseTool):
     @parameter("rego_point", "Registration Point", "GPPoint", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("overrides", "Transformation Overrides", "GPString", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
-    @input_output_table_with_output_affixes
+    @input_output_table(affixing=True)
     def getParameterInfo(self):
         """
 

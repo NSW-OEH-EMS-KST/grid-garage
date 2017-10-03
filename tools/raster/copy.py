@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
 
 from base import utils
-from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats, pixel_type, raster_formats2
+from base.decorators import input_tableview, input_output_table, parameter, raster_formats, pixel_type, raster_formats2
 import arcpy
 
 
@@ -39,7 +39,7 @@ class CopyRasterTool(BaseTool):
     @parameter("scale_pixel_value", "Scale Pixel value", "GPString", "Optional", False, "Input", ["NONE", "ScalePixelValue"], None, None, None, "Options")
     @parameter("RGB_to_Colormap", "RGB to Colourmap", "GPString", "Optional", False, "Input", ["NONE", "RGBToColormap"], None, None, None, "Options")
     @parameter("transform", "Transform", "GPString", "Optional", False, "Input", None, None, None, None, "Options")
-    @input_output_table_with_output_affixes
+    @input_output_table(affixing=True)
     def getParameterInfo(self):
         """
 

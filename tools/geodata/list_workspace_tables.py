@@ -26,7 +26,7 @@ class ListWorkspaceTablesGeodataTool(BaseTool):
         return
 
     @parameter("workspaces", "Workspaces", "DEWorkspace", "Required", True, "Input", None, None, None, None)
-    @input_output_table
+    @input_output_table()
     def getParameterInfo(self):
         """
 

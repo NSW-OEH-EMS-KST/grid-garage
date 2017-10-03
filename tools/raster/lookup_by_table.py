@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
 
 from base import utils
-from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats
+from base.decorators import input_tableview, input_output_table, parameter, raster_formats
 from arcpy.sa import *
 
 
@@ -30,7 +30,7 @@ class LookupByTableRasterTool(BaseTool):
 
     @input_tableview(data_type="raster", other_fields="table_fields Lookup_Fields Required table_fields")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, "Esri Grid")
-    @input_output_table_with_output_affixes
+    @input_output_table(affixing=True)
     def getParameterInfo(self):
         """
 

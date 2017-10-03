@@ -27,7 +27,7 @@ class DescribeCdfTool(BaseTool):
         return
 
     @input_tableview(data_type="cdf")
-    @input_output_table
+    @input_output_table()
     def getParameterInfo(self):
         """
 

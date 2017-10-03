@@ -34,7 +34,7 @@ class ExportXmlMetadataTool(BaseTool):
     @parameter("xml_folder", "Output Folder", "DEFolder", "Required", False, "Input", None, None, None, None)
     # @parameter("translator", "Translator", "DEFile", "Required", False, "Input", None, None, None, default_translator, None)
     @parameter("stylesheet", "Style Sheet", "DEFile", "Required", False, "Input", None, None, None, default_stylesheet, None)
-    @input_output_table
+    @input_output_table()
     def getParameterInfo(self):
         """
 

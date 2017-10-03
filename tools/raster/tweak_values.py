@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
 
 from base import utils
-from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats
+from base.decorators import input_tableview, input_output_table, parameter, raster_formats
 import arcpy
 
 tool_settings = {"label": "Tweak Values",
@@ -35,7 +35,7 @@ class TweakValuesRasterTool(BaseTool):
     @parameter("over_max", "Values Over Maximum", "GPString", "Optional", False, "Input", ["Maximum", "NoData"], None, None, "Maximum", "Options")
     @parameter("integerise", "Integerise Result", "GPBoolean", "Optional", False, "Input", None, None, None, False, "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
-    @input_output_table_with_output_affixes
+    @input_output_table(affixing=True)
     def getParameterInfo(self):
         """
 

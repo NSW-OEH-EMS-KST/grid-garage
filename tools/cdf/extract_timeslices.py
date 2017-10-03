@@ -1,5 +1,5 @@
 from base.base_tool import BaseTool
-from base.decorators import input_tableview, input_output_table_with_output_affixes, parameter
+from base.decorators import input_tableview, input_output_table, parameter
 from netCDF4 import Dataset
 import numpy as np
 import pandas as pd
@@ -33,7 +33,7 @@ class ExtractTimeslicesCdfTool(BaseTool):
 
     @input_tableview(data_type="cdf")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, raster_formats[0])
-    @input_output_table_with_output_affixes
+    @input_output_table(affixing=True)
     def getParameterInfo(self):
         """
 
