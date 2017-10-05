@@ -42,7 +42,7 @@ class SelectGeodataTool(BaseTool):
 
         """
 
-        self.iterate_function_on_parameter(self.process)
+        self.iterate_function_on_parameter(self.process, "geodata", ["geodata"])
 
         return
 
@@ -55,6 +55,7 @@ class SelectGeodataTool(BaseTool):
         Returns:
 
         """
+        # self.info(data)
 
         self.result.add_pass(data)
 

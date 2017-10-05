@@ -145,17 +145,6 @@ def validate_parameter(name, display_name, data_type, parameter_type, multi_valu
     return
 
 
-# class FieldText(object):
-#     """
-#     """
-#
-#     def __init__(self):
-#         """
-#
-#         """
-#         pass
-
-
 class TableSetting(object):
     """
 
@@ -237,9 +226,11 @@ def input_tableview(data_type="geodata", multi_value=False, other_fields=None, o
     """
 
     # setup and validate
-    tset = TableSetting(data_type)
-
-    required_fields = parse_fields(tset.fields)
+    if data_type:
+        tset = TableSetting(data_type)
+        required_fields = parse_fields(tset.fields)
+    else:
+        required_fields = []
 
     if other_fields:
         other_fields = parse_fields(other_fields)

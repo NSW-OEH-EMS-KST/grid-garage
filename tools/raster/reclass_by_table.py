@@ -32,7 +32,7 @@ class ReclassByTableRasterTool(BaseTool):
         return
 
     @input_tableview(data_type="raster")
-    @input_tableview(ob_name="in_remap_table", ob_title="Remap Table", other_fields="from_value_field From_Value Required from_value, to_value_field To_Value Required to_value, output_value_field Output_Value Required output_value")
+    @input_tableview(data_type=None, ob_name="in_remap_table", ob_title="Remap Table", other_fields="from_value_field From_Value Required from_value, to_value_field To_Value Required to_value, output_value_field Output_Value Required output_value")
     @parameter("missing_values", "Missing value treatment", "GPString", "Optional", False, "Input", data_nodata, None, None, data_nodata[0], "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, "Esri Grid")
     @input_output_table(affixing=True)

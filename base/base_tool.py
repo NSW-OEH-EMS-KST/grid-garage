@@ -55,7 +55,7 @@ def error_trap(context):
         context (function): function to be contextualised
 
     Returns:
-        :
+        None
 
     Raises:
         caught (exception): original exception is re-raised after debug logging
