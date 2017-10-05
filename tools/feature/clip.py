@@ -47,7 +47,7 @@ class ClipFeatureTool(BaseTool):
         """
 
         self.clip_srs = base.utils.get_srs(self.clip_features, raise_unknown_error=True)
-        # self.iterate_function_on_tableview(self.clip, "feature_table", ["geodata"], return_to_results=True)
+
         self.iterate_function_on_tableview(self.clip, return_to_results=True)
 
         return
@@ -62,7 +62,7 @@ class ClipFeatureTool(BaseTool):
 
         """
 
-        fc = data["geodata"]
+        fc = data["feature"]
         base.utils.validate_geodata(fc, vector=True, srs_known=True)
         fc_srs = base.utils.get_srs(fc, raise_unknown_error=True)
         base.utils.compare_srs(fc_srs, self.clip_srs, raise_no_match_error=True)

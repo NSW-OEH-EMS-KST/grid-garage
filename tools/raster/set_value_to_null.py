@@ -1,5 +1,7 @@
-from base.base_tool import BaseTool
+"""
 
+"""
+from base.base_tool import BaseTool
 from base import utils
 from base.decorators import input_tableview, input_output_table, parameter, raster_formats
 from arcpy.sa import SetNull
