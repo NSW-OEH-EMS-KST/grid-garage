@@ -214,6 +214,7 @@ class BaseTool(object):
             self.messages.addMessage("Initialising logging...")
 
         logger = logging.getLogger(self.tool_name)
+        logger.handlers = []
 
         # convenience aliases
         self.debug = logger.debug

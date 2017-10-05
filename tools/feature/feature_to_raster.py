@@ -59,7 +59,7 @@ class FeatureToRasterTool(BaseTool):
             data:
         """
 
-        feat_ds = data["geodata"]
+        feat_ds = data["feature"]
         base.utils.validate_geodata(feat_ds, vector=True)
 
         fields_string = data["table_fields"]

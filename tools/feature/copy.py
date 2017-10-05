@@ -48,7 +48,6 @@ class CopyFeatureTool(base.base_tool.BaseTool):
 
         """
 
-        # self.iterate_function_on_tableview(self.process, "features_table", ["geodata"], return_to_results=True)
         self.iterate_function_on_tableview(self.process, return_to_results=True)
 
         return
@@ -63,7 +62,7 @@ class CopyFeatureTool(base.base_tool.BaseTool):
 
         """
 
-        fc = data["geodata"]
+        fc = data["feature"]
         base.utils.validate_geodata(fc, vector=True)
 
         ws = self.result.output_workspace

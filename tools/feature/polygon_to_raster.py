@@ -50,8 +50,7 @@ class PolygonToRasterTool(BaseTool):
 
         self.cell_assignment = "CELL_CENTER" if self.cell_assignment in [None, "#"] else self.cell_assignment
 
-        # self.iterate_function_on_tableview(self.rasterise, "features_table", ["geodata", "table_fields", "priority_field"])
-        self.iterate_function_on_tableview(self.rasterise, "features_table", ["geodata", "table_fields", "priority_field"])
+        self.iterate_function_on_tableview(self.rasterise)  #, "feature_table", ["feature", "table_fields", "priority_field"])
 
         return
 
@@ -63,7 +62,7 @@ class PolygonToRasterTool(BaseTool):
         """
         self.info(data)
 
-        feat_ds = data["geodata"]
+        feat_ds = data["feature"]
         base.utils.validate_geodata(feat_ds, vector=True, polygon=True)
 
         fields_string = data["table_fields"]
@@ -79,7 +78,6 @@ class PolygonToRasterTool(BaseTool):
         try:
             priority_field = data["priority_field"] if data["priority_field"] else priority_field
         except:
-            # self.warn("")
             pass
 
         for field in target_fields:

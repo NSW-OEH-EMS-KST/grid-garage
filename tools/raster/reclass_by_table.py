@@ -54,9 +54,9 @@ class ReclassByTableRasterTool(BaseTool):
 
         p = self.get_parameter_dict()
 
-        self.from_value_field = p["in_remap_table_field_from_value_field"]
-        self.to_value_field = p["in_remap_table_field_to_value_field"]
-        self.output_value_field = p["in_remap_table_field_output_value_field"]
+        self.from_value_field = p["from_value_field"]
+        self.to_value_field = p["to_value_field"]
+        self.output_value_field = p["output_value_field"]
 
         self.iterate_function_on_tableview(self.reclass, return_to_results=True)
 

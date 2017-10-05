@@ -62,7 +62,7 @@ class SetValueToNullRasterTool(BaseTool):
 
         """
 
-        r_in = data['geodata']
+        r_in = data['raster']
 
         utils.validate_geodata(r_in, raster=True)
 
