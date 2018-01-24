@@ -63,7 +63,7 @@ class ImportTipFilesToTableMetadataTool(BaseTool):
                 else:
                     tips[s1] = s2
 
-        tips["field_order"] = tips.keys()
+        tips["field_order"] = ",".join(tips.keys())
 
         res = {"geodata": geodata, "tip_file": tip_file}
         res.update(tips)
