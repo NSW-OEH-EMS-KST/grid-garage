@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-
+from base.results import result
 from base import utils
-from base.decorators import input_tableview, input_output_table, parameter, raster_formats
+from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats
 from arcpy.sa import *
 
 
@@ -11,57 +11,32 @@ tool_settings = {"label": "Lookup by Table",
                  "category": "Raster"}
 
 
-
+@result
 class LookupByTableRasterTool(BaseTool):
-    """
-    """
 
     def __init__(self):
-        """
-
-        Returns:
-
-        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
         return
 
-    @input_tableview(data_type="raster", other_fields="table_fields Lookup_Fields Required table_fields")
+    @input_tableview("raster_table", "Table for Rasters", False, ["lookup fields:table_fields:", "raster:geodata:"])
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, "Esri Grid")
-    @input_output_table(affixing=True)
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.lookup)
+        self.iterate_function_on_tableview(self.lookup, "raster_table", ["table_fields", "geodata"])
 
         return
 
     def lookup(self, data):
-        """
 
-        Args:
-            data:
-
-        Returns:
-
-        """
-
-        ras = data["raster"]
+        ras = data["geodata"]
 
         utils.validate_geodata(ras, raster=True)
 
@@ -74,10 +49,10 @@ class LookupByTableRasterTool(BaseTool):
                 out.save(ras_out)
                 self.info("Saved to {0}".format(ras_out))
 
-                self.result.add_pass({"raster": ras_out, "source_geodata": ras})
+                self.result.add_pass({"geodata": ras_out, "source_geodata": ras})
             except:
                 self.warn("Failed on field '{}'".format(f))
-                data["raster"] = ras
+                data["geodata"] = ras
                 data["failure_field"] = f
                 self.result.add_fail(data)
 

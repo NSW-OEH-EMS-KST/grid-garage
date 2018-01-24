@@ -1,5 +1,6 @@
-from base.base_tool import BaseTool
-from base.decorators import input_output_table, input_tableview, parameter
+import base.base_tool
+import base.results
+from base.method_decorators import input_output_table_with_output_affixes, input_tableview, parameter
 import arcpy
 import base.utils
 
@@ -9,60 +10,35 @@ tool_settings = {"label": "Clip",
                  "category": "Feature"}
 
 
-class ClipFeatureTool(BaseTool):
-    """
-    """
+@base.results.result
+class ClipFeatureTool(base.base_tool.BaseTool):
 
     def __init__(self):
-        """
 
-        Returns:
-
-        """
-
-        BaseTool.__init__(self, tool_settings)
+        base.base_tool.BaseTool.__init__(self, tool_settings)
         self.clip_srs = None
         self.execution_list = [self.iterate]
 
         return
 
-    @input_tableview(data_type="feature")
+    @input_tableview("feature_table", "Table of Features", False, ["feature:geodata:"])
     @parameter("clip_features", "Clip Features", "GPFeatureLayer", "Required", False, "Input", ["Polygon"], None, None, None,)
     @parameter("xy_tolerance", "XY Tolerance", "GPLinearUnit", "Optional", False, "Input", None, None, None, None, "Options")
-    @input_output_table(affixing=True)
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        """
 
-        Returns:
-
-        """
-
-        return BaseTool.getParameterInfo(self)
+        return base.base_tool.BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
-
-        Returns:
-
-        """
 
         self.clip_srs = base.utils.get_srs(self.clip_features, raise_unknown_error=True)
-
-        self.iterate_function_on_tableview(self.clip, return_to_results=True)
+        self.iterate_function_on_tableview(self.clip, "feature_table", ["geodata"], return_to_results=True)
 
         return
 
     def clip(self, data):
-        """
 
-        Args:
-            data:
-
-        Returns:
-
-        """
-
-        fc = data["feature"]
+        fc = data["geodata"]
         base.utils.validate_geodata(fc, vector=True, srs_known=True)
         fc_srs = base.utils.get_srs(fc, raise_unknown_error=True)
         base.utils.compare_srs(fc_srs, self.clip_srs, raise_no_match_error=True)

@@ -211,12 +211,6 @@ class Paperwork(object):
     def _dictionary_to_metadata(self, d):
         """ converts a dictionary to xml"""
         def _to_etree(d, root):
-            """
-
-            Args:
-                d:
-                root:
-            """
             if not d:
                 pass
             elif isinstance(d, basestring):

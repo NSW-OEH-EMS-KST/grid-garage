@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-
+from base.results import result
 from base import utils
-from base.decorators import input_tableview, input_output_table, parameter, resample_methods, raster_formats
+from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, resample_methods, raster_formats
 import arcpy
 
 tool_settings = {"label": "Resample",
@@ -10,16 +10,10 @@ tool_settings = {"label": "Resample",
                  "category": "Raster"}
 
 
+@result
 class ResampleRasterTool(BaseTool):
-    """
-    """
 
     def __init__(self):
-        """
-
-        Returns:
-
-        """
 
         BaseTool.__init__(self, tool_settings)
 
@@ -27,42 +21,24 @@ class ResampleRasterTool(BaseTool):
 
         return
 
-    @input_tableview(data_type="raster")
+    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("resample_type", "Resampling Method", "GPString", "Required", False, "Input", resample_methods, "resamplingMethod", None, None)
     @parameter("cell_size", "Cell Size", "GPSACellSize", "Required", False, "Input", None, "cellSize", None, None)
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
-    @input_output_table(affixing=True)
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.resample, return_to_results=True)
+        self.iterate_function_on_tableview(self.resample, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def resample(self, data):
-        """
 
-        Args:
-            data:
-
-        Returns:
-
-        """
-
-        ras = data["raster"]
+        ras = data["geodata"]
 
         utils.validate_geodata(ras, raster=True)
 
@@ -72,7 +48,7 @@ class ResampleRasterTool(BaseTool):
 
         arcpy.Resample_management(ras, ras_out, self.cell_size, self.resample_type)
 
-        return {"raster": ras_out, "source_geodata": ras}
+        return {"geodata": ras_out, "source_geodata": ras}
 
 # "http://desktop.arcgis.com/en/arcmap/latest/tools/data-management-toolbox/resample.htm"
 

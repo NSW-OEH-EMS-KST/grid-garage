@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-
+from base.results import result
 from base import utils
-from base.decorators import input_tableview, input_output_table, parameter, raster_formats
+from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats
 import arcpy
 
 tool_settings = {"label": "Tweak Values",
@@ -10,23 +10,17 @@ tool_settings = {"label": "Tweak Values",
                  "category": "Raster"}
 
 
+@result
 class TweakValuesRasterTool(BaseTool):
-    """
-    """
 
     def __init__(self):
-        """
-
-        Returns:
-
-        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
 
         return
 
-    @input_tableview(data_type="raster")
+    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("scalar", "Scale Factor", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("constant", "Constant Shift", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("min_val", "Minimum value", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
@@ -35,22 +29,12 @@ class TweakValuesRasterTool(BaseTool):
     @parameter("over_max", "Values Over Maximum", "GPString", "Optional", False, "Input", ["Maximum", "NoData"], None, None, "Maximum", "Options")
     @parameter("integerise", "Integerise Result", "GPBoolean", "Optional", False, "Input", None, None, None, False, "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
-    @input_output_table(affixing=True)
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def initialise(self):
-        """
-
-        Returns:
-
-        """
 
         if not (self.min_val or self.max_val or self.constant or self.scalar or self.integerise):
             raise ValueError("No tweaks specified")
@@ -58,27 +42,14 @@ class TweakValuesRasterTool(BaseTool):
         return
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.tweak, return_to_results=True)
+        self.iterate_function_on_tableview(self.tweak, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def tweak(self, data):
-        """
 
-        Args:
-            data:
-
-        Returns:
-
-        """
-
-        r_in = data["raster"]
+        r_in = data["geodata"]
         utils.validate_geodata(r_in, raster=True)
 
         r_out = utils.make_raster_name(r_in, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
@@ -140,6 +111,6 @@ class TweakValuesRasterTool(BaseTool):
         self.info('\tSaving to {}'.format(r_out))
         ras.save(r_out)
 
-        return {"raster": r_out, "source_geodata": r_in, "tweaks": ' & '.join(tweaks)}
+        return {"geodata": r_out, "source_geodata": r_in, "tweaks": ' & '.join(tweaks)}
 
 # Con (in_conditional_raster, in_true_raster_or_constant, {in_false_raster_or_constant}, {where_clause})

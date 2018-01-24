@@ -1,9 +1,7 @@
-"""
-
-"""
 from base.base_tool import BaseTool
+from base.results import result
 from base import utils
-from base.decorators import input_tableview, input_output_table, parameter, raster_formats
+from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats
 from arcpy.sa import SetNull
 
 
@@ -13,16 +11,10 @@ tool_settings = {"label": "Set Value to Null",
                  "category": "Raster"}
 
 
+@result
 class SetValueToNullRasterTool(BaseTool):
-    """
-    """
 
     def __init__(self):
-        """
-
-        Returns:
-
-        """
 
         BaseTool.__init__(self, tool_settings)
 
@@ -30,41 +22,23 @@ class SetValueToNullRasterTool(BaseTool):
 
         return
 
-    @input_tableview(data_type="raster")
+    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("val_to_null", "Value to Set Null", "GPDouble", "Required", False, "Input", None, None, None, None)
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, "Esri Grid")
-    @input_output_table(affixing=True)
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.set_null, return_to_results=True)
+        self.iterate_function_on_tableview(self.set_null, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def set_null(self, data):
-        """
 
-        Args:
-            data:
-
-        Returns:
-
-        """
-
-        r_in = data['raster']
+        r_in = data['geodata']
 
         utils.validate_geodata(r_in, raster=True)
 
@@ -76,6 +50,6 @@ class SetValueToNullRasterTool(BaseTool):
 
         out_ras.save(r_out)
 
-        return {"raster": r_out, "source_geodata": r_in}
+        return {"geodata": r_out, "source_geodata": r_in}
 
 

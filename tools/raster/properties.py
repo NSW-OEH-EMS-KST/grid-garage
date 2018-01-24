@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-
+from base.results import result
 from base.utils import validate_geodata
-from base.decorators import input_output_table, input_tableview
+from base.method_decorators import input_output_table, input_tableview
 from arcpy import Describe, GetRasterProperties_management
 from os.path import join
 from collections import OrderedDict
@@ -19,15 +19,9 @@ describe_field_groups = dict(
                                "SUNELEVATION", "CLOUDCOVER", "SUNAZIMUTH", "SENSORAZIMUTH", "SENSORELEVATION", "OFFNADIR", "WAVELENGTH"])
 
 
-class BandPropertiesRasterTool(BaseTool):
-    """
-    """
+@result
+class BandPropetiesRasterTool(BaseTool):
     def __init__(self):
-        """
-
-        Returns:
-
-        """
 
         BaseTool.__init__(self, tool_settings)
 
@@ -35,39 +29,21 @@ class BandPropertiesRasterTool(BaseTool):
 
         return
 
-    @input_tableview(data_type="raster")
-    @input_output_table()
+    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
+    @input_output_table
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.describe, return_to_results=True)
+        self.iterate_function_on_tableview(self.describe, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def describe(self, data):
-        """
 
-        Args:
-            data:
-
-        Returns:
-
-        """
-
-        ras = data["raster"]
+        ras = data["geodata"]
 
         validate_geodata(ras, raster=True)
 
@@ -96,7 +72,7 @@ class BandPropertiesRasterTool(BaseTool):
 
         # return an ordered dictionary
         od = OrderedDict()
-        od["raster"] = ras
+        od["geodata"] = ras
         for i, attributes in sorted(desc.items()):
             od[i] = attributes
 

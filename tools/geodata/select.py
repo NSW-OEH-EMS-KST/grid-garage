@@ -1,6 +1,6 @@
-from base.base_tool import BaseTool
-
-from base.decorators import input_output_table, parameter
+import base.base_tool
+import base.results
+from base.method_decorators import input_output_table, parameter
 
 tool_settings = {"label": "Select",
                  "description": "Feed selected geodata into a table",
@@ -8,54 +8,29 @@ tool_settings = {"label": "Select",
                  "category": "Geodata"}
 
 
-class SelectGeodataTool(BaseTool):
-    """
-    """
+@base.results.result
+class SelectGeodataTool(base.base_tool.BaseTool):
 
     def __init__(self):
-        """
 
-        Returns:
-
-        """
-
-        BaseTool.__init__(self, tool_settings)
+        base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
         return
 
     @parameter("geodata", "Select Geodata", "GPType", "Required", True, "Input", None, None, None, None)
-    @input_output_table()
+    @input_output_table
     def getParameterInfo(self):
-        """
 
-        Returns:
-
-        """
-
-        return BaseTool.getParameterInfo(self)
+        return base.base_tool.BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
-
-        Returns:
-
-        """
 
         self.iterate_function_on_parameter(self.process, "geodata", ["geodata"])
 
         return
 
     def process(self, data):
-        """
-
-        Args:
-            data:
-
-        Returns:
-
-        """
-        # self.info(data)
 
         self.result.add_pass(data)
 

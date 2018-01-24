@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-
+from base.results import result
 from base.utils import raster_formats, resample_methods, validate_geodata, make_raster_name, get_transformation
-from base.decorators import input_tableview, input_output_table, parameter
+from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter
 import arcpy
 
 tool_settings = {"label": "Reproject",
@@ -10,44 +10,30 @@ tool_settings = {"label": "Reproject",
                  "category": "Raster"}
 
 
+@result
 class ReprojectRasterTool(BaseTool):
-    """
-    """
 
     def __init__(self):
-        """
-
-        Returns:
-
-        """
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
 
         return
 
-    @input_tableview(data_type="raster")
+    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("output_cs", "Output Spatial Reference", "Spatial Reference", "Required", False, "Input", None, "outputCoordinateSystem", None, None)
     @parameter("cell_size", "Cell Size", "GPSACellSize", "Required", False, "Input", None, "cellSize", None, None)
     @parameter("resample_type", "Resampling Method", "GPString", "Required", False, "Input", resample_methods, "resamplingMethod", None, None)
     @parameter("rego_point", "Registration Point", "GPPoint", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("overrides", "Transformation Overrides", "GPString", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
-    @input_output_table(affixing=True)
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def initialise(self):
-        """
 
-        Returns:
-
-        """
+        self.debug("initialise locals={}".format(locals()))
 
         self.output_cs = self.parameters[2].value  # need the object for later code to work
         self.cell_size = str(self.cell_size)  # this seemed to solve an issue with unicode... strange
@@ -64,27 +50,14 @@ class ReprojectRasterTool(BaseTool):
         return
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.reproject, return_to_results=True)
+        self.iterate_function_on_tableview(self.reproject, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def reproject(self, data):
-        """
 
-        Args:
-            data:
-
-        Returns:
-
-        """
-
-        r_in = data['raster']
+        r_in = data['geodata']
 
         validate_geodata(r_in, raster=True, srs_known=True)
 
@@ -96,4 +69,4 @@ class ReprojectRasterTool(BaseTool):
 
         arcpy.ProjectRaster_management(r_in, r_out, self.output_cs, geographic_transform=tx, resampling_type=self.resample_type, cell_size=self.cell_size, Registration_Point=self.rego_point)
 
-        return {"raster": r_out, "source": r_in}
+        return {"geodata": r_out, "source": r_in}

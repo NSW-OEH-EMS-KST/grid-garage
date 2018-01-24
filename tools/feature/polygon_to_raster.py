@@ -1,5 +1,6 @@
 from base.base_tool import BaseTool
-from base.decorators import input_output_table, input_tableview, parameter, raster_formats
+import base.results
+from base.method_decorators import input_output_table_with_output_affixes, input_tableview, parameter, raster_formats
 from os.path import splitext
 from arcpy import PolygonToRaster_conversion
 import base.utils
@@ -11,58 +12,38 @@ tool_settings = {"label": "Polygon to Raster",
                  "category": "Feature"}
 
 
+@base.results.result
 class PolygonToRasterTool(BaseTool):
-    """
-    """
 
     def __init__(self):
-        """
-
-        Returns:
-
-        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
         return
 
-    @input_tableview(data_type="feature", other_fields="table_fields Burn_Fields Required table_fields, priority_field Priority_Field Optional priority_field")
+    @input_tableview("features_table", "Table for Features and Fields", False, ["priority field:priority_field:Optional", "fields:table_fields:", "feature:geodata:"])
     @parameter("cell_size", "Cell Size", "GPSACellSize", "Required", False, "Input", None, "cellSize", None, None)
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
     @parameter("cell_assignment", "Cell Assignment", "GPString", "Optional", False, "Input", ["CELL_CENTER", "MAXIMUM_AREA", "MAXIMUM_COMBINED_AREA"], None, None, None)
-    @input_output_table(affixing=True)
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
-
-        Returns:
-
-        """
+        self.info(self.get_parameter_dict())
 
         self.cell_assignment = "CELL_CENTER" if self.cell_assignment in [None, "#"] else self.cell_assignment
 
-        self.iterate_function_on_tableview(self.rasterise)  #, "feature_table", ["feature", "table_fields", "priority_field"])
+        self.iterate_function_on_tableview(self.rasterise, "features_table", ["geodata", "table_fields", "priority_field"])
 
         return
 
     def rasterise(self, data):
-        """
-
-        Args:
-            data:
-        """
         self.info(data)
 
-        feat_ds = data["feature"]
+        feat_ds = data["geodata"]
         base.utils.validate_geodata(feat_ds, vector=True, polygon=True)
 
         fields_string = data["table_fields"]
@@ -78,6 +59,7 @@ class PolygonToRasterTool(BaseTool):
         try:
             priority_field = data["priority_field"] if data["priority_field"] else priority_field
         except:
+            # self.warn("")
             pass
 
         for field in target_fields:

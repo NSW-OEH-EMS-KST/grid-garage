@@ -1,6 +1,7 @@
 from base.base_tool import BaseTool
+from base.results import result
 from base.utils import validate_geodata, describe
-from base.decorators import input_tableview, input_output_table, parameter
+from base.method_decorators import input_tableview, input_output_table, parameter
 from collections import OrderedDict
 
 
@@ -10,13 +11,9 @@ tool_settings = {"label": "Create Tips Table",
                  "category": "Metadata"}
 
 
+@result
 class CreateTipsTableMetadataTool(BaseTool):
-    """
-    """
     def __init__(self):
-        """
-
-        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
@@ -24,25 +21,15 @@ class CreateTipsTableMetadataTool(BaseTool):
         self.tip_order = []
         self.extractions = None
 
-    @input_tableview()
+    @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
     @parameter("tip_template", "Tip Template", "GPTableView", "Required", False, "Input", None, None, None, None, None)
     @parameter("include_fields", "Include Fields", "Field", "Required", True, "Input", None, None, ["tip_template"], None, None)
-    @input_output_table()
+    @input_output_table
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def initialise(self):
-        """
-
-        Returns:
-
-        """
 
         self.include_fields = self.include_fields.split(";")
         self.info("Tip fields to be included are: {}".format(self.include_fields))
@@ -63,35 +50,20 @@ class CreateTipsTableMetadataTool(BaseTool):
         self.info("Base tips will be: {}".format(self.base_tips))
 
         def startsnends(string, code):
-            """ Simple check """
-            code = code.strip().strip('"').strip("'")
             return string.startswith(code) and string.endswith(code)
 
-        self.extractions = {k: v for k, v in self.base_tips.iteritems() if startsnends(v, "$")}
+        self.extractions = {k: v for k, v in self.base_tips.iteritems() if startsnends(v.strip().strip('"'), "$")}
         self.info("Field values extraction from describe will: {}".format(self.extractions))
 
         return
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.create, return_to_results=True)
+        self.iterate_function_on_tableview(self.create, "geodata_table", ["geodata"], return_to_results=True)
 
         return
 
     def create(self, data):
-        """
-
-        Args:
-            data:
-
-        Returns:
-
-        """
 
         geodata = data["geodata"]
 
@@ -99,7 +71,7 @@ class CreateTipsTableMetadataTool(BaseTool):
 
         self.info("Building tips for {0}".format(geodata))
 
-        r = {"geodata": geodata, "tip_order": self.tip_order}
+        r = {"geodata": geodata, "field_order": self.tip_order}
 
         new_tips = OrderedDict()
 

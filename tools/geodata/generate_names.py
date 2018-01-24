@@ -1,6 +1,6 @@
 import base.base_tool
-
-from base.decorators import input_output_table, input_tableview, parameter
+import base.results
+from base.method_decorators import input_output_table_with_output_affixes, input_tableview, parameter
 from base.utils import split_up_filename, is_raster, is_vector, make_raster_name, make_vector_name, make_table_name, get_search_cursor_rows
 
 
@@ -10,31 +10,20 @@ tool_settings = {"label": "Generate Names",
                  "category": "Geodata"}
 
 
+@base.results.result
 class GenerateNamesGeodataTool(base.base_tool.BaseTool):
-    """
-    """
 
     def __init__(self):
-        """
-
-        Returns:
-
-        """
 
         base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate, self.test_duplicates]
 
         return
 
-    @input_tableview()
+    @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
     @parameter("replacements", "Replacements", "GPString", "Optional", False, "Input", None, None, None, None)
-    @input_output_table(affixing=True, out_file_workspace=False)
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return base.base_tool.BaseTool.getParameterInfo(self)
 
@@ -58,11 +47,6 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
             self.warn(['!! There seems to be non-unique new names. DOH! Please check the following...'] + duplicates)
 
     def initialise(self):
-        """
-
-        Returns:
-
-        """
 
         # look for an early exit as all parameters are optional
         if not (self.output_filename_prefix or self.output_filename_suffix) and self.replacements == "#":
@@ -90,13 +74,8 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
         return
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.process, return_to_results=True)
+        self.iterate_function_on_tableview(self.process, "geodata_table", ["geodata"], return_to_results=True)
 
         return
 

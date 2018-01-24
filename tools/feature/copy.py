@@ -1,5 +1,6 @@
 import base.base_tool
-from base.decorators import input_output_table, input_tableview, parameter
+import base.results
+from base.method_decorators import input_output_table_with_output_affixes, input_tableview, parameter
 from os.path import splitext
 import base.utils
 import arcpy
@@ -11,58 +12,34 @@ tool_settings = {"label": "Copy",
                  "category": "Feature"}
 
 
+@base.results.result
 class CopyFeatureTool(base.base_tool.BaseTool):
-    """
-    """
 
     def __init__(self):
-        """
-
-        Returns:
-
-        """
         base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
         return
 
-    @input_tableview(data_type="feature")
+    @input_tableview("features_table", "Table for Features", False, ["feature:geodata:"])
     @parameter("config_kw", "Config Keyword", "GPString", "Optional", False, "Input", None, "configKeyword", None, None)
     @parameter("sg_1", "Spatial Grid 1", "GPLong", "Optional", False, "Input", None, None, None, 0, "Options")
     @parameter("sg_2", "Spatial Grid 2", "GPLong", "Optional", False, "Input", None, None, None, 0, "Options")
     @parameter("sg_3", "Spatial Grid 3", "GPLong", "Optional", False, "Input", None, None, None, 0, "Options")
-    @input_output_table(affixing=True)
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return base.base_tool.BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.process, return_to_results=True)
+        self.iterate_function_on_tableview(self.process, "features_table", ["geodata"], return_to_results=True)
 
         return
 
     def process(self, data):
-        """
 
-        Args:
-            data:
-
-        Returns:
-
-        """
-
-        fc = data["feature"]
+        fc = data["geodata"]
         base.utils.validate_geodata(fc, vector=True)
 
         ws = self.result.output_workspace

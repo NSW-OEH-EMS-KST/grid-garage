@@ -1,8 +1,9 @@
 from base.base_tool import BaseTool
-
+from base.results import result
 from base.utils import validate_geodata
-from base.decorators import input_tableview, input_output_table
+from base.method_decorators import input_tableview, input_output_table
 from arcpy import ImportMetadata_conversion
+from hermes import Paperwork
 
 
 tool_settings = {"label": "Import Metadata",
@@ -11,16 +12,10 @@ tool_settings = {"label": "Import Metadata",
                  "category": "Metadata"}
 
 
+@result
 class ImportMetadataTool(BaseTool):
-    """
-    """
 
     def __init__(self):
-        """
-
-        Returns:
-
-        """
 
         BaseTool.__init__(self, tool_settings)
 
@@ -28,37 +23,19 @@ class ImportMetadataTool(BaseTool):
 
         return
 
-    @input_tableview(other_fields="source Source Required geodata")
-    @input_output_table()
+    @input_tableview("geodata_table", "Table of Geodata", False, ["source:source:", "geodata:geodata:"])
+    @input_output_table
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.do_import, return_to_results=True)
+        self.iterate_function_on_tableview(self.do_import, "geodata_table", ["geodata", "source"], return_to_results=True)
 
         return
 
     def do_import(self, data):
-        """
-
-        Args:
-            data:
-
-        Returns:
-
-        """
 
         geodata = data["geodata"]
 

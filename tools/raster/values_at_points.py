@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-
+from base.results import result
 from base import utils
-from base.decorators import input_tableview, input_output_table, parameter
+from base.method_decorators import input_tableview, input_output_table, parameter
 from arcpy import GetCellValue_management, GetCount_management
 import arcpy.sa
 from collections import OrderedDict
@@ -13,15 +13,9 @@ tool_settings = {"label": "Values at Points",
                  "category": "Raster"}
 
 
+@result
 class ValuesAtPointsRasterTool(BaseTool):
-    """
-    """
     def __init__(self):
-        """
-
-        Returns:
-
-        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate, self.finish]
@@ -31,24 +25,14 @@ class ValuesAtPointsRasterTool(BaseTool):
 
         return
 
-    @input_tableview(data_type="raster")
+    @input_tableview("raster_table", "Table of Rasters", False, ["raster:geodata:"])
     @parameter("points", "Point Features", "GPFeatureLayer", "Required", False, "Input", ["Point"], None, None, None)
-    @input_output_table()
+    @input_output_table
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def initialise(self):
-        """
-
-        Returns:
-
-        """
 
         d = utils.describe(self.points)
         self.points_srs = d.get("dataset_spatialReference", "Unknown")
@@ -65,27 +49,14 @@ class ValuesAtPointsRasterTool(BaseTool):
         return
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.process)
+        self.iterate_function_on_tableview(self.process, "raster_table", ["geodata"])
 
         return
 
     def process(self, data):
-        """
 
-        Args:
-            data:
-
-        Returns:
-
-        """
-
-        ras = data["raster"]
+        ras = data["geodata"]
         utils.validate_geodata(ras, raster=True, srs_known=True)
 
         d = utils.describe(ras)
@@ -122,11 +93,6 @@ class ValuesAtPointsRasterTool(BaseTool):
         return
 
     def finish(self):
-        """
-
-        Returns:
-
-        """
 
         result_list = []
 

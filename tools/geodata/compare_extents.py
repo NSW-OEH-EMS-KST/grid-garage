@@ -1,8 +1,10 @@
-from base.base_tool import BaseTool
+import base.base_tool
+import base.results
 import collections
 import arcpy
 import base.utils
-from base.decorators import input_output_table, input_tableview, parameter
+from base.method_decorators import input_output_table, input_tableview, parameter
+
 
 tool_settings = {"label": "Compare Extents",
                  "description": "Compare Extents...",
@@ -10,18 +12,12 @@ tool_settings = {"label": "Compare Extents",
                  "category": "Geodata"}
 
 
-class CompareExtentsGeodataTool(BaseTool):
-    """
-    """
+@base.results.result
+class CompareExtentsGeodataTool(base.base_tool.BaseTool):
 
     def __init__(self):
-        """
 
-        Returns:
-
-        """
-
-        BaseTool.__init__(self, tool_settings)
+        base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
         self.aoi_extent = None
         self.aoi_srs_name = None
@@ -29,24 +25,14 @@ class CompareExtentsGeodataTool(BaseTool):
 
         return
 
-    @input_tableview()
+    @input_tableview("geodata_table", "Table for Geodata", False, ["geodata:geodata:"])
     @parameter("aoi_dataset", "Dataset (Area of Interest) to compare with", ["DEFeatureClass", "DERasterDataset"], "Required", False, "Input", None, None, None, None)
-    @input_output_table()
+    @input_output_table
     def getParameterInfo(self):
-        """
 
-        Returns:
-
-        """
-
-        return BaseTool.getParameterInfo(self)
+        return base.base_tool.BaseTool.getParameterInfo(self)
 
     def initialise(self):
-        """
-
-        Returns:
-
-        """
 
         self.aoi_extent = arcpy.Describe(self.aoi_dataset).extent
         self.aoi_srs_name = self.aoi_extent.spatialReference.name
@@ -55,25 +41,12 @@ class CompareExtentsGeodataTool(BaseTool):
         return
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.compare, return_to_results=True)
+        self.iterate_function_on_tableview(self.compare, "geodata_table", ["geodata"], return_to_results=True)
 
         return
 
     def compare(self, data):
-        """
-
-        Args:
-            data:
-
-        Returns:
-
-        """
 
         ds_in = data["geodata"]
         base.utils.validate_geodata(ds_in, srs_known=True)

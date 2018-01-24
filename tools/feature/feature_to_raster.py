@@ -1,5 +1,6 @@
 from base.base_tool import BaseTool
-from base.decorators import input_output_table, input_tableview, parameter, raster_formats
+import base.results
+from base.method_decorators import input_output_table_with_output_affixes, input_tableview, parameter, raster_formats
 from os.path import splitext
 from arcpy import FeatureToRaster_conversion
 import base.utils
@@ -11,55 +12,33 @@ tool_settings = {"label": "Feature to Raster",
                  "category": "Feature"}
 
 
+@base.results.result
 class FeatureToRasterTool(BaseTool):
-    """
-    """
 
     def __init__(self):
-        """
-
-        Returns:
-
-        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
         return
 
-    @input_tableview(data_type="feature", other_fields="table_fields Burn_Fields Required table_fields")
+    @input_tableview("features_table", "Table for Features and Fields", False, ["fields:table_fields:", "feature:geodata:"])
     @parameter("cell_size", "Cell Size", "GPSACellSize", "Required", False, "Input", None, "cellSize", None, None)
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
-    @input_output_table(affixing=True)
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        # self.iterate_function_on_tableview(self.rasterise, "features_table", ["geodata", "table_fields"])
-        self.iterate_function_on_tableview(self.rasterise)
+        self.iterate_function_on_tableview(self.rasterise, "features_table", ["geodata", "table_fields"])
 
         return
 
     def rasterise(self, data):
-        """
 
-        Args:
-            data:
-        """
-
-        feat_ds = data["feature"]
+        feat_ds = data["geodata"]
         base.utils.validate_geodata(feat_ds, vector=True)
 
         fields_string = data["table_fields"]

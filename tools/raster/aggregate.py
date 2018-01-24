@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-
+from base.results import result
 from base import utils
-from base.decorators import input_tableview, input_output_table, parameter, raster_formats, aggregation_methods, data_nodata, expand_trunc
+from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats, aggregation_methods, data_nodata, expand_trunc
 from arcpy.sa import Aggregate
 
 
@@ -11,16 +11,10 @@ tool_settings = {"label": "Aggregate",
                  "category": "Raster"}
 
 
+@result
 class AggregateRasterTool(BaseTool):
-    """
-    """
 
     def __init__(self):
-        """
-
-        Returns:
-
-        """
 
         BaseTool.__init__(self, tool_settings)
 
@@ -28,44 +22,26 @@ class AggregateRasterTool(BaseTool):
 
         return
 
-    @input_tableview(data_type="raster")
+    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("cell_factor", "Cell Aggregation Factor", "GPLong", "Required", False, "Input", ["Range", 2, 1000], None, None, None)
     @parameter("aggregation_type", "Aggregation Method", "GPString", "Optional", False, "Input", aggregation_methods, None, None, aggregation_methods[0], "Options")
     @parameter("extent_handling", "Extent Boundary", "GPString", "Optional", False, "Input", expand_trunc, None, None, expand_trunc[0], "Options")
     @parameter("ignore_nodata", "No Data Treatment", "GPString", "Optional", False, "Input", data_nodata, None, None, data_nodata[0], "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, raster_formats[0])
-    @input_output_table(affixing=True)
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.aggregate, return_to_results=True)
+        self.iterate_function_on_tableview(self.aggregate, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def aggregate(self, data):
-        """
 
-        Args:
-            data:
-
-        Returns:
-
-        """
-
-        ras = data["raster"]
+        ras = data["geodata"]
 
         utils.validate_geodata(ras, raster=True)
 

@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-
+from base.results import result
 from base import utils
-from base.decorators import input_tableview, input_output_table, parameter, data_nodata, raster_formats
+from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, data_nodata, raster_formats
 import arcpy
 
 tool_settings = {"label": "Slice",
@@ -10,16 +10,10 @@ tool_settings = {"label": "Slice",
                  "category": "Raster"}
 
 
+@result
 class SliceRasterTool(BaseTool):
-    """
-    """
 
     def __init__(self):
-        """
-
-        Returns:
-
-        """
 
         BaseTool.__init__(self, tool_settings)
 
@@ -27,27 +21,17 @@ class SliceRasterTool(BaseTool):
 
         return
 
-    @input_tableview(data_type="raster")
+    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("raster_format", "Output Raster Format", "GPString", "Optional", False, "Input", raster_formats, None, None, "Esri Grid")
     @parameter("num_zones", "Number of Zones", "GPLong", "Required", False, "Input", None, None, None, 10, "Options")
     @parameter("slice_type", "Type of Slice", "GPString", "Required", False, "Input", ["EQUAL_INTERVAL", "EQUAL_AREA", "NATURAL_BREAKS"], None, None, None)
     @parameter("base_output_zone", "Base Output Zone", "GPLong", "Required", False, "Input", None, None, None, 1, "Options")
-    @input_output_table(affixing=True)
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
-
-        Returns:
-
-        """
 
         # p = self.get_parameter_dict()
 
@@ -55,21 +39,13 @@ class SliceRasterTool(BaseTool):
         # self.to_value_field = p["in_remap_table_field_to_value_field"]
         # self.output_value_field = p["in_remap_table_field_output_value_field"]
 
-        self.iterate_function_on_tableview(self.slice, return_to_results=True)
+        self.iterate_function_on_tableview(self.slice, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def slice(self, data):
-        """
 
-        Args:
-            data:
-
-        Returns:
-
-        """
-
-        ras = data["raster"]
+        ras = data["geodata"]
 
         utils.validate_geodata(ras, raster=True)
 
@@ -79,6 +55,6 @@ class SliceRasterTool(BaseTool):
 
         arcpy.Slice_3d(ras, ras_out, self.num_zones, self.slice_type, self.base_output_zone)
 
-        return {"raster": ras_out, "source_geodata": ras}
+        return {"geodata": ras_out, "source_geodata": ras}
 
 #  Slice_3d (in_raster, out_raster, number_zones, {slice_type}, {base_output_zone})

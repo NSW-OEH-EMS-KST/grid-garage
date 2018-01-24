@@ -1,6 +1,6 @@
 from base.base_tool import BaseTool
-
-from base.decorators import input_tableview, input_output_table, parameter, raster_formats
+from base.results import result
+from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats
 import arcpy
 from base.utils import get_srs, validate_geodata, compare_srs, make_raster_name
 
@@ -14,16 +14,10 @@ tool_settings = {"label": "Clip",
 #     NO_MAINTAIN_EXTENT - Maintain the cell alignment as the input raster and adjust the output extent accordingly."""
 
 
+@result
 class ClipRasterTool(BaseTool):
-    """
-    """
 
     def __init__(self):
-        """
-
-        Returns:
-
-        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
@@ -31,29 +25,19 @@ class ClipRasterTool(BaseTool):
 
         return
 
-    @input_tableview(data_type="raster")
+    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("rectangle", "Rectangle", "GPExtent", "Required", False, "Input", None, "extent", None, None)
     @parameter("polygons", "Polygon feature(s) to clip by", "GPFeatureLayer", "Optional", False, "Input", ["Polygon"], None, None, None, "Options")
     @parameter("clipping_geometry", "Use features for clipping", "GPBoolean", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("no_data_val", "Value for 'NoData'", "GPString", "Optional", False, "Input", None, "nodata", None, None, "Options")
     @parameter("maintain_extent", "Maintain clipping extent", "GPString", "Optional", False, "Input", ["MAINTAIN_EXTENT", "NO_MAINTAIN_EXTENT"], None, None, None, "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
-    @input_output_table(affixing=True)
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
-
-        Returns:
-
-        """
 
         if self.clipping_geometry:
             self.clipping_geometry = "ClippingGeometry"
@@ -62,21 +46,13 @@ class ClipRasterTool(BaseTool):
             self.clipping_geometry = "NONE"
             self.polygons = "#"
 
-        self.iterate_function_on_tableview(self.clip, return_to_results=True)
+        self.iterate_function_on_tableview(self.clip, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def clip(self, data):
-        """
 
-        Args:
-            data:
-
-        Returns:
-
-        """
-
-        ras = data["raster"]
+        ras = data["geodata"]
         validate_geodata(ras, raster=True, srs_known=True)
         ras_srs = get_srs(ras, raise_unknown_error=True)
         self.debug("raster srs = {}".format(ras_srs))
@@ -89,7 +65,7 @@ class ClipRasterTool(BaseTool):
         self.info("Clipping {0} -->> {1} ...".format(ras, ras_out))
         arcpy.Clip_management(ras, self.rectangle, ras_out, self.polygons, self.no_data_val, self.clipping_geometry, self.maintain_extent)
 
-        return {"raster": ras_out, "source_geodata": ras}
+        return {"geodata": ras_out, "source_geodata": ras}
 
 # import arcpy
 # arcpy.Clip_management(

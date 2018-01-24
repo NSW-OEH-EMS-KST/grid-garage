@@ -15,25 +15,12 @@ LOG_FILE = os.path.join(APPDATA_PATH, "gridgarage.log")
 
 
 def make_tuple(ob):
-    """
-
-    Args:
-        ob:
-
-    Returns:
-
-    """
 
     return ob if isinstance(ob, (list, tuple)) else [ob]
 
 
 @static_vars(logger=None)
 def get_logger():
-    """
-
-    Returns:
-
-    """
 
     if not get_logger.logger:
         get_logger.logger = logging.getLogger("gridgarage")
@@ -42,14 +29,6 @@ def get_logger():
 
 
 def debug(message):
-    """
-
-    Args:
-        message:
-
-    Returns:
-
-    """
 
     message = make_tuple(message)
 
@@ -67,14 +46,6 @@ def debug(message):
 
 
 def info(message):
-    """
-
-    Args:
-        message:
-
-    Returns:
-
-    """
 
     message = make_tuple(message)
 
@@ -92,14 +63,6 @@ def info(message):
 
 
 def warn(message):
-    """
-
-    Args:
-        message:
-
-    Returns:
-
-    """
 
     message = make_tuple(message)
 
@@ -117,14 +80,6 @@ def warn(message):
 
 
 def error(message):
-    """
-
-    Args:
-        message:
-
-    Returns:
-
-    """
 
     message = make_tuple(message)
 
@@ -145,11 +100,6 @@ class ArcStreamHandler(logging.StreamHandler):
     """ Logging handler to log messages to ArcGIS """
 
     def __init__(self, messages):
-        """
-
-        Args:
-            messages:
-        """
 
         logging.StreamHandler.__init__(self)
 
@@ -166,7 +116,7 @@ class ArcStreamHandler(logging.StreamHandler):
         """
 
         msg = self.format(record)
-        msg = msg.replace("\n", ", ").replace("\t", " ").replace("  ", " ").encode("ascii")
+        msg = msg.replace("\n", ", ").replace("\t", " ").replace("  ", " ")
         lvl = record.levelno
 
         if lvl in [logging.ERROR, logging.CRITICAL]:
@@ -181,3 +131,40 @@ class ArcStreamHandler(logging.StreamHandler):
         self.flush()
 
         return
+
+
+def configure_logging(messages):
+
+    if not os.path.exists(LOG_FILE):
+
+        if not os.path.exists(APPDATA_PATH):
+            messages.addMessage("Creating app data path {}".format(APPDATA_PATH))
+            os.makedirs(APPDATA_PATH)
+
+        messages.addMessage("Creating log file {}".format(LOG_FILE))
+        open(LOG_FILE, 'a').close()
+
+    logger = get_logger()
+
+    logger.handlers = []  # be rid of ones from other tools
+
+    logger.setLevel(logging.DEBUG)
+
+    formatter = logging.Formatter(fmt="%(asctime)s.%(msecs)03d %(levelname)s %(module)s %(funcName)s %(lineno)s %(message)s", datefmt="%Y%m%d %H%M%S")
+
+    file_handler = logging.FileHandler(LOG_FILE)
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    logger.debug("FileHandler added")
+
+    ah = ArcStreamHandler(messages)
+    ah.setLevel(logging.INFO)
+    logger.addHandler(ah)
+    logger.debug("ArcLogHandler added")
+
+    logger.debug("Logging configured")
+
+    return
+
+

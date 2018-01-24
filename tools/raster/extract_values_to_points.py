@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-
+from base.results import result
 from base.utils import make_vector_name, describe, get_search_cursor_rows, validate_geodata
-from base.decorators import input_tableview, input_output_table, parameter
+from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter
 from arcpy.sa import ExtractValuesToPoints
 from arcpy import MakeFeatureLayer_management, Exists, Delete_management
 
@@ -12,15 +12,9 @@ tool_settings = {"label": "Extract Values to Points",
                  "category": "Raster"}
 
 
+@result
 class ExtractValuesToPointsRasterTool(BaseTool):
-    """
-    """
     def __init__(self):
-        """
-
-        Returns:
-
-        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.initialise, self.iterate]
@@ -30,26 +24,16 @@ class ExtractValuesToPointsRasterTool(BaseTool):
 
         return
 
-    @input_tableview(data_type="raster", other_fields="query query Optional query")
+    @input_tableview("raster_table", "Table of Rasters", False, ["query:query:Optional", "raster:geodata:"])
     @parameter("points", "Point Features", "GPFeatureLayer", "Required", False, "Input", ["Point"], None, None, None)
     @parameter("interpolate", "Interpolate Values", "GPString", "Optional", False, "Input", ["NONE", "INTERPOLATE"], None, None, None, "Options")
     @parameter("add_attributes", "Add Raster Attributes", "GPString", "Optional", False, "Input", ["VALUE_ONLY", "ALL"], None, None, None, "Options")
-    @input_output_table(affixing=True)
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def initialise(self):
-        """
-
-        Returns:
-
-        """
 
         d = describe(self.points)
         self.points_srs = d.get("dataset_spatialReference", "Unknown")
@@ -65,27 +49,14 @@ class ExtractValuesToPointsRasterTool(BaseTool):
         return
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.process, return_to_results=True)
+        self.iterate_function_on_tableview(self.process, "raster_table", ["geodata", "query"], return_to_results=True)
 
         return
 
     def process(self, data):
-        """
 
-        Args:
-            data:
-
-        Returns:
-
-        """
-
-        ras = data["raster"]
+        ras = data["geodata"]
         qry = data.get("query", None)
         validate_geodata(ras, raster=True, srs_known=True)
 

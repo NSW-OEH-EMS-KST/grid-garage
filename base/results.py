@@ -1,30 +1,39 @@
 from base.utils import make_tuple
-from arcpy import Describe, TableToTable_conversion, FieldMappings, Field
+from arcpy import Describe, TableToTable_conversion, FieldMappings, FieldMap, Field
+# from shutil import copyfile
 from sys import exc_info
 from traceback import format_exception
 import os
 import csv
-import collections
 
 
-class GgResult(object):
-    """
-    """
+def result(cls):
+    setattr(cls, "result", ResultsUtils())
+    return cls
+
+
+class ResultsUtils(object):
 
     def __init__(self):
         """ Add class members """
-        table_tokens = "table table_name count table_output_parameter csv".split()
 
-        for att in ["fail_{}".format(t) for t in table_tokens]:
-            setattr(self, att, None)
+        self.fail_table = ""
+        self.fail_table_name = ""
+        self.fail_count = 0
+        self.fail_table_output_parameter = None
+        self.fail_csv = ""
 
-        for att in ["pass_{}".format(t) for t in table_tokens]:
-            setattr(self, att, None)
+        self.pass_table = ""
+        self.pass_table_name = ""
+        self.pass_count = 0
+        self.pass_table_output_parameter = None
+        self.pass_csv = ""
 
-        for att in "output_workspace output_workspace_type output_workspace_parent logger".split():
-            setattr(self, att, None)
+        self.output_workspace = ""
+        self.output_workspace_type = ""
+        self.output_workspace_parent = ""
 
-        self.pass_count = self.fail_count = 0
+        self.logger = None
 
         return
 
@@ -112,35 +121,13 @@ class GgResult(object):
 
         results = make_tuple(results)
 
-        def make_string(data):
-            """
-
-            Args:
-                data:
-
-            Returns:
-
-            """
-            if isinstance(data, basestring):
-                return str(data)
-            elif isinstance(data, collections.Mapping):
-                return dict(map(make_string, data.iteritems()))
-            elif isinstance(data, collections.Iterable):
-                return type(data)(map(make_string, data))
-            else:
-                return data
-
-        results = [make_string(result) for result in results]
-
         # here we will just store the keys from the first result, re-using these will force an error for any inconsistency
-        # HACK !
         if not os.path.isfile(self.pass_csv):
             result_fieldnames = results[0].keys()
             setattr(self, "result_fieldnames", result_fieldnames)
             with open(self.pass_csv, "wb") as csv_file:
                 writer = csv.DictWriter(csv_file, delimiter=',', lineterminator='\n', fieldnames=self.result_fieldnames)
                 writer.writeheader()  # write the header on first call
-
             self.logger.info("Header written to '{}".format(self.pass_csv))
 
         # write the data
@@ -187,19 +174,16 @@ class GgResult(object):
         # tbinfo + str(exc_info()[1])
         msg = msg.strip().replace('\n', ', ').replace('\r', ' ').replace('  ', ' ')
 
-        geodata = row.values()[0]  #row[0]
-
-        # try:
-        #     geodata = row["raster"]
-        # except KeyError:
-        #     try:
-        #         geodata = row["feature"]
-        #     except KeyError:
-        #         try:
-        #             geodata = row["geodata"]
-        #         except KeyError:
-        #             try:
-        #             geodata = "geodata not set for row"
+        try:
+            geodata = row["raster"]
+        except KeyError:
+            try:
+                geodata = row["feature"]
+            except KeyError:
+                try:
+                    geodata = row["geodata"]
+                except KeyError:
+                    geodata = "geodata not set for row"
 
         # write the failure record
         with open(self.fail_csv, "ab") as csv_file:
@@ -290,7 +274,7 @@ class GgResult(object):
             f = Field()
             f.name = fm.outputField.name
             f.type = "String"
-            f.length = 100000
+            f.length = 8000
             fm.outputField = f
             fms.replaceFieldMap(i, fm)
             # self.logger.info("{} type {} length is {}".format(fm.outputField.name, fm.outputField.type, fm.outputField.length))

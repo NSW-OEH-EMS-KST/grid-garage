@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-
+from base.results import result
 from base import utils
-from base.decorators import input_tableview, input_output_table, parameter, raster_formats
+from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, raster_formats
 import arcpy
 
 
@@ -11,16 +11,10 @@ tool_settings = {"label": "Set NoData Value",
                  "category": "Raster"}
 
 
+@result
 class SetNodataValueRasterTool(BaseTool):
-    """
-    """
 
     def __init__(self):
-        """
-
-        Returns:
-
-        """
 
         BaseTool.__init__(self, tool_settings)
 
@@ -28,41 +22,23 @@ class SetNodataValueRasterTool(BaseTool):
 
         return
 
-    @input_tableview(data_type="raster")
+    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:"])
     @parameter("ndv", "NoData Value", "GPDouble", "Required", False, "Input", None, None, None, None)
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, "Esri Grid")
-    @input_output_table(affixing=True)
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.set_ndv, return_to_results=True)
+        self.iterate_function_on_tableview(self.set_ndv, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def set_ndv(self, data):
-        """
 
-        Args:
-            data:
-
-        Returns:
-
-        """
-
-        ras = data['raster']
+        ras = data['geodata']
 
         utils.validate_geodata(ras, raster=True)
 
@@ -76,4 +52,4 @@ class SetNodataValueRasterTool(BaseTool):
 
         out_ras.save(r_out)
 
-        return {"raster": r_out, "source_geodata": ras}
+        return {"geodata": r_out, "source_geodata": ras}

@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-
+from base.results import result
 from base.utils import validate_geodata, split_up_filename, join_up_filename
-from base.decorators import input_tableview, input_output_table, parameter
+from base.method_decorators import input_tableview, input_output_table, parameter
 import arcpy
 from os.path import join, exists
 from hermes import Paperwork
@@ -18,38 +18,24 @@ install_dir = arcpy.GetInstallInfo("desktop")["InstallDir"]
 default_stylesheet = join(install_dir, "Metadata", "Stylesheets", "ArcGIS.xsl")  # ESRI_ISO2ISO19139.xml")
 
 
+@result
 class ExportXmlMetadataTool(BaseTool):
-    """
-    """
 
     def __init__(self):
-        """
-
-        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
-    @input_tableview()
+    @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
     @parameter("xml_folder", "Output Folder", "DEFolder", "Required", False, "Input", None, None, None, None)
     # @parameter("translator", "Translator", "DEFile", "Required", False, "Input", None, None, None, default_translator, None)
     @parameter("stylesheet", "Style Sheet", "DEFile", "Required", False, "Input", None, None, None, default_stylesheet, None)
-    @input_output_table()
+    @input_output_table
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
-
-        Returns:
-
-        """
 
         # if not exists(self.translator):
         #     raise ValueError("Translator '{}' does not exist".format(self.translator))
@@ -57,19 +43,11 @@ class ExportXmlMetadataTool(BaseTool):
         if not exists(self.stylesheet):
             raise ValueError("Stylesheet '{}' does not exist".format(self.stylesheet))
 
-        self.iterate_function_on_tableview(self.export, return_to_results=True)
+        self.iterate_function_on_tableview(self.export, "geodata_table", ["geodata"], return_to_results=True)
 
         return
 
     def export(self, data):
-        """
-
-        Args:
-            data:
-
-        Returns:
-
-        """
 
         geodata = data["geodata"]
 

@@ -1,10 +1,11 @@
 from base.base_tool import BaseTool
-
+from base.results import result
 from base.utils import split_up_filename, validate_geodata
-from base.decorators import input_tableview, input_output_table
+from base.method_decorators import input_tableview, input_output_table
 import arcpy
 from os.path import exists, join
 from hermes import Paperwork
+from datetime import datetime
 
 
 tool_settings = {"label": "Audit",
@@ -13,47 +14,25 @@ tool_settings = {"label": "Audit",
                  "category": "Metadata"}
 
 
+@result
 class AuditMetadataTool(BaseTool):
-    """
-    """
     def __init__(self):
-        """
-
-        """
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
-    @input_tableview()
-    @input_output_table()
+    @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
+    @input_output_table
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.audit, return_to_results=True)
+        self.iterate_function_on_tableview(self.audit, "geodata_table", ["geodata"], return_to_results=True)
 
         return
 
     def audit(self, data):
-        """
-
-        Args:
-            data:
-
-        Returns:
-
-        """
 
         geodata = data["geodata"]
 
@@ -62,13 +41,11 @@ class AuditMetadataTool(BaseTool):
         self.info("Auditing {0}".format(geodata))
 
         desc = arcpy.Describe(geodata)
-        self.info(str(desc))
 
         pw = Paperwork(dataset=geodata)
-        self.info(str(pw))
 
         meta = pw.convert()
-        # meta['metadata']['grid_garage'] = {}
+        meta['metadata']['grid_garage'] = {}
         # meta['metadata']['grid_garage']['metadata_audit'] = {"@date": datetime.now().time(), }
 
         pw.save(meta)

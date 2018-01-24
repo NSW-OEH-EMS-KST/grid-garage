@@ -1,7 +1,7 @@
 from base.base_tool import BaseTool
-
+from base.results import result
 from base import utils
-from base.decorators import input_tableview, input_output_table, parameter, transform_methods, raster_formats
+from base.method_decorators import input_tableview, input_output_table_with_output_affixes, parameter, transform_methods, raster_formats
 import arcpy
 
 tool_settings = {"label": "Transform",
@@ -10,46 +10,30 @@ tool_settings = {"label": "Transform",
                  "category": "Raster"}
 
 
+@result
 class TransformRasterTool(BaseTool):
-    """
-    """
 
     def __init__(self):
-        """
-
-        Returns:
-
-        """
 
         BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
         return
 
-    @input_tableview(data_type="raster")
+    @input_tableview("raster_table", "Table for Rasters", False, ["raster:geodata:none"])
     @parameter("method", "Method", "GPString", "Required", False, "Input", transform_methods, None, None, transform_methods[0])
     @parameter("max_stretch", "Stretch to maximum value", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("min_stretch", "Stretch to minimum value", "GPDouble", "Optional", False, "Input", None, None, None, None, "Options")
     @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, None)
-    @input_output_table(affixing=True)
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def updateParameters(self, parameters):
-        """
 
-        Args:
-            parameters:
-
-        Returns:
-
-        """
+        ps = [(i, p.name) for i, p in enumerate(parameters)]
+        self.debug("TransformRasterTool.updateParameters {}".format(ps))
 
         p2, p3, p4 = parameters[2], parameters[3], parameters[4]
 
@@ -68,14 +52,6 @@ class TransformRasterTool(BaseTool):
         return
 
     def updateMessages(self, parameters):
-        """
-
-        Args:
-            parameters:
-
-        Returns:
-
-        """
 
         # print [(i, p.name) for i, p in enumerate(parameters)]
         #
@@ -89,26 +65,12 @@ class TransformRasterTool(BaseTool):
         return
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.transform, return_to_results=True)
+        self.iterate_function_on_tableview(self.transform, "raster_table", ["geodata"], return_to_results=True)
 
         return
 
     def get_property(self, raster, property):
-        """
-
-        Args:
-            raster:
-            property:
-
-        Returns:
-
-        """
 
         v = arcpy.GetRasterProperties_management(raster, property)
         v = v.getOutput(0)
@@ -117,16 +79,8 @@ class TransformRasterTool(BaseTool):
         return float(v)
 
     def transform(self, data):
-        """
 
-        Args:
-            data:
-
-        Returns:
-
-        """
-
-        r_in = data["raster"]
+        r_in = data["geodata"]
         utils.validate_geodata(r_in, raster=True)
 
         r_out = utils.make_raster_name(r_in, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
@@ -174,7 +128,7 @@ class TransformRasterTool(BaseTool):
 
         data["method"] = self.method
 
-        return {"raster": r_out, "source_geodata": r_in, "transform": data}
+        return {"geodata": r_out, "source_geodata": r_in, "transform": data}
 
         # this numpy stuff.. numpyarraytoraster just not behaving
         # self.send_info(data)

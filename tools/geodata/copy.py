@@ -1,9 +1,9 @@
-from base.base_tool import BaseTool
-from base.decorators import input_output_table, input_tableview
+import base.base_tool
+import base.results
+from base.method_decorators import input_output_table_with_output_affixes, input_tableview
 from os.path import splitext
 from base.utils import make_table_name
 from arcpy import Copy_management
-
 
 tool_settings = {"label": "Copy",
                  "description": "Make a simple copy of geodata",
@@ -11,53 +11,29 @@ tool_settings = {"label": "Copy",
                  "category": "Geodata"}
 
 
-class CopyGeodataTool(BaseTool):
-    """
-    """
+@base.results.result
+class CopyGeodataTool(base.base_tool.BaseTool):
 
     def __init__(self):
-        """
 
-        Returns:
-
-        """
-
-        BaseTool.__init__(self, tool_settings)
+        base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
         return
 
-    @input_tableview()
-    @input_output_table(affixing=True)
+    @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
+    @input_output_table_with_output_affixes
     def getParameterInfo(self):
-        """
 
-        Returns:
-
-        """
-
-        return BaseTool.getParameterInfo(self)
+        return base.base_tool.BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.copy, return_to_results=True)
+        self.iterate_function_on_tableview(self.copy, "geodata_table", ["geodata"], return_to_results=True)
 
         return
 
     def copy(self, data):
-        """
-
-        Args:
-            data:
-
-        Returns:
-
-        """
 
         gd = data["geodata"]
 

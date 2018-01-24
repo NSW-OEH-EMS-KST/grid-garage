@@ -1,6 +1,7 @@
 from base.base_tool import BaseTool
+from base.results import result
 from base import utils
-from base.decorators import input_tableview, input_output_table, parameter
+from base.method_decorators import input_tableview, input_output_table, parameter
 from collections import OrderedDict
 
 
@@ -10,51 +11,29 @@ tool_settings = {"label": "Export tips",
                  "category": "Metadata"}
 
 
+@result
 class ExportTipsToFileMetadataTool(BaseTool):
-    """
-    """
     def __init__(self):
-        """
-
-        """
 
         BaseTool.__init__(self, tool_settings)
 
         self.execution_list = [self.iterate]
 
-    @input_tableview()
-    @parameter("include_fields", "Include Fields", "Field", "Required", True, "Input", None, None, ["geodata_table"], None, None)
+    @input_tableview("tip_table", "Table of Tips", False, ["geodata:geodata:"])
+    @parameter("include_fields", "Include Fields", "Field", "Required", True, "Input", None, None, ["tip_table"], None, None)
     @parameter("tip_folder", "Folder for Tip Files", "DEFolder", "Required", False, "Input", None, None, None, None, None)
-    @input_output_table()
+    @input_output_table
     def getParameterInfo(self):
-        """
-
-        Returns:
-
-        """
 
         return BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.export, nonkey_names=self.include_fields.split(";"), return_to_results=True)
+        self.iterate_function_on_tableview(self.export, "tip_table", ["geodata"], nonkey_names=self.include_fields.split(";"), return_to_results=True)
 
         return
 
     def export(self, data):
-        """
-
-        Args:
-            data:
-
-        Returns:
-
-        """
 
         geodata = data["geodata"]
 
@@ -62,7 +41,7 @@ class ExportTipsToFileMetadataTool(BaseTool):
 
         self.info("Creating TIP file for {0}".format(geodata))
 
-        tip_order = data["tip_order"].split(",")
+        tip_order = data["field_order"].split(",")
 
         ordered_fields = [f for f in tip_order if f in self.include_fields]
 

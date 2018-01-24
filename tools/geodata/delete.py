@@ -1,5 +1,6 @@
-from base.base_tool import BaseTool
-from base.decorators import input_output_table, input_tableview
+import base.base_tool
+import base.results
+from base.method_decorators import input_output_table, input_tableview
 from datetime import datetime
 from arcpy import Delete_management
 
@@ -19,52 +20,28 @@ tool_settings = {"label": "Delete",
                  "category": "Geodata"}
 
 
-class DeleteGeodataTool(BaseTool):
-    """
-    """
+@base.results.result
+class DeleteGeodataTool(base.base_tool.BaseTool):
 
     def __init__(self):
-        """
-
-        Returns:
-
-        """
-        BaseTool.__init__(self, tool_settings)
+        base.base_tool.BaseTool.__init__(self, tool_settings)
         self.execution_list = [self.iterate]
 
         return
 
-    @input_tableview()
-    @input_output_table()
+    @input_tableview("geodata_table", "Table of Geodata", False, ["geodata:geodata:"])
+    @input_output_table
     def getParameterInfo(self):
-        """
 
-        Returns:
-
-        """
-
-        return BaseTool.getParameterInfo(self)
+        return base.base_tool.BaseTool.getParameterInfo(self)
 
     def iterate(self):
-        """
 
-        Returns:
-
-        """
-
-        self.iterate_function_on_tableview(self.delete, return_to_results=True)
+        self.iterate_function_on_tableview(self.delete, "geodata_table", ["geodata"], return_to_results=True)
 
         return
 
     def delete(self, data):
-        """
-
-        Args:
-            data:
-
-        Returns:
-
-        """
 
         gd = data["geodata"]
         self.info('Deleting {0}'.format(gd))
