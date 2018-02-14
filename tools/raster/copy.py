@@ -103,9 +103,12 @@ class CopyRasterTool(BaseTool):
                 except:
                     self.result.add_fail(data)
         else:
-            ras_out = utils.make_raster_name(ras, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
-            arcpy.CopyRaster_management(ras, ras_out, self.config_keyword, self.background_value, self.nodata_value, self.onebit_to_eightbit, self.colormap_to_RGB, self.pixel_type, self.scale_pixel_value, self.RGB_to_Colormap, None, self.transform)
-            self.result.add_pass({"raster": ras_out, "source_geodata": ras})
+            try:
+                ras_out = utils.make_raster_name(ras, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+                arcpy.CopyRaster_management(ras, ras_out, self.config_keyword, self.background_value, self.nodata_value, self.onebit_to_eightbit, self.colormap_to_RGB, self.pixel_type, self.scale_pixel_value, self.RGB_to_Colormap, None, self.transform)
+                self.result.add_pass({"raster": ras_out, "source_geodata": ras})
+            except:
+                self.result.add_fail(data)
 
             # return {"raster": ras_out, "source_geodata": ras}
 
