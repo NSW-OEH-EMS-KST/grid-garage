@@ -10,6 +10,14 @@ tool_settings = {"label": "Copy",
                  "can_run_background": "True",
                  "category": "Raster"}
 
+from os.path import splitext, join
+
+
+def splitext_(path):
+    if len(path.split('.')) > 2:
+        return path.split('.')[0], '.'.join(path.split('.')[-2:])
+    return splitext(path)
+
 
 class CopyRasterTool(BaseTool):
     """
@@ -39,6 +47,7 @@ class CopyRasterTool(BaseTool):
     @parameter("scale_pixel_value", "Scale Pixel value", "GPString", "Optional", False, "Input", ["NONE", "ScalePixelValue"], None, None, None, "Options")
     @parameter("RGB_to_Colormap", "RGB to Colourmap", "GPString", "Optional", False, "Input", ["NONE", "RGBToColormap"], None, None, None, "Options")
     @parameter("transform", "Transform", "GPString", "Optional", False, "Input", None, None, None, None, "Options")
+    @parameter("bands", "Bands", "GPLong", "Optional", True, "Input", None, None, None, None, "Options")
     @input_output_table(affixing=True)
     def getParameterInfo(self):
         """
@@ -56,7 +65,7 @@ class CopyRasterTool(BaseTool):
 
         """
 
-        self.iterate_function_on_tableview(self.copy, return_to_results=True)
+        self.iterate_function_on_tableview(self.copy, return_to_results=False)
 
         return
 
@@ -69,6 +78,7 @@ class CopyRasterTool(BaseTool):
         Returns:
 
         """
+        self.info(data)
 
         ras = data["raster"]
 
@@ -77,9 +87,27 @@ class CopyRasterTool(BaseTool):
 
         self.info("Copying {0} -->> {1} ...".format(ras, ras_out))
         # arcpy.CopyRaster_management(ras, ras_out, self.config_keyword, self.background_value, self.nodata_value, self.onebit_to_eightbit, self.colormap_to_RGB, self.pixel_type, self.scale_pixel_value, self.RGB_to_Colormap, self.raster_format, self.transform)
-        arcpy.CopyRaster_management(ras, ras_out, self.config_keyword, self.background_value, self.nodata_value, self.onebit_to_eightbit, self.colormap_to_RGB, self.pixel_type, self.scale_pixel_value, self.RGB_to_Colormap, None, self.transform)
 
-        return {"raster": ras_out, "source_geodata": ras}
+        if self.bands:
+            for band in self.bands:
+                try:
+                    band = "Band_{}".format(band)
+                    rasband = join(ras, band)
+                    ras_out = utils.make_raster_name(ras, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix + "_{}".format(band))
+                    self.info(band)
+                    self.info(rasband)
+                    self.info(ras_out)
+                    arcpy.CopyRaster_management(rasband, ras_out, self.config_keyword, self.background_value, self.nodata_value, self.onebit_to_eightbit,
+                                            self.colormap_to_RGB, self.pixel_type, self.scale_pixel_value, self.RGB_to_Colormap, None, self.transform)
+                    self.result.add_pass({"raster": ras_out, "source_geodata": rasband})
+                except:
+                    self.result.add_fail(data)
+        else:
+            ras_out = utils.make_raster_name(ras, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+            arcpy.CopyRaster_management(ras, ras_out, self.config_keyword, self.background_value, self.nodata_value, self.onebit_to_eightbit, self.colormap_to_RGB, self.pixel_type, self.scale_pixel_value, self.RGB_to_Colormap, None, self.transform)
+            self.result.add_pass({"raster": ras_out, "source_geodata": ras})
+
+            # return {"raster": ras_out, "source_geodata": ras}
 
 # "http://desktop.arcgis.com/en/arcmap/latest/tools/data-management-toolbox/copy-raster.htm"
 # CopyRaster_management (in_raster, out_rasterdataset, {config_keyword}, {background_value}, {nodata_value}, {onebit_to_eightbit}, {colormap_to_RGB}, {pixel_type}, {scale_pixel_value}, {RGB_to_Colormap}, {format}, {transform})

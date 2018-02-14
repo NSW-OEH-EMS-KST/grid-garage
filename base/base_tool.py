@@ -134,7 +134,10 @@ class ArcStreamHandler(logging.StreamHandler):
             :
         """
 
-        msg = self.format(record).replace("\n", ", ").replace("\t", " ").replace("  ", " ")
+        try:
+            msg = self.format(record).replace("\n", ", ").replace("\t", " ").replace("  ", " ")
+        except:
+            msg = record
 
         lvl = record.levelno
 
@@ -492,9 +495,15 @@ class BaseTool(object):
             elif p.datatype == "Boolean":
                 pd[name] = [False, True][p.valueAsText == "true"]
             elif p.datatype == "Double":
-                pd[name] = float(p.valueAsText) if p.valueAsText else None
+                if p.multiValue:
+                    pd[name] = [float(v) for v in p.valueAsText.split(";")] if p.valueAsText else None
+                else:
+                    pd[name] = float(p.valueAsText) if p.valueAsText else None
             elif p.datatype == "Long":
-                pd[name] = int(float(p.valueAsText)) if p.valueAsText else None
+                if p.multiValue:
+                    pd[name] = [int(float(v)) for v in p.valueAsText.split(";")] if p.valueAsText else None
+                else:
+                    pd[name] = int(float(p.valueAsText)) if p.valueAsText else None
             else:
                 pd[name] = p.valueAsText or "#"
 
@@ -559,13 +568,13 @@ class BaseTool(object):
         field_name = [self.get_parameter(field_name).valueAsText for field_name in field_alias]  # values
         field_map = {k: v for k, v in OrderedDict(zip(field_alias, field_name)).iteritems() if v not in [None, "NONE"]}  # dict
 
-        self.info("nk = ", nonkey_names)
+        self.info("nk = {}".format(nonkey_names))
 
         if nonkey_names:  # we want hard-wired fields to be included in the row
             field_map.update(OrderedDict([(v, v) for v in nonkey_names]))  # nonkey_names is a list at the mo
 
-        self.info("fm = ", field_map)
-        self.info("fmv = ", field_map.values())
+        self.info("fm = {}".format(field_map))
+        self.info("fmv = {}".format(field_map.values()))
 
         rows = [r for r in arcpy.da.SearchCursor(param.name, field_map.values())]
 
