@@ -54,6 +54,8 @@ class ImportTipFilesToTableMetadataTool(BaseTool):
                 s = line.strip().encode("ascii").split(":", 1)
                 if len(s) > 1:
                     s1, s2 = s
+                    s1 = s1.strip()
+                    s2 = s2.strip()
                     buf = s1
                 else:
                     s1 = s[0]
