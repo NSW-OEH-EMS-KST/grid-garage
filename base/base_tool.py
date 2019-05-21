@@ -445,11 +445,11 @@ class BaseTool(object):
         if not self.messages:  # stop run errors during ide tests
             return
 
-        self.info(["\n", "Parameter summary: {}".format(["{} ({}): {}".format(p.DisplayName, p.name, p.valueAsText) for p in self.parameters]), "\n"])
+        # self.info(["\n", "Parameter summary: {}".format(["{} ({}): {}".format(p.DisplayName, p.name, p.valueAsText) for p in self.parameters]), "\n"])
 
         # set the input parameters as local attributes
         [setattr(self, k, v) for k, v in self.get_parameter_dict().iteritems()]  # nb side-effect
-        self.info(["\n", "Tool attributes set {}".format(self.__dict__), "\n"])
+        # self.info(["\n", "Tool attributes set {}".format(self.__dict__), "\n"])
 
         try:
             self.result.initialise(self.get_parameter("result_table"), self.get_parameter("fail_table"), self.get_parameter("output_workspace").value, self.get_parameter("result_table_name").value, self.logger)
@@ -568,13 +568,13 @@ class BaseTool(object):
         field_name = [self.get_parameter(field_name).valueAsText for field_name in field_alias]  # values
         field_map = {k: v for k, v in OrderedDict(zip(field_alias, field_name)).iteritems() if v not in [None, "NONE"]}  # dict
 
-        self.info("nk = {}".format(nonkey_names))
+        # self.info("nk = {}".format(nonkey_names))
 
         if nonkey_names:  # we want hard-wired fields to be included in the row
             field_map.update(OrderedDict([(v, v) for v in nonkey_names]))  # nonkey_names is a list at the mo
 
-        self.info("fm = {}".format(field_map))
-        self.info("fmv = {}".format(field_map.values()))
+        # self.info("fm = {}".format(field_map))
+        # self.info("fmv = {}".format(field_map.values()))
 
         rows = [r for r in arcpy.da.SearchCursor(param.name, field_map.values())]
 
