@@ -451,6 +451,7 @@ def make_raster_name(like_name, out_wspace, ext='', prefix='', suffix=''):
 
     raster_name = ap.ValidateTableName(prefix + r_name + suffix, out_wspace)
     raster_name = ap.CreateUniqueName(raster_name, out_wspace)
+    raster_name = raster_name.replace(".", "_")
 
     return os.path.join(out_wspace, raster_name + ext)
 
