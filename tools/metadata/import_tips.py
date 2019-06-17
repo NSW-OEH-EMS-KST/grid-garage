@@ -74,15 +74,15 @@ class ImportTipFilesToTableMetadataTool(BaseTool):
             for line in tipfile:
                 s = line.strip().encode("ascii").split(":", 1)
                 if len(s) > 1:
-                    s1, s2 = s
+                    s1, s2 = s[0].strip(), s[1].strip()
                     buf = s1
                 else:
-                    s1 = s[0]
+                    s1 = s[0].strip()
                     s2 = None
                 if not s2:
-                    tips[buf] += s1
+                    tips[buf] += s1.strip()
                 else:
-                    tips[s1] = s2
+                    tips[s1] = s2.strip()
 
         tips["field_order"] = tips.keys()
 
