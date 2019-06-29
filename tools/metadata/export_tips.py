@@ -41,8 +41,11 @@ class ExportTipsToFileMetadataTool(BaseTool):
         Returns:
 
         """
+        nks = [s.strip() for s in self.include_fields.split(";")]
+        self.info(nks)
 
-        self.iterate_function_on_tableview(self.export, nonkey_names=self.include_fields.split(";"), return_to_results=True)
+        # self.iterate_function_on_tableview(self.export, nonkey_names=self.include_fields.split(";"), return_to_results=True)
+        self.iterate_function_on_tableview(self.export, nonkey_names=nks, return_to_results=True)
 
         return
 
