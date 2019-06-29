@@ -200,10 +200,10 @@ def parse_fields(fields):
         x = f.split()  # [["w", "x", "y", "z"]] or [["w", "x", "y", "z"], ["w", "x", "y", "z"], ...]
         assert len(x) == 4
 
-        f[2].replace("_", " ")
+        x[2].replace("_", " ")
 
-        if fields[3] == "None":
-            fields[3] = None
+        if x[3] == "None":
+            x[3] = None
 
         parsed_list.append(x)
 
