@@ -261,6 +261,8 @@ def input_tableview(data_type="geodata", multi_value=False, other_fields=None, o
                       multiValue=False,
                       direction="Input")
         if f_default:
+            if f_default == "None":
+                f_default = None
             p.value = f_default
 
         p.parameterDependencies = [pn]  # should be constant

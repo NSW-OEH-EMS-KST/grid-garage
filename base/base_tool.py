@@ -565,16 +565,31 @@ class BaseTool(object):
 
         # this code is difficult to make any clearer, builds a dict of name/alias pairs for dependant parameters
         field_alias = [p.name for i, p in enumerate(self.parameters[1:]) if 0 in p.parameterDependencies]  # keys
-        field_name = [self.get_parameter(field_name).valueAsText for field_name in field_alias]  # values
+        self.info("field_alias = {}".format(field_alias))
+        field_name = []
+        for field in field_alias:
+            v = self.get_parameter(field).valueAsText
+            delim = ";"
+            if delim in v:
+                field_name.extend([x.strip() for x in v.split(delim)])
+            else:
+                field_name.append(v.strip())
+            # field_name = [self.get_parameter(field_name).valueAsText for field_name in field_alias]  # values
+        self.info("field_name = {}".format(field_name))
         field_map = {k: v for k, v in OrderedDict(zip(field_alias, field_name)).iteritems() if v not in [None, "NONE"]}  # dict
+        self.info("field_map = {}".format(field_name))
 
         # self.info("nk = {}".format(nonkey_names))
 
         if nonkey_names:  # we want hard-wired fields to be included in the row
-            field_map.update(OrderedDict([(v, v) for v in nonkey_names]))  # nonkey_names is a list at the mo
+            nkd = OrderedDict([(v, v) for v in nonkey_names])
+            self.info(nkd)
+            for k, v in nkd.iteritems():
+                field_map[v] = v
+             # field_map.update(OrderedDict([(v, v) for v in nonkey_names]))  # nonkey_names is a list at the mo
 
-        # self.info("fm = {}".format(field_map))
-        # self.info("fmv = {}".format(field_map.values()))
+        self.info("fm = {}".format(field_map))
+        self.info("fmv = {}".format(field_map.values()))
 
         rows = [r for r in arcpy.da.SearchCursor(param.name, field_map.values())]
 

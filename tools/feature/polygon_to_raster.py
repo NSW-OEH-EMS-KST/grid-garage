@@ -80,6 +80,8 @@ class PolygonToRasterTool(BaseTool):
         except:
             pass
 
+        self.info("Fields to burn for '{0}' are {1}".format(feat_ds, target_fields))
+
         for field in target_fields:
             try:
                 r_out = base.utils.make_raster_name("{0}_{1}".format(splitext(feat_ds)[0], field), self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
