@@ -1,5 +1,4 @@
 from base.base_tool import BaseTool
-
 from base import utils
 from base.decorators import input_tableview, input_output_table, parameter, data_nodata, raster_formats
 import arcpy

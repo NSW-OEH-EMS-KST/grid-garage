@@ -3,6 +3,7 @@ from tools.feature.clip import ClipFeatureTool
 from tools.feature.copy import CopyFeatureTool
 from tools.feature.feature_to_raster import FeatureToRasterTool
 from tools.feature.polygon_to_raster import PolygonToRasterTool
+from tools.feature.tabulate_intersection import TabulateIntersectionTool
 # feature tools
 from tools.geodata.compare_extents import CompareExtentsGeodataTool
 from tools.geodata.copy import CopyGeodataTool
@@ -70,7 +71,8 @@ class Toolbox(object):
         feature_tools = {FeatureToRasterTool,
                          PolygonToRasterTool,
                          CopyFeatureTool,
-                         ClipFeatureTool}
+                         ClipFeatureTool,
+                         TabulateIntersectionTool}
 
         raster_tools = {AggregateRasterTool,
                         # BandPropertiesRasterTool,
