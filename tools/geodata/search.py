@@ -1,7 +1,6 @@
 from base.base_tool import BaseTool
-
 from base.decorators import input_output_table, parameter
-from base.utils import datatype_list, walk
+from base.utils import datatype_list, walk, get_datatype
 tool_settings = {"label": "Search",
                  "description": "Search for identifiable geodata",
                  "can_run_background": "True",
@@ -77,7 +76,7 @@ class SearchGeodataTool(BaseTool):
         for dt in self.geodata_types:
 
             self.info("Searching for {0} geodata types in {1}".format(dt, ws))
-            found = [{"geodata": v} for v in walk(ws.strip("'"), data_types=dt)]
+            found = [{"geodata": v, "dataType": get_datatype(v)} for v in walk(ws.strip("'"), data_types=dt)]
 
             if not found:
                 self.info("Nothing found")
