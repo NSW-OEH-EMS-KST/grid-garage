@@ -72,7 +72,7 @@ class SetValueToNullRasterTool(BaseTool):
 
         self.info("Setting values of {0} to Null in {1} -> {2}".format(self.val_to_null, r_in, r_out))
 
-        out_ras = SetNull(r_in, r_in, 'VALUE = {0}'.format(self.val_to_null))
+        out_ras = SetNull(in_conditional_raster=r_in, in_false_raster_or_constant=r_in, where_clause='VALUE = {0}'.format(self.val_to_null))
 
         out_ras.save(r_out)
 

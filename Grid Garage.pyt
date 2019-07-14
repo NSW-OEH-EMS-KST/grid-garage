@@ -4,6 +4,7 @@ from tools.feature.clip import ClipFeatureTool
 from tools.feature.copy import CopyFeatureTool
 from tools.feature.feature_to_raster import FeatureToRasterTool
 from tools.feature.polygon_to_raster import PolygonToRasterTool
+from tools.feature.search_features import SearchFeaturesTool
 # feature tools
 from tools.geodata.compare_extents import CompareExtentsGeodataTool
 from tools.geodata.copy import CopyGeodataTool
@@ -37,6 +38,7 @@ from tools.raster.zonal_stats_as_table import ZonalStatisticsAsTableTool
 from tools.raster.reclass_by_table import ReclassByTableRasterTool
 from tools.raster.reproject import ReprojectRasterTool
 from tools.raster.resample import ResampleRasterTool
+from tools.raster.search_rasters import SearchRastersTool
 from tools.raster.set_no_data_value import SetNodataValueRasterTool
 from tools.raster.set_value_to_null import SetValueToNullRasterTool
 from tools.raster.to_ascii import ToAsciiRasterTool
@@ -73,7 +75,8 @@ class Toolbox(object):
                                     FeatureToRasterTool,
                                     PolygonToRasterTool,
                                     CopyFeatureTool,
-                                    ClipFeatureTool}))
+                                    ClipFeatureTool,
+                                    SearchFeaturesTool}))
 
         raster_tools = set(sorted({AggregateRasterTool,
                                    DescribeRasterTool,
@@ -87,6 +90,7 @@ class Toolbox(object):
                                    ReclassByTableRasterTool,
                                    ReclassByThresholdRasterTool,
                                    ResampleRasterTool,
+                                   SearchRastersTool,
                                    SetNodataValueRasterTool,
                                    SetValueToNullRasterTool,
                                    SliceRasterTool,
@@ -95,7 +99,7 @@ class Toolbox(object):
                                    TweakValuesRasterTool,
                                    ExtractValuesToPointsRasterTool,
                                    ValuesAtPointsRasterTool,
-                                   ZonalStatisticsAsTableTool}))
+                         
 
         metadata_tools = set(sorted({CreateTipsTableMetadataTool,
                                      ImportTipFilesToTableMetadataTool,
