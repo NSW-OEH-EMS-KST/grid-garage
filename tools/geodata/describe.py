@@ -27,7 +27,7 @@ class DescribeGeodataTool(base.base_tool.BaseTool):
 
     @input_tableview()
     @parameter("comprehensive", "Comprehensive Inspection", "GPBoolean", "Optional", False, "Input", None, None, None, None)
-    @parameter("flatten", "Property Groups to Flatten", "GPString", "Optional", True, "Input", sorted(describe_property_groups()), None, None, "BaseProperties")
+    @parameter("flatten", "Property Groups to Flatten", "GPString", "Optional", True, "Input", sorted(describe_property_groups()), None, None, "BaseProperties", enabled=False)
     @input_output_table()
     def getParameterInfo(self):
         """
@@ -37,6 +37,19 @@ class DescribeGeodataTool(base.base_tool.BaseTool):
         """
 
         return base.base_tool.BaseTool.getParameterInfo(self)
+
+    def updateParameters(self, parameters):
+        super(DescribeGeodataTool, self).updateParameters(parameters)
+
+        # validate workspace and raster format
+        comp_ins_par = self.get_parameter("comprehensive", raise_not_found_error=True, parameters=parameters)
+        flatten_par = self.get_parameter("flatten", raise_not_found_error=True, parameters=parameters)
+
+        if comp_ins_par.altered:
+            b = comp_ins_par.value
+            flatten_par.enabled = b
+
+        return
 
     def iterate(self):
         """
