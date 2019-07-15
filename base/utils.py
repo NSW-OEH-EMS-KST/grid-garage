@@ -224,6 +224,18 @@ def is_local_gdb(workspace):
     return describe_arc(workspace).workspaceType == "LocalDatabase"
 
 
+def is_filesystem_workspace(workspace):
+    """
+
+    Args:
+        workspace:
+
+    Returns:
+
+    """
+    return describe_arc(workspace).workspaceType == "FileSystem"
+
+
 def is_file_system(workspace):
     """
 
@@ -495,9 +507,15 @@ def make_vector_name(like_name, out_wspace, ext='', prefix='', suffix=''):
     Returns:
 
     """
-    _, __, v_name, v_ext = split_up_filename(like_name)
+    path, basename, v_name, v_ext = split_up_filename(like_name)
 
-    ext = "" if is_local_gdb(out_wspace) else ext
+    not_fs = not is_file_system(out_wspace)
+
+    if not_fs:
+        v_name = v_name + v_ext
+
+    ext = "" if not_fs else ext
+
     ext = "." + ext if (ext and ext[0] != ".") else ext
 
     vector_name = ap.ValidateTableName(prefix + v_name + suffix, out_wspace)
