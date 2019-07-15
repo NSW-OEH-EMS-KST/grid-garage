@@ -60,56 +60,55 @@ class Toolbox(object):
         self.label = "Grid Garage"
         self.alias = "GridGarage"
 
-        geodata_tools = set(sorted({CopyGeodataTool,
-                                    DescribeGeodataTool,
-                                    SearchGeodataTool,
-                                    SelectGeodataTool,
-                                    DisplayGeodataTool,
-                                    CompareExtentsGeodataTool,
-                                    DeleteGeodataTool,
-                                    GenerateNamesGeodataTool,
-                                    RenameGeodataTool,
-                                    ListWorkspaceTablesGeodataTool}))
+        geodata_tools = set(sorted([CopyGeodataTool,
+                                DescribeGeodataTool,
+                                SearchGeodataTool,
+                                SelectGeodataTool,
+                                DisplayGeodataTool,
+                                CompareExtentsGeodataTool,
+                                DeleteGeodataTool,
+                                GenerateNamesGeodataTool,
+                                RenameGeodataTool,
+                                ListWorkspaceTablesGeodataTool]))
 
-        feature_tools = set(sorted({DescribeFeatureTool,
-                                    FeatureToRasterTool,
-                                    PolygonToRasterTool,
-                                    CopyFeatureTool,
-                                    ClipFeatureTool,
-                                    SearchFeaturesTool}))
+        feature_tools = set(sorted([DescribeFeatureTool,
+                                FeatureToRasterTool,
+                                PolygonToRasterTool,
+                                CopyFeatureTool,
+                                ClipFeatureTool,
+                                SearchFeaturesTool]))
 
-        raster_tools = set(sorted({AggregateRasterTool,
-                                   DescribeRasterTool,
-                                   BlockStatisticsRasterTool,
-                                   BuildAttributeTableRasterTool,
-                                   CalculateStatisticsRasterTool,
-                                   ClipRasterTool,
-                                   CopyRasterTool,
-                                   LookupByTableRasterTool,
-                                   ReprojectRasterTool,
-                                   ReclassByTableRasterTool,
-                                   ReclassByThresholdRasterTool,
-                                   ResampleRasterTool,
-                                   SearchRastersTool,
-                                   SetNodataValueRasterTool,
-                                   SetValueToNullRasterTool,
-                                   SliceRasterTool,
-                                   ToAsciiRasterTool,
-                                   TransformRasterTool,
-                                   TweakValuesRasterTool,
-                                   ExtractValuesToPointsRasterTool,
-                                   ValuesAtPointsRasterTool,
-                         
+        raster_tools = set(sorted([AggregateRasterTool,
+                               DescribeRasterTool,
+                               BlockStatisticsRasterTool,
+                               BuildAttributeTableRasterTool,
+                               CalculateStatisticsRasterTool,
+                               ClipRasterTool,
+                               CopyRasterTool,
+                               LookupByTableRasterTool,
+                               ReprojectRasterTool,
+                               ReclassByTableRasterTool,
+                               ReclassByThresholdRasterTool,
+                               ResampleRasterTool,
+                               SearchRastersTool,
+                               SetNodataValueRasterTool,
+                               SetValueToNullRasterTool,
+                               SliceRasterTool,
+                               ToAsciiRasterTool,
+                               TransformRasterTool,
+                               TweakValuesRasterTool,
+                               ExtractValuesToPointsRasterTool,
+                               ValuesAtPointsRasterTool]))
 
-        metadata_tools = set(sorted({CreateTipsTableMetadataTool,
-                                     ImportTipFilesToTableMetadataTool,
-                                     ExportTipsToFileMetadataTool,
-                                     ExportXmlMetadataTool}))
+        metadata_tools = set(sorted([CreateTipsTableMetadataTool,
+                                 ImportTipFilesToTableMetadataTool,
+                                 ExportTipsToFileMetadataTool,
+                                 ExportXmlMetadataTool]))
 
-        cdf_tools = set(sorted({SearchCdfTool,
-                                DescribeCdfTool,
-                                ExtractTimeslicesCdfTool}))
+        cdf_tools = set(sorted([SearchCdfTool,
+                            DescribeCdfTool,
+                            ExtractTimeslicesCdfTool]))
         # ToStandardGridCdfTool,
-        # ExportCdfTool}
+        # ExportCdfTool]
 
         self.tools = list(geodata_tools | feature_tools | raster_tools | metadata_tools | cdf_tools)
