@@ -60,7 +60,7 @@ class Toolbox(object):
         self.label = "Grid Garage"
         self.alias = "GridGarage"
 
-        geodata_tools = set(sorted({CopyGeodataTool,
+        geodata_tools = set(sorted([CopyGeodataTool,
                                     DescribeGeodataTool,
                                     SearchGeodataTool,
                                     SelectGeodataTool,
@@ -69,16 +69,16 @@ class Toolbox(object):
                                     DeleteGeodataTool,
                                     GenerateNamesGeodataTool,
                                     RenameGeodataTool,
-                                    ListWorkspaceTablesGeodataTool}))
+                                    ListWorkspaceTablesGeodataTool]))
 
-        feature_tools = set(sorted({DescribeFeatureTool,
+        feature_tools = set(sorted([DescribeFeatureTool,
                                     FeatureToRasterTool,
                                     PolygonToRasterTool,
                                     CopyFeatureTool,
                                     ClipFeatureTool,
-                                    SearchFeaturesTool}))
+                                    SearchFeaturesTool]))
 
-        raster_tools = set(sorted({AggregateRasterTool,
+        raster_tools = set(sorted([AggregateRasterTool,
                                    DescribeRasterTool,
                                    BlockStatisticsRasterTool,
                                    BuildAttributeTableRasterTool,
@@ -98,18 +98,18 @@ class Toolbox(object):
                                    TransformRasterTool,
                                    TweakValuesRasterTool,
                                    ExtractValuesToPointsRasterTool,
-                                   ValuesAtPointsRasterTool,
+                                   ValuesAtPointsRasterTool]))
                          
 
-        metadata_tools = set(sorted({CreateTipsTableMetadataTool,
+        metadata_tools = set(sorted([CreateTipsTableMetadataTool,
                                      ImportTipFilesToTableMetadataTool,
                                      ExportTipsToFileMetadataTool,
-                                     ExportXmlMetadataTool}))
+                                     ExportXmlMetadataTool]))
 
-        cdf_tools = set(sorted({SearchCdfTool,
+        cdf_tools = set(sorted([SearchCdfTool,
                                 DescribeCdfTool,
-                                ExtractTimeslicesCdfTool}))
+                                ExtractTimeslicesCdfTool]))
         # ToStandardGridCdfTool,
-        # ExportCdfTool}
+        # ExportCdfTool]
 
         self.tools = list(geodata_tools | feature_tools | raster_tools | metadata_tools | cdf_tools)
