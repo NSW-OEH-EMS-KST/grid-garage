@@ -1,5 +1,5 @@
 from base.base_tool import BaseTool
-from base.utils import validate_geodata, describe
+from base.utils import validate_geodata, describe, describe_property_groups
 from base.decorators import input_tableview, input_output_table, parameter
 from collections import OrderedDict
 
@@ -108,6 +108,8 @@ class CreateTipsTableMetadataTool(BaseTool):
 
         r.update(new_tips)
 
+        all_property_groups = describe_property_groups()
+
         fld_tips = {}
         for k, v in self.extractions.iteritems():   # "$table_fields,2#.html$"
             v = v.strip().strip('"').strip("$")     # table_fields,2#.html
@@ -123,7 +125,7 @@ class CreateTipsTableMetadataTool(BaseTool):
                 fld_tips[k] = "{}{}".format("", text)
                 continue
 
-            desc = describe(geodata)
+            desc = describe(geodata, comprehensive=True, flatten=all_property_groups)
             try:
                 new_val = desc[field]
             except [KeyError, AttributeError] as e:
