@@ -196,20 +196,20 @@ def static_vars(**kwargs):
 #     return ret
 
 
-def describe_arc(geodata):
-    """
-
-    Args:
-        geodata:
-
-    Returns:
-
-    """
-
-    if not geodata_exists(geodata):
-        raise DoesNotExistError(geodata)
-
-    return ap.Describe(geodata)
+# def describe_arc(geodata):
+#     """
+#
+#     Args:
+#         geodata:
+#
+#     Returns:
+#
+#     """
+#
+#     if not geodata_exists(geodata):
+#         raise DoesNotExistError(geodata)
+#
+#     return ap.Describe(geodata)
 
 
 def is_local_gdb(workspace):
@@ -233,7 +233,7 @@ def is_file_system(workspace):
     Returns:
 
     """
-    return describe_arc(workspace).workspaceType == "FileSystem"
+    return ap.Describe(workspace).workspaceType == "FileSystem"
 
 
 def get_search_cursor_rows(in_table, field_names, where_clause=None):

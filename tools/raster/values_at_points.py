@@ -50,9 +50,9 @@ class ValuesAtPointsRasterTool(BaseTool):
 
         """
 
-        d = utils.describe(self.points)
-        self.points_srs = d.get("dataset_spatialReference", "Unknown")
-        source = d.get("general_catalogPath", None)
+        d = utils.describe(self.points, feature=True)
+        self.points_srs = d.get("spatialReference", "unknown")
+        source = d.get("catalogPath", None)
 
         if "unknown" in self.points_srs.lower():
             raise ValueError("Point dataset '{0}'has unknown spatial reference system ({1})".format(source, self.points_srs))
@@ -88,9 +88,9 @@ class ValuesAtPointsRasterTool(BaseTool):
         ras = data["raster"]
         utils.validate_geodata(ras, raster=True, srs_known=True)
 
-        d = utils.describe(ras)
-        r_base = d.get("general_baseName", "None")
-        ras_srs = d.get("dataset_spatialReference", "Unknown")
+        d = utils.describe(ras, raster=True)
+        r_base = d.get("baseName", "None")
+        ras_srs = d.get("spatialReference", "unknown")
 
         if ras_srs != self.points_srs:  # hack!! needs doing properly
             raise ValueError("Spatial reference systems do not match ({0} != {1})".format(ras_srs, self.points_srs))
