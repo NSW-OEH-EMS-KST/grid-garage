@@ -65,12 +65,14 @@ class LookupByTableRasterTool(BaseTool):
 
         utils.validate_geodata(ras, raster=True)
 
+        ws = self.output_file_workspace or self.output_workspace
+
         lookup_fields = data["table_fields"].replace(" ", "").split(",")
         for f in lookup_fields:
             try:
                 self.info("Lookup field '{0}' in '{1}'".format(f, ras))
                 out = Lookup(ras, f)
-                ras_out = utils.make_raster_name(ras, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix + "_" + f)
+                ras_out = utils.make_raster_name(ras, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix + "_" + f)
                 out.save(ras_out)
                 self.info("Saved to {0}".format(ras_out))
 

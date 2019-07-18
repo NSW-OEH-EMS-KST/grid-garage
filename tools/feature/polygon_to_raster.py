@@ -82,9 +82,11 @@ class PolygonToRasterTool(BaseTool):
 
         self.info("Fields to burn for '{0}' are {1}".format(feat_ds, target_fields))
 
+        ws = self.output_file_workspace or self.output_workspace
+
         for field in target_fields:
             try:
-                r_out = base.utils.make_raster_name("{0}_{1}".format(splitext(feat_ds)[0], field), self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+                r_out = base.utils.make_raster_name("{0}_{1}".format(splitext(feat_ds)[0], field), ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
                 self.info("Rasterising {} on {} with priority field {} -> {}".format(feat_ds, field, priority_field, r_out))
                 PolygonToRaster_conversion(feat_ds, field, r_out, self.cell_assignment, priority_field, self.cell_size)
                 self.result.add_pass({"geodata": r_out, "source_geodata": feat_ds, "source_field": field, "priority_field": priority_field})

@@ -65,8 +65,8 @@ class CopyFeatureTool(base.base_tool.BaseTool):
         fc = data["feature"]
         base.utils.validate_geodata(fc, vector=True)
 
-        # ws = self.result.output_workspace
         ws = self.output_file_workspace or self.output_workspace
+
         ex = splitext(fc)[1]
 
         nfc = base.utils.make_vector_name(fc, ws, ex, self.output_filename_prefix, self. output_filename_suffix)

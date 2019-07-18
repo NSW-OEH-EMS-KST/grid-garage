@@ -88,7 +88,9 @@ class ReprojectRasterTool(BaseTool):
 
         validate_geodata(r_in, raster=True, srs_known=True)
 
-        r_out = make_raster_name(r_in, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+        ws = self.output_file_workspace or self.output_workspace
+
+        r_out = make_raster_name(r_in, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
 
         tx = get_transformation(r_in, self.output_cs, self.overrides)
 
