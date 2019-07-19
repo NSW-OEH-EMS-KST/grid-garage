@@ -42,6 +42,7 @@ class ExportTipsToFileMetadataTool(BaseTool):
 
         """
         nks = [s.strip() for s in self.include_fields.split(";")]
+
         self.info(nks)
 
         self.iterate_function_on_tableview(self.export, nonkey_names=nks, return_to_results=True)
@@ -64,7 +65,7 @@ class ExportTipsToFileMetadataTool(BaseTool):
 
         self.info("Creating TIP file for {0}".format(geodata))
 
-        field_order = data["field_order"].split(",")
+        field_order = data["tip_order"].split(",")
 
         ordered_fields = [f for f in field_order if f in self.include_fields]
 
