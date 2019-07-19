@@ -125,7 +125,6 @@ class TweakValuesRasterTool(BaseTool):
                 raise ValueError("Raster '{}' does not have a nodata value".format(r_in))
             ras = arcpy.sa.Con(ras <= self.min_val, under, ras)
             tweaks.append('Minimum set to {}'.format(self.min_val))
-        print "min", self.min_val, under
 
         if self.max_val or (self.max_val == 0):
             self.info('\tSetting maximum to {} any values above this will be reset'.format(self.max_val))
