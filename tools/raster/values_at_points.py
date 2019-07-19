@@ -51,7 +51,9 @@ class ValuesAtPointsRasterTool(BaseTool):
         """
 
         d = utils.describe(self.points, feature=True)
+
         self.points_srs = d.get("spatialReference", "unknown")
+
         source = d.get("catalogPath", None)
 
         if "unknown" in self.points_srs.lower():
@@ -59,8 +61,12 @@ class ValuesAtPointsRasterTool(BaseTool):
 
         c = GetCount_management(self.points).getOutput(0)
 
-        self.point_rows = arcpy.da.SearchCursor(self.points, ("SHAPE@XY", "OID@"))
+        x = arcpy.env.extent
+
+        self.point_rows = [row for row in arcpy.da.SearchCursor(self.points, ("SHAPE@XY", "OID@", "SHAPE@")) if x.contains(row[2])]
+
         self.info("{0} points found in '{1}'".format(c, self.points))
+        self.info("{0} points found in '{1}'".format(len(self.point_rows), self.point_rows))
 
         return
 
@@ -86,10 +92,13 @@ class ValuesAtPointsRasterTool(BaseTool):
         """
 
         ras = data["raster"]
+
         utils.validate_geodata(ras, raster=True, srs_known=True)
 
         d = utils.describe(ras, raster=True)
+
         r_base = d.get("baseName", "None")
+
         ras_srs = d.get("spatialReference", "unknown")
 
         if ras_srs != self.points_srs:  # hack!! needs doing properly
@@ -99,6 +108,7 @@ class ValuesAtPointsRasterTool(BaseTool):
 
         for row in self.point_rows:
             oid = row[1]
+
             # calc
             xy = "{0} {1}".format(row[0][0], row[0][1])
             res = GetCellValue_management(ras, xy)
@@ -112,6 +122,8 @@ class ValuesAtPointsRasterTool(BaseTool):
 
             # store it
             id_res[r_base] = val
+
+            self.info(id_res[r_base])
 
         # Get the Band_2 and Band_3 cell value of certain point in a RGB image
         # result = arcpy.GetCellValue_management("rgb.img", "480785 3807335", "2;3")
