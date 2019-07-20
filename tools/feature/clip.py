@@ -69,7 +69,10 @@ class ClipFeatureTool(BaseTool):
 
         # parse input name, construct output name
         fc_ws, fc_base, fc_name, fc_ext = base.utils.split_up_filename(fc)
-        fc_out = base.utils.make_vector_name(fc, self.output_file_workspace, fc_ext, self.output_filename_prefix, self.output_filename_suffix)
+
+        ws = self.output_file_workspace or self.output_workspace
+
+        fc_out = base.utils.make_vector_name(fc, ws, fc_ext, self.output_filename_prefix, self.output_filename_suffix)
 
         self.info("Clipping {0} -->> {1} ...".format(fc, fc_out))
         arcpy.Clip_analysis(fc, self.clip_features, fc_out, self.xy_tolerance)

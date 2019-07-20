@@ -64,7 +64,9 @@ class ToAsciiRasterTool(BaseTool):
 
         utils.validate_geodata(ras, raster=True)
 
-        ras_out = utils.make_raster_name(ras, self.output_file_workspace, "asc", self.output_filename_prefix, self.output_filename_suffix)
+        ws = self.output_file_workspace or self.output_workspace
+
+        ras_out = utils.make_raster_name(ras, ws, "asc", self.output_filename_prefix, self.output_filename_suffix)
 
         self.info("Converting {0} -->> {1} ...".format(ras, ras_out))
 

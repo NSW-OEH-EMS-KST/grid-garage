@@ -68,11 +68,13 @@ class SetValueToNullRasterTool(BaseTool):
 
         utils.validate_geodata(r_in, raster=True)
 
-        r_out = utils.make_raster_name(r_in, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+        ws = self.output_file_workspace or self.output_workspace
+
+        r_out = utils.make_raster_name(r_in, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
 
         self.info("Setting values of {0} to Null in {1} -> {2}".format(self.val_to_null, r_in, r_out))
 
-        out_ras = SetNull(r_in, r_in, 'VALUE = {0}'.format(self.val_to_null))
+        out_ras = SetNull(in_conditional_raster=r_in, in_false_raster_or_constant=r_in, where_clause='VALUE = {0}'.format(self.val_to_null))
 
         out_ras.save(r_out)
 

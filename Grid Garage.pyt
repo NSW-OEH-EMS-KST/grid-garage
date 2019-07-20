@@ -1,10 +1,4 @@
 # geodata tools
-from tools.feature.clip import ClipFeatureTool
-from tools.feature.copy import CopyFeatureTool
-from tools.feature.feature_to_raster import FeatureToRasterTool
-from tools.feature.polygon_to_raster import PolygonToRasterTool
-from tools.feature.tabulate_intersection import TabulateIntersectionTool
-# feature tools
 from tools.geodata.compare_extents import CompareExtentsGeodataTool
 from tools.geodata.copy import CopyGeodataTool
 from tools.geodata.delete import DeleteGeodataTool
@@ -15,12 +9,21 @@ from tools.geodata.list_workspace_tables import ListWorkspaceTablesGeodataTool
 from tools.geodata.rename import RenameGeodataTool
 from tools.geodata.search import SearchGeodataTool
 from tools.geodata.select import SelectGeodataTool
+# feature tools
+from tools.feature.describe import DescribeFeatureTool
+from tools.feature.clip import ClipFeatureTool
+from tools.feature.copy import CopyFeatureTool
+from tools.feature.feature_to_raster import FeatureToRasterTool
+from tools.feature.polygon_to_raster import PolygonToRasterTool
+from tools.feature.tabulate_intersection import TabulateIntersectionTool
+from tools.feature.search_features import SearchFeaturesTool
 # metadata tools
 from tools.metadata.create_tips import CreateTipsTableMetadataTool
 from tools.metadata.export_tips import ExportTipsToFileMetadataTool
 from tools.metadata.export_xml import ExportXmlMetadataTool
 from tools.metadata.import_tips import ImportTipFilesToTableMetadataTool
 # raster tools
+from tools.raster.describe import DescribeRasterTool
 from tools.raster.aggregate import AggregateRasterTool
 from tools.raster.block_statistics import BlockStatisticsRasterTool
 from tools.raster.build_attribute_table import BuildAttributeTableRasterTool
@@ -36,6 +39,7 @@ from tools.raster.zonal_stats_as_table import ZonalStatisticsAsTableTool
 from tools.raster.reclass_by_table import ReclassByTableRasterTool
 from tools.raster.reproject import ReprojectRasterTool
 from tools.raster.resample import ResampleRasterTool
+from tools.raster.search_rasters import SearchRastersTool
 from tools.raster.set_no_data_value import SetNodataValueRasterTool
 from tools.raster.set_value_to_null import SetValueToNullRasterTool
 from tools.raster.to_ascii import ToAsciiRasterTool
@@ -57,60 +61,58 @@ class Toolbox(object):
         self.label = "Grid Garage"
         self.alias = "GridGarage"
 
-        geodata_tools = {SearchGeodataTool,
-                         CopyGeodataTool,
-                         DescribeGeodataTool,
-                         SelectGeodataTool,
-                         DisplayGeodataTool,
-                         CompareExtentsGeodataTool,
-                         DeleteGeodataTool,
-                         GenerateNamesGeodataTool,
-                         RenameGeodataTool,
-                         ListWorkspaceTablesGeodataTool}
+        geodata_tools = set(sorted([CopyGeodataTool,
+                                    DescribeGeodataTool,
+                                    SearchGeodataTool,
+                                    SelectGeodataTool,
+                                    DisplayGeodataTool,
+                                    CompareExtentsGeodataTool,
+                                    DeleteGeodataTool,
+                                    GenerateNamesGeodataTool,
+                                    RenameGeodataTool,
+                                    ListWorkspaceTablesGeodataTool]))
 
-        feature_tools = {FeatureToRasterTool,
-                         PolygonToRasterTool,
-                         CopyFeatureTool,
-                         ClipFeatureTool,
-                         TabulateIntersectionTool}
+        feature_tools = set(sorted([DescribeFeatureTool,
+                                    FeatureToRasterTool,
+                                    PolygonToRasterTool,
+                                    CopyFeatureTool,
+                                    ClipFeatureTool,
+                                    SearchFeaturesTool,
+                                    TabulateIntersectionTool]))
 
-        raster_tools = {AggregateRasterTool,
-                        # BandPropertiesRasterTool,
-                        BlockStatisticsRasterTool,
-                        BuildAttributeTableRasterTool,
-                        CalculateStatisticsRasterTool,
-                        ClipRasterTool,
-                        CopyRasterTool,
-                        LookupByTableRasterTool,
-                        ReprojectRasterTool,
-                        ReclassByTableRasterTool,
-                        ReclassByThresholdRasterTool,
-                        ResampleRasterTool,
-                        SetNodataValueRasterTool,
-                        SetValueToNullRasterTool,
-                        SliceRasterTool,
-                        ToAsciiRasterTool,
-                        TransformRasterTool,
-                        TweakValuesRasterTool,
-                        ExtractValuesToPointsRasterTool,
-                        ValuesAtPointsRasterTool,
-                        ZonalStatisticsAsTableTool
-                        }
+        raster_tools = set(sorted([AggregateRasterTool,
+                                   DescribeRasterTool,
+                                   BlockStatisticsRasterTool,
+                                   BuildAttributeTableRasterTool,
+                                   CalculateStatisticsRasterTool,
+                                   ClipRasterTool,
+                                   CopyRasterTool,
+                                   LookupByTableRasterTool,
+                                   ReprojectRasterTool,
+                                   ReclassByTableRasterTool,
+                                   ReclassByThresholdRasterTool,
+                                   ResampleRasterTool,
+                                   SearchRastersTool,
+                                   SetNodataValueRasterTool,
+                                   SetValueToNullRasterTool,
+                                   SliceRasterTool,
+                                   ToAsciiRasterTool,
+                                   TransformRasterTool,
+                                   TweakValuesRasterTool,
+                                   ExtractValuesToPointsRasterTool,
+                                   ValuesAtPointsRasterTool]))
+                         
 
-        metadata_tools = {
-                          CreateTipsTableMetadataTool,
-                          ImportTipFilesToTableMetadataTool,
-                          ExportTipsToFileMetadataTool,
-                          ExportXmlMetadataTool,
-                          }
+        metadata_tools = set(sorted([CreateTipsTableMetadataTool,
+                                     ImportTipFilesToTableMetadataTool,
+                                     ExportTipsToFileMetadataTool,
+                                     ExportXmlMetadataTool]))
 
-        cdf_tools = {
-                     SearchCdfTool,
-                     DescribeCdfTool,
-                     # ToStandardGridCdfTool,
-                     ExtractTimeslicesCdfTool,
-                     # ExportCdfTool
-                     }
+        cdf_tools = set(sorted([SearchCdfTool,
+                                DescribeCdfTool,
+                                ExtractTimeslicesCdfTool]))
+
+        # ToStandardGridCdfTool,
+        # ExportCdfTool]
 
         self.tools = list(geodata_tools | feature_tools | raster_tools | metadata_tools | cdf_tools)
-

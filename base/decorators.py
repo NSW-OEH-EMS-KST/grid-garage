@@ -21,7 +21,7 @@ from functools import wraps
 from base.utils import raster_formats, resample_methods, aggregation_methods, data_nodata, expand_trunc, stats_type, pixel_type, raster_formats2, transform_methods
 
 
-def parameter(name, display_name, data_type, parameter_type, multi_value, direction, value_list, default_environment, dependancy_list, default_value, category=None):
+def parameter(name, display_name, data_type, parameter_type, multi_value, direction, value_list, default_environment, dependancy_list, default_value, category=None, enabled=True):
     """ Wrap a function with a function that generates a generic parameter
 
 
@@ -53,6 +53,9 @@ def parameter(name, display_name, data_type, parameter_type, multi_value, direct
 
     if dependancy_list:
         par.parameterDependencies = dependancy_list  # should be constant
+
+    if not enabled:
+        par.enabled = False
 
     def decorated(f):
         """

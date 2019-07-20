@@ -69,7 +69,9 @@ class AggregateRasterTool(BaseTool):
 
         utils.validate_geodata(ras, raster=True)
 
-        ras_out = utils.make_raster_name(ras, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+        ws = self.output_file_workspace or self.output_workspace
+
+        ras_out = utils.make_raster_name(ras, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
 
         self.info("Aggregating {} -->> {} ...".format(ras, ras_out))
 
@@ -77,7 +79,7 @@ class AggregateRasterTool(BaseTool):
 
         out.save(ras_out)
 
-        return {"geodata": ras_out, "source_geodata": ras}
+        return {"raster": ras_out, "source_raster": ras}
 
 
 # "http://desktop.arcgis.com/en/arcmap/latest/tools/spatial-analyst-toolbox/aggregate.htm"

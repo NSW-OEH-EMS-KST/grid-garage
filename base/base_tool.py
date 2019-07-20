@@ -570,10 +570,11 @@ class BaseTool(object):
         for field in field_alias:
             v = self.get_parameter(field).valueAsText
             delim = ";"
-            if delim in v:
-                field_name.extend([x.strip() for x in v.split(delim)])
-            else:
-                field_name.append(v.strip())
+            if v:
+                if delim in v:
+                    field_name.extend([x.strip() for x in v.split(delim)])
+                else:
+                    field_name.append(v.strip())
             # field_name = [self.get_parameter(field_name).valueAsText for field_name in field_alias]  # values
         self.info("field_name = {}".format(field_name))
         field_map = {k: v for k, v in OrderedDict(zip(field_alias, field_name)).iteritems() if v not in [None, "NONE"]}  # dict

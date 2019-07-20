@@ -1,5 +1,4 @@
 from base.base_tool import BaseTool
-
 from base.utils import make_vector_name, describe, get_search_cursor_rows, validate_geodata
 from base.decorators import input_tableview, input_output_table, parameter
 from arcpy.sa import ExtractValuesToPoints
@@ -51,9 +50,11 @@ class ExtractValuesToPointsRasterTool(BaseTool):
 
         """
 
-        d = describe(self.points)
-        self.points_srs = d.get("dataset_spatialReference", "Unknown")
-        source = d.get("general_catalogPath", None)
+        d = describe(self.points, feature=True)
+
+        self.points_srs = d.get("spatialReference", "unknown")
+
+        source = d.get("catalogPath", None)
 
         if "unknown" in self.points_srs.lower():
             raise ValueError("Point dataset '{}' has unknown spatial reference system ({})".format(source, self.points_srs))
@@ -89,14 +90,16 @@ class ExtractValuesToPointsRasterTool(BaseTool):
         qry = data.get("query", None)
         validate_geodata(ras, raster=True, srs_known=True)
 
-        d = describe(ras)
-        r_base = d.get("general_baseName", "None")
-        ras_srs = d.get("dataset_spatialReference", "Unknown")
+        d = describe(ras, raster=True)
+        r_base = d.get("baseName", "None")
+        ras_srs = d.get("spatialReference", "Unknown")
 
         if ras_srs != self.points_srs:  # hack!! needs doing properly
             raise ValueError("Spatial reference systems do not match ({0} != {1})".format(ras_srs, self.points_srs))
 
-        pts_out = make_vector_name(self.points, self.output_file_workspace, "", self.output_filename_prefix, self.output_filename_suffix + "_{}".format(r_base))
+        ws = self.output_file_workspace or self.output_workspace
+
+        pts_out = make_vector_name(self.points, ws, "", self.output_filename_prefix, self.output_filename_suffix + "_{}".format(r_base))
 
         self.info("Extracting point values from {} to {}...".format(ras, pts_out))
 

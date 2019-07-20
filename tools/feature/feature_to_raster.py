@@ -47,7 +47,6 @@ class FeatureToRasterTool(BaseTool):
 
         """
 
-        # self.iterate_function_on_tableview(self.rasterise, "features_table", ["geodata", "table_fields"])
         self.iterate_function_on_tableview(self.rasterise)
 
         return
@@ -71,9 +70,13 @@ class FeatureToRasterTool(BaseTool):
         if not target_fields:
             raise ValueError("No target fields '{0}'".format(target_fields))
 
+        ws = self.output_file_workspace or self.output_workspace
+
+        self.info("ws = {}".format(ws))
+
         for field in target_fields:
             try:
-                r_out = base.utils.make_raster_name("{0}_{1}".format(splitext(feat_ds)[0], field), self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+                r_out = base.utils.make_raster_name("{0}_{1}".format(splitext(feat_ds)[0], field), ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
                 self.info("Rasterising {0} on {1} -> {2}".format(feat_ds, field, r_out))
                 FeatureToRaster_conversion(feat_ds, field, r_out)
                 self.result.add_pass({"geodata": r_out, "source_geodata": feat_ds, "source_field": field})

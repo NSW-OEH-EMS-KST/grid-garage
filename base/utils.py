@@ -196,20 +196,20 @@ def static_vars(**kwargs):
 #     return ret
 
 
-def describe_arc(geodata):
-    """
-
-    Args:
-        geodata:
-
-    Returns:
-
-    """
-
-    if not geodata_exists(geodata):
-        raise DoesNotExistError(geodata)
-
-    return ap.Describe(geodata)
+# def describe_arc(geodata):
+#     """
+#
+#     Args:
+#         geodata:
+#
+#     Returns:
+#
+#     """
+#
+#     if not geodata_exists(geodata):
+#         raise DoesNotExistError(geodata)
+#
+#     return ap.Describe(geodata)
 
 
 def is_local_gdb(workspace):
@@ -233,7 +233,7 @@ def is_file_system(workspace):
     Returns:
 
     """
-    return describe_arc(workspace).workspaceType == "FileSystem"
+    return ap.Describe(workspace).workspaceType == "FileSystem"
 
 
 def get_search_cursor_rows(in_table, field_names, where_clause=None):
@@ -444,14 +444,25 @@ def make_raster_name(like_name, out_wspace, ext='', prefix='', suffix=''):
     Returns:
         object:
     """
-    _, __, r_name, r_ext = split_up_filename(like_name)
+    # _, __, r_name, r_ext = split_up_filename(like_name)
+    #
+    # ext = "" if (is_local_gdb(out_wspace) or ext == "Esri Grid") else ext
+    # ext = "." + ext if (ext and ext[0] != ".") else ext
 
-    ext = "" if (is_local_gdb(out_wspace) or ext == "Esri Grid") else ext
+    path, basename, r_name, r_ext = split_up_filename(like_name)
+
+    not_fs = not is_file_system(out_wspace)
+
+    if not_fs:
+        r_name = r_name + r_ext
+
+    ext = "" if (not_fs or ext == "Esri Grid") else ext
+
     ext = "." + ext if (ext and ext[0] != ".") else ext
 
     raster_name = ap.ValidateTableName(prefix + r_name + suffix, out_wspace)
     raster_name = ap.CreateUniqueName(raster_name, out_wspace)
-    raster_name = raster_name.replace(".", "_")
+    # raster_name = raster_name.replace(".", "_")
 
     return os.path.join(out_wspace, raster_name + ext)
 
@@ -495,9 +506,15 @@ def make_vector_name(like_name, out_wspace, ext='', prefix='', suffix=''):
     Returns:
 
     """
-    _, __, v_name, v_ext = split_up_filename(like_name)
+    path, basename, v_name, v_ext = split_up_filename(like_name)
 
-    ext = "" if is_local_gdb(out_wspace) else ext
+    not_fs = not is_file_system(out_wspace)
+
+    if not_fs:
+        v_name = v_name + v_ext
+
+    ext = "" if not_fs else ext
+
     ext = "." + ext if (ext and ext[0] != ".") else ext
 
     vector_name = ap.ValidateTableName(prefix + v_name + suffix, out_wspace)
@@ -586,8 +603,16 @@ def walk(workspace, data_types=None, types=None, followlinks=True):
     return x
 
 
+def get_datatype(x):
+    try:
+        x = ap.Describe(x).dataType
+    except:
+        x = "N/A"
+    return x
+
+
 # @base.log.log_error
-def describe(geodata):
+def describe(geodata, raster=False, feature=False, comprehensive=False, flatten = []):
     """
 
     Args:
@@ -596,86 +621,66 @@ def describe(geodata):
     Returns:
 
     """
-
-    describe_field_groups = dict(
-        general=["baseName", "catalogPath", "children", "childrenExpanded", "dataElementType", "dataType", "extension", "file", "fullPropsRetrieved", "metadataRetrieved", "name", "path"],
-        file=["FileSizeKB", "FileModified"],
-        dataset=["canVersion", "datasetType", "DSID", "extent", "isVersioned", "MExtent", "spatialReference", "ZExtent"],
-        table=["hasOID", "OIDFieldName", "fields", "indexes"],
-        raster=["bandCount", "compressionType", "format", "permanent", "sensorType"],
-        raster_band=["height", "isInteger", "meanCellHeight", "meanCellWidth", "noDataValue", "pixelType", "primaryField", "tableType", "width"],
-        raster_band_stats=["MINIMUM", "MAXIMUM", "MEAN", "STD", "UNIQUEVALUECOUNT", "TOP", "LEFT", "RIGHT", "BOTTOM", "CELLSIZEX", "CELLSIZEY", "VALUETYPE", "COLUMNCOUNT", "ROWCOUNT", "BANDCOUNT", "ANYNODATA", "ALLNODATA", "SENSORNAME", "PRODUCTNAME", "ACQUSITIONDATE", "SOURCETYPE", "SUNELEVATION", "CLOUDCOVER", "SUNAZIMUTH", "SENSORAZIMUTH", "SENSORELEVATION", "OFFNADIR", "WAVELENGTH"])
-
     d = ap.Describe(geodata)
-    result = {}
-    for group, attributes in describe_field_groups.iteritems():
-        group_atts = {"{0}_{1}".format(group, att): getattr(d, att, None) for att in attributes}
-        result.update(group_atts)
+    properties = describe_properties()
+    result = collections.OrderedDict()
 
-    # check for table fields which need to be stringified
-    fs = result.get("table_fields", None)
-    fs = fs if fs else []  # in case above returns a value of none, can't combine these lines
-    fs = [str(f.name) for f in fs]
-    fs = ", ".join(fs)
-    result["table_fields"] = fs
+    if raster:
+        result["raster"] = geodata
+        flatten = ('BaseProperties', 'DatasetProperties', 'RasterDatasetProperties', 'RasterBandProperties', 'RasterCatalogProperties')
+        target_attributes = [(x, properties[x]) for x in flatten]
 
-    # check for table indexes which need to be stringified
-    xs = result.get("table_indexes", [])
-    xs = xs if xs else []  # in case above returns a value of none, can't combine these lines
-    xs = [x.name for x in xs]
-    xs = ", ".join(xs)
-    result["table_indexes"] = xs
+    elif feature:
+        result["feature"] = geodata
+        flatten = ('BaseProperties', 'DatasetProperties', 'TableProperties', 'EditorTrackingProperties')
+        target_attributes = [(x, properties[x]) for x in flatten]
 
-    # check for child datasets which need to be stringified
-    cs = result.get("general_children", [])
-    cs = [c.name for c in cs]
-    cs = ", ".join(cs)
-    result["general_children"] = cs
+    else:
+        result["geodata"] = geodata
+        if comprehensive:
+            target_attributes = sorted([(k, v) for k, v in properties.iteritems()])
+        else:
+            target_attributes = [('BaseProperties', properties['BaseProperties'])]
 
-    # check for spatial reference which needs to be stringified
-    sr = result.get("dataset_spatialReference", None)
-    if sr:
-        result["dataset_spatialReference"] = sr.name
+    for k, v in target_attributes:
+        result[k] = {att: getattr(d, att, "N/A") for att in v}
 
-    # # check for raster bands which need to be looked at
-    # dt = result.get("dataset_datasetType", None)
-    # if dt == "RasterDataset" and cs:
-    #     cs = cs.split(", ")
-    #     for c in cs:
-    #         bnd = join_up_filename(geodata, c)
-    #         d = ap.Describe(bnd)
-    #         ns = ["raster_band_{0}".format(a) for a in describe_field_groups["raster_band"]]
-    #         for n in ns:
-    #             a = getattr(d, n, "")
-    #             result[n] += ", {0}".format(a)
-            #     group_atts = {"{0}_{1}".format(group, att): getattr(d, att, None) for att in attributes}
-            #     result.update(group_atts)
-            # bp = geta(tool.describe(bnd), fields_band)
-            # for field in fields_band_ex:
+    if flatten:
+        flat = collections.OrderedDict()
+        if raster:
+            flat["raster"] = result["raster"]
+        elif feature:
+            flat["feature"] = result["feature"]
+        else:
+            flat["geodata"] = result["geodata"]
 
-        # result["dataset_spatialReference"] = sr.name
+        for f in flatten:
+            try:
+                for k, v in result.pop(f).iteritems():
+                    flat[k] = stringify_objects(v)
+            except KeyError:
+                pass
 
-    # return an ordered dictionary
-    od = collections.OrderedDict()
-    od["geodata"] = geodata
-    for i, attributes in sorted(result.items()):
-        od[i] = attributes
+        for k, v in result.iteritems():
+            flat[k] = stringify_objects(v)
 
-    return od
-    # # band properties
-    # if do_band:
-    #     children = getattr(desc, 'children', None)
-    #     getr = tool.get_raster_property
-    #     i = 0
-    #     for child in children:
-    #         cname = child.name
-    #         i += 1
-    #         bnd = tool.join_up(raster, cname)
-    #         bp = geta(tool.describe(bnd), fields_band)
-    #         for field in fields_band_ex:
-    #             z = getr(raster, field, cname, as_string=True)
-    #             bp.update(z)
-    #         update({"Band_{0}".format(i): bp})
+        result = flat
+
+    return result
+
+
+def stringify_objects(x):
+    try:
+        x = ",".join([f.name for f in x])
+    except (KeyError, TypeError, AttributeError):
+        pass
+
+    try:
+        x = x.name
+    except (KeyError, TypeError, AttributeError):
+        pass
+
+    return x
 
 
 # @base.log.log_error
@@ -883,3 +888,326 @@ def get_band_nodata_value(raster, bandindex=1):
     return ndv
 
 
+def describe_properties():
+    s = """
+            Base Properties:
+            baseName
+            catalogPath
+            children
+            childrenExpanded
+            dataElementType
+            dataType
+            extension
+            file
+            fullPropsRetrieved
+            metadataRetrieved
+            name
+            path
+             
+            ArcInfo Workstation Item:
+            alternateName
+            isIndexed
+            isPseudo
+            isRedefined
+            itemType
+            numberDecimals
+            outputWidth
+            startPosition
+            width
+             
+            ArcInfo Workstation Table:
+            itemSet
+             
+            CAD Drawing Dataset Properties:
+            is2D
+            is3D
+            isAutoCAD
+            isDGN
+            
+            Cadastral Fabric Properties:
+            bufferDistanceForAdjustment
+            compiledAccuracyCategory
+            defaultAccuracyCategory
+            maximumShiftThreshold
+            multiGenerationEditing
+            multiLevelReconcile
+            pinAdjustmentBoundary
+            pinAdjustmentPointsWithinBoundary
+            surrogateVersion
+            type
+            version
+            writeAdjustmentVectors
+             
+            Coverage FeatureClass Properties:
+            featureClassType
+            hasFAT
+            topology
+             
+            Coverage Properties:
+            tolerances
+             
+            Dataset Properties:
+            canVersion
+            changeTracked
+            datasetType
+            DSID
+            extent
+            isArchived
+            isVersioned
+            MExtent
+            spatialReference
+            ZExtent
+            
+            Editor Tracking Properties:
+            editorTrackingEnabled
+            creatorFieldName
+            createdAtFieldName
+            editorFieldName
+            editedAtFieldName
+            isTimeInUTC
+            
+            FeatureClass Properties:
+            featureType
+            hasM
+            hasZ
+            hasSpatialIndex
+            shapeFieldName
+            shapeType
+             
+            GDB FeatureClass Properties:
+            areaFieldName
+            geometryStorage
+            lengthFieldName
+            representations
+             
+            GDB Table Properties:
+            aliasName
+            defaultSubtypeCode
+            extensionProperties
+            globalIDFieldName
+            hasGlobalID
+            modelName
+            rasterFieldName
+            relationshipClassNames
+            subtypeFieldName
+            versionedView
+            
+            Geometric Network Properties:
+            featureClassNames
+            networkType
+            orphanJunctionFeatureClassName
+            
+            LAS Dataset Properties:
+            constraintCount
+            fileCount
+            hasStatistics
+            needsUpdateStatistics
+            pointCount
+            usesRelativePath
+                
+            Layer Properties:
+            dataElement
+            featureClass
+            FIDSet
+            fieldInfo
+            layer
+            nameString
+            table
+            whereClause
+             
+            Mosaic Dataset Properties:
+            allowedCompressionMethods
+            allowedFields
+            allowedMensurationCapabilities
+            allowedMosaicMethods
+            applyColorCorrection
+            blendWidth
+            blendWidthUnits
+            cellSizeToleranceFactor
+            childrenNames
+            clipToBoundary
+            clipToFootprint
+            defaultCompressionMethod
+            defaultMensurationCapability
+            defaultMosaicMethod
+            defaultProcessingTemplate
+            defaultResamplingMethod
+            dimensionAttributes
+            dimensionNames
+            dimensionValues
+            endTimeField
+            footprintMayContainNoData
+            GCSTransforms
+            isMultidimensional
+            JPEGQuality
+            LERCTolerance
+            maxDownloadImageCount
+            maxDownloadSizeLimit
+            maxRastersPerMosaic
+            maxRecordsReturned
+            maxRequestSizeX
+            maxRequestSizeY
+            minimumPixelContribution
+            mosaicOperator
+            multidimensionalInfo
+            orderBaseValue
+            orderField
+            processingTemplates
+            rasterMetadataLevel
+            referenced
+            sortAscending
+            startTimeField
+            timeValueFormat
+            useTime
+            variableAttributes
+            variableNames
+            viewpointSpacingX
+            viewpointSpacingY
+            
+            Network Analyst:
+            network
+            nameString
+            solverName
+            impedance
+            accumulators
+            restrictions
+            ignoreInvalidLocations
+            uTurns
+            useHierarchy
+            hierarchyAttribute
+            hierarchyLevelCount
+            maxValueForHierarchyX
+            locatorCount
+            locators
+            findClosest
+            searchTolerance
+            excludeRestrictedElements
+            solverProperties
+            children
+            parameterCount
+            parameters
+            
+            Network Dataset Properties:
+            attributes
+            catalogPath
+            defaultTravelModeName
+            directions
+            edgeSources
+            elevationModel
+            historicalTrafficData
+            isBuildable
+            junctionSources
+            liveTrafficData
+            networkType
+            optimizations
+            sources
+            supportsDirections
+            supportsHistoricalTrafficData
+            supportsLiveTrafficData
+            supportsTurns
+            systemJunctionSource
+            timeZoneAttributeName
+            timeZoneTableName
+            trafficSupportType
+            turnSources
+            
+            Prj File Properties:
+            spatialReference
+             
+            Raster Band Properties:
+            height
+            isInteger
+            meanCellHeight
+            meanCellWidth
+            noDataValue
+            pixelType
+            primaryField
+            tableType
+            width
+             
+            Raster Catalog Properties:
+            rasterFieldName
+             
+            Raster Dataset Properties:
+            bandCount
+            compressionType
+            format
+            permanent
+            sensorType
+             
+            RecordSet and FeatureSet Properties:
+            json
+            pjson
+             
+            RelationshipClass Properties:
+            backwardPathLabel
+            cardinality
+            classKey
+            destinationClassKeys
+            destinationClassNames
+            forwardPathLabel
+            isAttachmentRelationship
+            isAttributed
+            isComposite
+            isReflexive
+            keyType
+            notification
+            originClassNames
+            originClassKeys
+            relationshipRules
+            
+            RepresentationClass Properties:
+            overrideFieldName
+            requireShapeOverride
+            ruleIDFieldName
+            
+            Schematic Diagram Properties:
+            diagramClassName
+             
+            Table Properties:
+            hasOID
+            OIDFieldName
+            fields
+            indexes
+             
+            TableView Properties:
+            table
+            FIDSet
+            fieldInfo
+            whereClause
+            nameString
+             
+            Tin Properties:
+            fields
+            hasEdgeTagValues
+            hasNodeTagValues
+            hasTriangleTagValues
+            isDelaunay
+            ZFactor
+             
+            Topology Properties:
+            clusterTolerance
+            featureClassNames
+            maximumGeneratedErrorCount
+            ZClusterTolerance
+             
+            Workspace Properties:
+            connectionProperties
+            connectionString
+            currentRelease
+            domains
+            release
+            workspaceFactoryProgID
+            workspaceType
+        """
+
+    d = dict([[k.strip("\n"), v] for k, v in [x.split(":") for x in s.strip().replace(" ", "").replace("\t", "").split("\n\n")]])
+
+    for k, v in d.iteritems():
+        d[k] = v.strip().split("\n")
+
+    return d
+
+
+def describe_property_groups():
+    return describe_properties().keys()
