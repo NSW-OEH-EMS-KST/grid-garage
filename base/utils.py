@@ -221,7 +221,7 @@ def is_local_gdb(workspace):
     Returns:
 
     """
-    return describe_arc(workspace).workspaceType == "LocalDatabase"
+    return ap.Describe(workspace).workspaceType == "LocalDatabase"
 
 
 def is_file_system(workspace):
@@ -444,10 +444,6 @@ def make_raster_name(like_name, out_wspace, ext='', prefix='', suffix=''):
     Returns:
         object:
     """
-    # _, __, r_name, r_ext = split_up_filename(like_name)
-    #
-    # ext = "" if (is_local_gdb(out_wspace) or ext == "Esri Grid") else ext
-    # ext = "." + ext if (ext and ext[0] != ".") else ext
 
     path, basename, r_name, r_ext = split_up_filename(like_name)
 
@@ -462,7 +458,6 @@ def make_raster_name(like_name, out_wspace, ext='', prefix='', suffix=''):
 
     raster_name = ap.ValidateTableName(prefix + r_name + suffix, out_wspace)
     raster_name = ap.CreateUniqueName(raster_name, out_wspace)
-    # raster_name = raster_name.replace(".", "_")
 
     return os.path.join(out_wspace, raster_name + ext)
 
@@ -481,9 +476,16 @@ def make_table_name(like_name, out_wspace, ext='', prefix='', suffix=''):
     Returns:
 
     """
-    _, __, t_name, t_ext = split_up_filename(like_name)
 
-    ext = "" if (is_local_gdb(out_wspace) or ext == "Esri Grid") else ext
+    path, basename, t_name, t_ext = split_up_filename(like_name)
+
+    not_fs = not is_file_system(out_wspace)
+
+    if not_fs:
+        t_name = t_name + t_ext
+
+    ext = "" if not_fs else ext
+
     ext = "." + ext if (ext and ext[0] != ".") else ext
 
     table_name = ap.ValidateTableName(prefix + t_name + suffix, out_wspace)
