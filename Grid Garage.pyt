@@ -1,11 +1,4 @@
 # geodata tools
-from tools.feature.describe import DescribeFeatureTool
-from tools.feature.clip import ClipFeatureTool
-from tools.feature.copy import CopyFeatureTool
-from tools.feature.feature_to_raster import FeatureToRasterTool
-from tools.feature.polygon_to_raster import PolygonToRasterTool
-from tools.feature.search_features import SearchFeaturesTool
-# feature tools
 from tools.geodata.compare_extents import CompareExtentsGeodataTool
 from tools.geodata.copy import CopyGeodataTool
 from tools.geodata.delete import DeleteGeodataTool
@@ -16,6 +9,14 @@ from tools.geodata.list_workspace_tables import ListWorkspaceTablesGeodataTool
 from tools.geodata.rename import RenameGeodataTool
 from tools.geodata.search import SearchGeodataTool
 from tools.geodata.select import SelectGeodataTool
+# feature tools
+from tools.feature.describe import DescribeFeatureTool
+from tools.feature.clip import ClipFeatureTool
+from tools.feature.copy import CopyFeatureTool
+from tools.feature.feature_to_raster import FeatureToRasterTool
+from tools.feature.polygon_to_raster import PolygonToRasterTool
+from tools.feature.tabulate_intersection import TabulateIntersectionTool
+from tools.feature.search_features import SearchFeaturesTool
 # metadata tools
 from tools.metadata.create_tips import CreateTipsTableMetadataTool
 from tools.metadata.export_tips import ExportTipsToFileMetadataTool
@@ -76,7 +77,8 @@ class Toolbox(object):
                                     PolygonToRasterTool,
                                     CopyFeatureTool,
                                     ClipFeatureTool,
-                                    SearchFeaturesTool]))
+                                    SearchFeaturesTool,
+                                    TabulateIntersectionTool]))
 
         raster_tools = set(sorted([AggregateRasterTool,
                                    DescribeRasterTool,
