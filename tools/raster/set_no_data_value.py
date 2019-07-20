@@ -29,7 +29,6 @@ class SetNodataValueRasterTool(BaseTool):
 
     @input_tableview(data_type="raster")
     @parameter("ndv", "NoData Value", "GPDouble", "Required", False, "Input", None, None, None, None)
-    # @parameter("raster_format", "Format for output rasters", "GPString", "Required", False, "Input", raster_formats, None, None, "Esri Grid")
     @input_output_table(affixing=False, out_file_workspace=False)
     def getParameterInfo(self):
         """

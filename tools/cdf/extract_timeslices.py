@@ -106,11 +106,13 @@ class ExtractTimeslicesCdfTool(BaseTool):
 
             self.info("Exporting {} individual bands from {}".format(bandcount, ras_tmp))
 
+            ws = self.output_file_workspace or self.output_workspace
+
             for i in range(1, bandcount + 1):
                 band = "Band_{}".format(i)
                 i_ras = join(ras_tmp, band)
                 dimension_value = sanitise_dimension(nc_fprops.getDimensionValue("time", i))
-                o_ras = make_name(cdf, dimension_value, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+                o_ras = make_name(cdf, dimension_value, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
                 try:
                     arcpy.CopyRaster_management(i_ras, o_ras)
                     self.info("{} exported successfully".format(o_ras))

@@ -97,7 +97,9 @@ class ExtractValuesToPointsRasterTool(BaseTool):
         if ras_srs != self.points_srs:  # hack!! needs doing properly
             raise ValueError("Spatial reference systems do not match ({0} != {1})".format(ras_srs, self.points_srs))
 
-        pts_out = make_vector_name(self.points, self.output_file_workspace, "", self.output_filename_prefix, self.output_filename_suffix + "_{}".format(r_base))
+        ws = self.output_file_workspace or self.output_workspace
+
+        pts_out = make_vector_name(self.points, ws, "", self.output_filename_prefix, self.output_filename_suffix + "_{}".format(r_base))
 
         self.info("Extracting point values from {} to {}...".format(ras, pts_out))
 
