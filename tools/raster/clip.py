@@ -2,7 +2,7 @@ from base.base_tool import BaseTool
 
 from base.decorators import input_tableview, input_output_table, parameter, raster_formats
 import arcpy
-from base.utils import get_srs, validate_geodata, compare_srs, make_raster_name
+from base.utils import get_srs, validate_geodata, compare_srs, make_table_name
 
 
 tool_settings = {"label": "Clip",
@@ -86,7 +86,7 @@ class ClipRasterTool(BaseTool):
 
         ws = self.output_file_workspace or self.output_workspace
 
-        ras_out = make_raster_name(ras, ws, self.raster_format, self.output_filename_prefix, self. output_filename_suffix)
+        ras_out = make_table_name(ras, ws, self.raster_format, self.output_filename_prefix, self. output_filename_suffix)
 
         self.info("Clipping {0} -->> {1} ...".format(ras, ras_out))
         arcpy.Clip_management(ras, self.rectangle, ras_out, self.polygons, self.no_data_val, self.clipping_geometry, self.maintain_extent)

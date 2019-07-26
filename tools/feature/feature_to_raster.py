@@ -76,7 +76,7 @@ class FeatureToRasterTool(BaseTool):
 
         for field in target_fields:
             try:
-                r_out = base.utils.make_raster_name("{0}_{1}".format(splitext(feat_ds)[0], field), ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+                r_out = base.utils.make_table_name("{0}_{1}".format(splitext(feat_ds)[0], field), ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
                 self.info("Rasterising {0} on {1} -> {2}".format(feat_ds, field, r_out))
                 FeatureToRaster_conversion(feat_ds, field, r_out)
                 self.result.add_pass({"geodata": r_out, "source_geodata": feat_ds, "source_field": field})

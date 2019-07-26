@@ -131,7 +131,7 @@ class TransformRasterTool(BaseTool):
 
         ws = self.output_file_workspace or self.output_workspace
 
-        r_out = utils.make_raster_name(r_in, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+        r_out = utils.make_table_name(r_in, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
 
         self.info("\tCalculating statistics")
         arcpy.CalculateStatistics_management(r_in)

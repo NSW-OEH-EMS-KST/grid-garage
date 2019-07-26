@@ -72,7 +72,7 @@ class ClipFeatureTool(BaseTool):
 
         ws = self.output_file_workspace or self.output_workspace
 
-        fc_out = base.utils.make_vector_name(fc, ws, fc_ext, self.output_filename_prefix, self.output_filename_suffix)
+        fc_out = base.utils.make_table_name(fc, ws, fc_ext, self.output_filename_prefix, self.output_filename_suffix)
 
         self.info("Clipping {0} -->> {1} ...".format(fc, fc_out))
         arcpy.Clip_analysis(fc, self.clip_features, fc_out, self.xy_tolerance)

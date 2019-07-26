@@ -68,7 +68,7 @@ class ResampleRasterTool(BaseTool):
 
         ws = self.output_file_workspace or self.output_workspace
 
-        ras_out = utils.make_raster_name(ras, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+        ras_out = utils.make_table_name(ras, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
 
         self.info("Resampling {0} -->> {1} ...".format(ras, ras_out))
 

@@ -1,7 +1,7 @@
 import base.base_tool
 
 from base.decorators import input_output_table, input_tableview, parameter
-from base.utils import split_up_filename, is_raster, is_vector, make_raster_name, make_vector_name, make_table_name, get_search_cursor_rows
+from base.utils import split_up_filename, is_raster, is_vector, make_table_name, make_table_name, make_table_name, get_search_cursor_rows
 
 
 tool_settings = {"label": "Generate Names",
@@ -118,9 +118,9 @@ class GenerateNamesGeodataTool(base.base_tool.BaseTool):
         # get the new name elements for validation
         new_ws, new_base, new_name, new_ext = split_up_filename(new_name)
         if is_raster(gd):
-            new_full = make_raster_name(new_name, old_ws, old_ext, self.output_filename_prefix, self.output_filename_suffix)
+            new_full = make_table_name(new_name, old_ws, old_ext, self.output_filename_prefix, self.output_filename_suffix)
         elif is_vector(gd):
-            new_full = make_vector_name(new_name, old_ws, old_ext, self.output_filename_prefix, self.output_filename_suffix)
+            new_full = make_table_name(new_name, old_ws, old_ext, self.output_filename_prefix, self.output_filename_suffix)
         else:
             new_full = make_table_name(new_name, old_ws, old_ext, self.output_filename_prefix, self.output_filename_suffix)
 

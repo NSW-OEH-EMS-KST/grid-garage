@@ -72,7 +72,7 @@ class LookupByTableRasterTool(BaseTool):
             try:
                 self.info("Lookup field '{0}' in '{1}'".format(f, ras))
                 out = Lookup(ras, f)
-                ras_out = utils.make_raster_name(ras, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix + "_" + f)
+                ras_out = utils.make_table_name(ras, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix + "_" + f)
                 out.save(ras_out)
                 self.info("Saved to {0}".format(ras_out))
 

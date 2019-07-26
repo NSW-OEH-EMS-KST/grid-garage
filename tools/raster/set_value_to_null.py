@@ -70,7 +70,7 @@ class SetValueToNullRasterTool(BaseTool):
 
         ws = self.output_file_workspace or self.output_workspace
 
-        r_out = utils.make_raster_name(r_in, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+        r_out = utils.make_table_name(r_in, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
 
         self.info("Setting values of {0} to Null in {1} -> {2}".format(self.val_to_null, r_in, r_out))
 

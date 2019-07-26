@@ -69,7 +69,7 @@ class CopyFeatureTool(base.base_tool.BaseTool):
 
         ex = splitext(fc)[1]
 
-        nfc = base.utils.make_vector_name(fc, ws, ex, self.output_filename_prefix, self. output_filename_suffix)
+        nfc = base.utils.make_table_name(fc, ws, ex, self.output_filename_prefix, self. output_filename_suffix)
 
         self.info('copying {0} --> {1}'.format(fc, nfc))
         arcpy.CopyFeatures_management(fc, nfc, self.config_kw, self.sg_1, self.sg_2, self.sg_3)

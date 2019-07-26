@@ -2,7 +2,7 @@ from base.base_tool import BaseTool
 
 from base.decorators import input_tableview, input_output_table, parameter, stats_type, data_nodata, raster_formats
 from arcpy.sa import BlockStatistics
-from base.utils import validate_geodata, make_raster_name
+from base.utils import validate_geodata, make_table_name
 
 tool_settings = {"label": "Block Statistics",
                  "description": "Block Statistics...",
@@ -69,7 +69,7 @@ class BlockStatisticsRasterTool(BaseTool):
 
         ws = self.output_file_workspace or self.output_workspace
 
-        ras_out = make_raster_name(ras, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+        ras_out = make_table_name(ras, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
 
         self.info("Calculating block statistics on {0}...".format(ras))
 
