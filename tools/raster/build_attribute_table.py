@@ -71,6 +71,6 @@ class BuildAttributeTableRasterTool(BaseTool):
 
         arcpy.BuildRasterAttributeTable_management(ras, self.overwrite)
 
-        return {"geodata": ras, "attribute_table": "built"}
+        return {"raster": ras, "attribute_table": "built"}
 
 # "http://desktop.arcgis.com/en/arcmap/latest/tools/data-management-toolbox/build-raster-attribute-table.htm"

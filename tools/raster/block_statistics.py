@@ -79,7 +79,7 @@ class BlockStatisticsRasterTool(BaseTool):
 
         out.save(ras_out)
 
-        return {"geodata": ras_out, "source_geodata": ras}
+        return {"raster": ras_out, "source_geodata": ras}
 
 
 # "http://desktop.arcgis.com/en/arcmap/latest/tools/spatial-analyst-toolbox/block-statistics.htm"

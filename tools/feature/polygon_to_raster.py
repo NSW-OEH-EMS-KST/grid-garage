@@ -89,7 +89,7 @@ class PolygonToRasterTool(BaseTool):
                 r_out = base.utils.make_table_name("{0}_{1}".format(splitext(feat_ds)[0], field), ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
                 self.info("Rasterising {} on {} with priority field {} -> {}".format(feat_ds, field, priority_field, r_out))
                 PolygonToRaster_conversion(feat_ds, field, r_out, self.cell_assignment, priority_field, self.cell_size)
-                self.result.add_pass({"geodata": r_out, "source_geodata": feat_ds, "source_field": field, "priority_field": priority_field})
+                self.result.add_pass({"raster": r_out, "source_geodata": feat_ds, "source_field": field, "priority_field": priority_field})
             except Exception as e:
                 self.error("FAILED rasterising {} on {} priority {}: {}".format(feat_ds, field, priority_field, str(e)))
                 self.result.add_fail(data)

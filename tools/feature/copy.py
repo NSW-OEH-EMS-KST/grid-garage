@@ -74,7 +74,7 @@ class CopyFeatureTool(base.base_tool.BaseTool):
         self.info('copying {0} --> {1}'.format(fc, nfc))
         arcpy.CopyFeatures_management(fc, nfc, self.config_kw, self.sg_1, self.sg_2, self.sg_3)
 
-        return {'geodata': nfc, 'copied_from': fc}
+        return {'feature': nfc, 'copied_from': fc}
 
 # "http://desktop.arcgis.com/en/arcmap/latest/tools/data-management-toolbox/copy-features.htm"
 # "CopyFeatures_management (in_features, out_feature_class, {config_keyword}, {spatial_grid_1}, {spatial_grid_2}, {spatial_grid_3})"
