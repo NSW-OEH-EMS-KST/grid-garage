@@ -68,6 +68,10 @@ class ToAsciiRasterTool(BaseTool):
 
         ras_out = utils.make_table_name(ras, ws, "asc", self.output_filename_prefix, self.output_filename_suffix)
 
+        # hack, the name validation gets confused, need to fix the extension
+        if ras_out[-4:] == "_asc":
+            ras_out = ras_out[:-4] + ".asc"
+
         self.info("Converting {0} -->> {1} ...".format(ras, ras_out))
 
         arcpy.RasterToASCII_conversion(ras, ras_out)
