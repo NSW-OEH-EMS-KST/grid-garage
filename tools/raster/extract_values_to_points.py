@@ -1,5 +1,5 @@
 from base.base_tool import BaseTool
-from base.utils import make_vector_name, describe, get_search_cursor_rows, validate_geodata
+from base.utils import make_table_name, describe, get_search_cursor_rows, validate_geodata
 from base.decorators import input_tableview, input_output_table, parameter
 from arcpy.sa import ExtractValuesToPoints
 from arcpy import MakeFeatureLayer_management, Exists, Delete_management
@@ -99,7 +99,7 @@ class ExtractValuesToPointsRasterTool(BaseTool):
 
         ws = self.output_file_workspace or self.output_workspace
 
-        pts_out = make_vector_name(self.points, ws, "", self.output_filename_prefix, self.output_filename_suffix + "_{}".format(r_base))
+        pts_out = make_table_name(self.points, ws, "", self.output_filename_prefix, self.output_filename_suffix + "_{}".format(r_base))
 
         self.info("Extracting point values from {} to {}...".format(ras, pts_out))
 

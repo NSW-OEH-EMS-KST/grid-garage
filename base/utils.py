@@ -438,91 +438,97 @@ def parse_proj_string_for_name(proj_string):
 
 
 # @base.log.log_error
-def make_raster_name(like_name, out_wspace, ext='', prefix='', suffix=''):
+def make_table_name(like_name, out_wspace, ext, prefix='', suffix=''):
     """
 
     Returns:
         object:
     """
 
-    path, basename, r_name, r_ext = split_up_filename(like_name)
-
-    not_fs = not is_file_system(out_wspace)
-
-    if not_fs:
-        r_name = r_name + r_ext
-
-    ext = "" if (not_fs or ext == "Esri Grid") else ext
-
-    ext = "." + ext if (ext and ext[0] != ".") else ext
-
-    raster_name = ap.ValidateTableName(prefix + r_name + suffix, out_wspace)
-    raster_name = ap.CreateUniqueName(raster_name, out_wspace)
-
-    return os.path.join(out_wspace, raster_name + ext)
-
-
-# @base.log.log_error
-def make_table_name(like_name, out_wspace, ext='', prefix='', suffix=''):
-    """
-
-    Args:
-        like_name:
-        out_wspace:
-        ext:
-        prefix:
-        suffix:
-
-    Returns:
-
-    """
-
     path, basename, t_name, t_ext = split_up_filename(like_name)
 
-    not_fs = not is_file_system(out_wspace)
+    # if ext == '':
+    #     ext = t_ext
 
-    if not_fs:
-        t_name = t_name + t_ext
+    # not_fs = not is_file_system(out_wspace)
 
-    ext = "" if not_fs else ext
+    if not is_file_system(out_wspace):
+        t_name = prefix + t_name + suffix
+    else:
+        if ext:
+            if ext == "Esri Grid":
+                ext = ""
+            elif ext[0] != ".":
+                ext = "." + ext
+        t_name = prefix + t_name + suffix + ext
 
-    ext = "." + ext if (ext and ext[0] != ".") else ext
-
-    table_name = ap.ValidateTableName(prefix + t_name + suffix, out_wspace)
+    table_name = ap.ValidateTableName(t_name, out_wspace)
     table_name = ap.CreateUniqueName(table_name, out_wspace)
 
-    return os.path.join(out_wspace, table_name + ext)
+    return os.path.join(out_wspace, table_name)
 
 
-# @base.log.log_error
-def make_vector_name(like_name, out_wspace, ext='', prefix='', suffix=''):
-    """
+# # @base.log.log_error
+# def make_table_name(like_name, out_wspace, ext='', prefix='', suffix=''):
+#     """
+#
+#     Args:
+#         like_name:
+#         out_wspace:
+#         ext:
+#         prefix:
+#         suffix:
+#
+#     Returns:
+#
+#     """
+#
+#     path, basename, t_name, t_ext = split_up_filename(like_name)
+#
+#     not_fs = not is_file_system(out_wspace)
+#
+#     if not_fs:
+#         t_name = t_name + t_ext
+#
+#     ext = "" if not_fs else ext
+#
+#     ext = "." + ext if (ext and ext[0] != ".") else ext
+#
+#     table_name = ap.ValidateTableName(prefix + t_name + suffix, out_wspace)
+#     table_name = ap.CreateUniqueName(table_name, out_wspace)
+#
+#     return os.path.join(out_wspace, table_name + ext)
 
-    Args:
-        like_name:
-        out_wspace:
-        ext:
-        prefix:
-        suffix:
 
-    Returns:
-
-    """
-    path, basename, v_name, v_ext = split_up_filename(like_name)
-
-    not_fs = not is_file_system(out_wspace)
-
-    if not_fs:
-        v_name = v_name + v_ext
-
-    ext = "" if not_fs else ext
-
-    ext = "." + ext if (ext and ext[0] != ".") else ext
-
-    vector_name = ap.ValidateTableName(prefix + v_name + suffix, out_wspace)
-    vector_name = ap.CreateUniqueName(vector_name, out_wspace)
-
-    return os.path.join(out_wspace, vector_name + ext)
+# # @base.log.log_error
+# def make_table_name(like_name, out_wspace, ext='', prefix='', suffix=''):
+#     """
+#
+#     Args:
+#         like_name:
+#         out_wspace:
+#         ext:
+#         prefix:
+#         suffix:
+#
+#     Returns:
+#
+#     """
+#     path, basename, v_name, v_ext = split_up_filename(like_name)
+#
+#     not_fs = not is_file_system(out_wspace)
+#
+#     if not_fs:
+#         v_name = v_name + v_ext
+#
+#     ext = "" if not_fs else ext
+#
+#     ext = "." + ext if (ext and ext[0] != ".") else ext
+#
+#     vector_name = ap.ValidateTableName(prefix + v_name + suffix, out_wspace)
+#     vector_name = ap.CreateUniqueName(vector_name, out_wspace)
+#
+#     return os.path.join(out_wspace, vector_name + ext)
 
 
 # @base.log.log_error

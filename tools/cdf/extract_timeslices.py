@@ -4,7 +4,7 @@ from netCDF4 import Dataset
 import numpy as np
 import pandas as pd
 import arcpy
-from base.utils import validate_geodata, make_raster_name, raster_formats
+from base.utils import validate_geodata, make_table_name, raster_formats
 from os.path import join
 from math import cos, sin, atan2, asin, radians, degrees
 
@@ -228,7 +228,7 @@ def make_name(cdf, dimval, ws, fmt, pfx, sfx):
 
     likename = "{}_{}".format(cdf.replace(".", "_"), dimval)
 
-    return make_raster_name(likename, ws, fmt, pfx, sfx)
+    return make_table_name(likename, ws, fmt, pfx, sfx)
 
 
 def sanitise_dimension(d):

@@ -86,7 +86,7 @@ class CopyRasterTool(BaseTool):
 
         ws = self.output_file_workspace or self.output_workspace
 
-        ras_out = utils.make_raster_name(ras, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+        ras_out = utils.make_table_name(ras, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
 
         self.info("Copying {0} -->> {1} ...".format(ras, ras_out))
         # arcpy.CopyRaster_management(ras, ras_out, self.config_keyword, self.background_value, self.nodata_value, self.onebit_to_eightbit, self.colormap_to_RGB, self.pixel_type, self.scale_pixel_value, self.RGB_to_Colormap, self.raster_format, self.transform)
@@ -96,7 +96,7 @@ class CopyRasterTool(BaseTool):
                 try:
                     band = "Band_{}".format(band)
                     rasband = join(ras, band)
-                    ras_out = utils.make_raster_name(ras, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix + "_{}".format(band))
+                    ras_out = utils.make_table_name(ras, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix + "_{}".format(band))
                     self.info(band)
                     self.info(rasband)
                     self.info(ras_out)
@@ -107,7 +107,7 @@ class CopyRasterTool(BaseTool):
                     self.result.add_fail(data)
         else:
             try:
-                ras_out = utils.make_raster_name(ras, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+                ras_out = utils.make_table_name(ras, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
                 arcpy.CopyRaster_management(ras, ras_out, self.config_keyword, self.background_value, self.nodata_value, self.onebit_to_eightbit, self.colormap_to_RGB, self.pixel_type, self.scale_pixel_value, self.RGB_to_Colormap, None, self.transform)
                 self.result.add_pass({"raster": ras_out, "source_geodata": ras})
             except:

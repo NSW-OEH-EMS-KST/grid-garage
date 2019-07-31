@@ -2,7 +2,7 @@ from base.base_tool import BaseTool
 from base.decorators import input_tableview, input_output_table, parameter
 # from netCDF4 import Dataset
 import arcpy
-from base.utils import validate_geodata, make_raster_name, raster_formats2
+from base.utils import validate_geodata, make_table_name, raster_formats2
 import numpy as np
 
 

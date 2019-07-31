@@ -1,6 +1,6 @@
 from base.base_tool import BaseTool
 
-from base.utils import raster_formats, resample_methods, validate_geodata, make_raster_name, get_transformation
+from base.utils import raster_formats, resample_methods, validate_geodata, make_table_name, get_transformation
 from base.decorators import input_tableview, input_output_table, parameter
 import arcpy
 
@@ -90,7 +90,7 @@ class ReprojectRasterTool(BaseTool):
 
         ws = self.output_file_workspace or self.output_workspace
 
-        r_out = make_raster_name(r_in, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
+        r_out = make_table_name(r_in, ws, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
 
         tx = get_transformation(r_in, self.output_cs, self.overrides)
 
