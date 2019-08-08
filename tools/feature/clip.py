@@ -77,6 +77,6 @@ class ClipFeatureTool(BaseTool):
         self.info("Clipping {0} -->> {1} ...".format(fc, fc_out))
         arcpy.Clip_analysis(fc, self.clip_features, fc_out, self.xy_tolerance)
 
-        return {"geodata": fc_out, "source_geodata": fc}
+        return {"feature": fc_out, "source_geodata": fc}
 
 # "http://desktop.arcgis.com/en/arcmap/latest/tools/analysis-toolbox/clip.htm"
