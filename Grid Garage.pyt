@@ -34,7 +34,8 @@ from tools.raster.reclass_by_threshold import ReclassByThresholdRasterTool
 from tools.raster.extract_values_to_points import ExtractValuesToPointsRasterTool
 from tools.raster.lookup_by_table import LookupByTableRasterTool
 from tools.raster.slice import SliceRasterTool
-from tools.raster.zonal_stats_as_table import ZonalStatisticsAsTableTool
+from tools.raster.assign_value_to_no_data import AssignValueToNodataRasterTool
+# from tools.raster.zonal_stats_as_table import ZonalStatisticsAsTableTool
 # from tools.raster.properties import BandPropertiesRasterTool
 from tools.raster.reclass_by_table import ReclassByTableRasterTool
 from tools.raster.reproject import ReprojectRasterTool
@@ -81,6 +82,7 @@ class Toolbox(object):
                                     TabulateIntersectionTool]))
 
         raster_tools = set(sorted([AggregateRasterTool,
+                                   AssignValueToNodataRasterTool,
                                    DescribeRasterTool,
                                    BlockStatisticsRasterTool,
                                    BuildAttributeTableRasterTool,
@@ -93,7 +95,7 @@ class Toolbox(object):
                                    ReclassByThresholdRasterTool,
                                    ResampleRasterTool,
                                    SearchRastersTool,
-                                   SetNodataValueRasterTool,
+                                   AssignValueToNodataRasterTool,
                                    SetValueToNullRasterTool,
                                    SliceRasterTool,
                                    ToAsciiRasterTool,
