@@ -177,7 +177,16 @@ class GgResult(object):
 
         # write the header on first call
         if not os.path.isfile(self.fail_csv):
-            setattr(self, "failure_fieldnames", ["geodata", "failure", "row_data"])
+            geodata_type = "geodata"  # default
+            other_types = ["table", "feature", "raster"]
+            row_keys = row.keys()
+            for k in row_keys:
+                if k in other_types:
+                    geodata_type = k
+                    break
+
+            setattr(self, "failure_fieldnames", [geodata_type, "failure", "row_data"])
+            setattr(self, "geodata_type", geodata_type)
             with open(self.fail_csv, "wb") as csv_file:
                 writer = csv.DictWriter(csv_file, delimiter=',', lineterminator='\n', fieldnames=self.failure_fieldnames)
                 writer.writeheader()
@@ -189,24 +198,12 @@ class GgResult(object):
         # tbinfo + str(exc_info()[1])
         msg = msg.strip().replace('\n', ', ').replace('\r', ' ').replace('  ', ' ')
 
-        geodata = row.values()[0]  #row[0]
-
-        # try:
-        #     geodata = row["raster"]
-        # except KeyError:
-        #     try:
-        #         geodata = row["feature"]
-        #     except KeyError:
-        #         try:
-        #             geodata = row["geodata"]
-        #         except KeyError:
-        #             try:
-        #             geodata = "geodata not set for row"
+        geodata = row[self.geodata_type]
 
         # write the failure record
         with open(self.fail_csv, "ab") as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames=self.failure_fieldnames)
-            writer.writerow({"geodata": geodata, "failure": msg, "row_data": str(row)})
+            writer.writerow({self.geodata_type: geodata, "failure": msg, "row_data": str(row)})
             self.fail_count += 1
 
         self.logger.info("Fail written: {}".format(msg))
