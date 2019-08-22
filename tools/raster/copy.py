@@ -90,7 +90,8 @@ class CopyRasterTool(BaseTool):
 
         self.info("Copying {0} -->> {1} ...".format(ras, ras_out))
         # arcpy.CopyRaster_management(ras, ras_out, self.config_keyword, self.background_value, self.nodata_value, self.onebit_to_eightbit, self.colormap_to_RGB, self.pixel_type, self.scale_pixel_value, self.RGB_to_Colormap, self.raster_format, self.transform)
-
+        # 10.3
+        # CopyRaster_management(in_raster, out_rasterdataset, {config_keyword}, {background_value}, {nodata_value}, {onebit_to_eightbit}, {colormap_to_RGB}, {pixel_type}, {scale_pixel_value}, {RGB_to_Colormap})
         if self.bands:
             for band in self.bands:
                 try:
@@ -108,7 +109,7 @@ class CopyRasterTool(BaseTool):
         else:
             try:
                 ras_out = utils.make_table_name(ras, self.output_file_workspace, self.raster_format, self.output_filename_prefix, self.output_filename_suffix)
-                arcpy.CopyRaster_management(ras, ras_out, self.config_keyword, self.background_value, self.nodata_value, self.onebit_to_eightbit, self.colormap_to_RGB, self.pixel_type, self.scale_pixel_value, self.RGB_to_Colormap, None, self.transform)
+                arcpy.CopyRaster_management(ras, ras_out, self.config_keyword, self.background_value, self.nodata_value, self.onebit_to_eightbit, self.colormap_to_RGB, self.pixel_type, self.scale_pixel_value, self.RGB_to_Colormap)
                 self.result.add_pass({"raster": ras_out, "source_geodata": ras})
             except:
                 self.result.add_fail(data)
