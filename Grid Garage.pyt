@@ -50,7 +50,7 @@ from tools.raster.values_at_points import ValuesAtPointsRasterTool
 # cdf tools
 from tools.cdf.describe_cdf import DescribeCdfTool
 # from tools.cdf.to_standard_grid import ToStandardGridCdfTool
-from tools.cdf.extract_timeslices import ExtractTimeslicesCdfTool
+#from tools.cdf.extract_timeslices import ExtractTimeslicesCdfTool
 # from tools.cdf.export_cdf import ExportCdfTool
 from tools.cdf.search_cdf import SearchCdfTool
 
@@ -111,8 +111,8 @@ class Toolbox(object):
                                      ExportXmlMetadataTool]))
 
         cdf_tools = set(sorted([SearchCdfTool,
-                                DescribeCdfTool,
-                                ExtractTimeslicesCdfTool]))
+                                DescribeCdfTool]))
+                                # ExtractTimeslicesCdfTool]))
 
         # ToStandardGridCdfTool,
         # ExportCdfTool]
